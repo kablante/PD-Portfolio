@@ -72,10 +72,17 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
 .kb-project-card__img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;-webkit-user-drag:none;user-select:none}
 .kb-project-card__grain{position:absolute;inset:0;background-image:var(--grain-url);opacity:.35;mix-blend-mode:overlay;pointer-events:none;z-index:0}
 .kb-project-card__scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(13,3,66,0) 30%,rgba(13,3,66,.88) 100%);z-index:0}
-/* Holographic glare: a soft highlight that follows the cursor, faded in
-   only while hovering — this is the "brilho de carta física". */
-.kb-project-card__glare{position:absolute;inset:0;z-index:2;opacity:0;pointer-events:none;transition:opacity 300ms ease-out;background:radial-gradient(circle at var(--pointer-x,50%) var(--pointer-y,50%),rgba(255,255,255,.55),rgba(255,255,255,0) 55%)}
-.kb-project-card:hover .kb-project-card__glare{opacity:.5}
+/* Holographic glare: a soft, colorful highlight that follows the cursor
+   (--pointer-x/--pointer-y, set by initCardTilt in site.js), faded in only
+   while hovering — the "brilho de carta física". Uses the site's own
+   palette (tokens.css) instead of an arbitrary hue cycle. */
+.kb-project-card__glare{position:absolute;inset:0;z-index:2;opacity:0;pointer-events:none;mix-blend-mode:overlay;transition:opacity 300ms ease-out;background:radial-gradient(circle at var(--pointer-x,50%) var(--pointer-y,50%),var(--kb-cyan) 0%,var(--kb-lavender) 35%,var(--kb-magenta) 60%,transparent 75%)}
+.kb-project-card:hover .kb-project-card__glare{opacity:.6}
+/* Holographic edge: same pointer-tracked spotlight, but masked down to a
+   thin bright ring right on the card's border — like foil catching light
+   at the edge of a trading card. */
+.kb-project-card__glare-ring{position:absolute;inset:0;z-index:3;padding:3px;border-radius:inherit;opacity:0;pointer-events:none;transition:opacity 300ms ease-out;background:radial-gradient(160px 160px at var(--pointer-x,50%) var(--pointer-y,50%),var(--kb-white) 0%,var(--kb-cyan) 35%,var(--kb-magenta) 65%,transparent 80%);filter:brightness(1.7);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.kb-project-card:hover .kb-project-card__glare-ring{opacity:.85}
 .kb-project-card__title{position:relative;z-index:1;display:block;font-family:var(--font-display);font-size:22px;line-height:1.05;color:var(--text-strong)}
 .kb-project-card__desc{position:relative;z-index:1;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;margin-top:8px;font-size:13px;line-height:1.45;font-weight:300;color:rgba(255,255,255,.82)}
 
