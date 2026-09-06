@@ -105,9 +105,10 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
 /* ---------- Nav/footer bar ----------
    Fixed to the bottom of the home screen, fixed to the top everywhere
    else — it's the persistent piece of chrome on every page. */
-.kb-footerbar{position:fixed;left:0;right:0;z-index:20;height:64px;background:var(--kb-void);display:flex;align-items:center;gap:16px;padding:0 19px}
-.kb-footerbar--bottom{bottom:0;border-top:1px solid var(--border-hairline)}
-.kb-footerbar--top{top:0;border-bottom:1px solid var(--border-hairline)}
+.kb-footerbar{position:fixed;left:0;right:0;z-index:20;height:64px;display:flex;align-items:center;gap:16px;padding:0 19px;background:var(--surface-glass);backdrop-filter:blur(var(--blur-glass));-webkit-backdrop-filter:blur(var(--blur-glass))}
+.kb-footerbar::after{content:"";position:absolute;inset:0;pointer-events:none;background-image:var(--grain-url);opacity:var(--grain-opacity);mix-blend-mode:overlay}
+.kb-footerbar--bottom{bottom:0;border-top:1px solid var(--border-soft)}
+.kb-footerbar--top{top:0;border-bottom:1px solid var(--border-soft)}
 .kb-footerbar__logo{all:unset;cursor:pointer;flex:none;display:flex;align-items:center;margin-right:8px}
 .kb-footerbar__logo img{display:block;width:auto;height:46px}
 .kb-footerbar__actions{flex:none;display:flex;align-items:center;gap:8px;--control-height:36px;--border-hairline:#aeaeae;--surface-card:transparent;color:#e9e9e9}
