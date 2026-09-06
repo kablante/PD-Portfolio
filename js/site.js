@@ -43,9 +43,17 @@
   function initCardTilt() {
     var cards = Array.prototype.slice.call(document.querySelectorAll(".kb-home-cards__row .kb-project-card"));
     if (!cards.length) return;
-    cards.forEach(function (card) {
+    cards.forEach(function (card, i) {
       var tilt = card.querySelector(".kb-project-card__tilt");
       if (!tilt) return;
+      card.addEventListener("mouseenter", function () {
+        // The cards don't overlap, so "making room" is a real width change:
+        // this card grows (via :hover in CSS) while every sibling shrinks,
+        // and the flex row redistributes the space between them.
+        cards.forEach(function (other, j) {
+          if (j !== i) other.classList.add("kb-neighbor-shrink");
+        });
+      });
       card.addEventListener("mousemove", function (e) {
         var rect = card.getBoundingClientRect();
         var relX = (e.clientX - rect.left) / rect.width;
@@ -58,6 +66,9 @@
       });
       card.addEventListener("mouseleave", function () {
         tilt.style.transform = "perspective(800px)";
+        cards.forEach(function (other) {
+          other.classList.remove("kb-neighbor-shrink");
+        });
       });
     });
   }
