@@ -34,8 +34,27 @@
     });
   }
 
+  function initCardFan() {
+    var cards = Array.prototype.slice.call(document.querySelectorAll(".kb-home-cards__row .kb-project-card"));
+    if (!cards.length) return;
+    cards.forEach(function (card, i) {
+      card.addEventListener("mouseenter", function () {
+        cards.forEach(function (other, j) {
+          if (j < i) other.classList.add("kb-push-left");
+          else if (j > i) other.classList.add("kb-push-right");
+        });
+      });
+      card.addEventListener("mouseleave", function () {
+        cards.forEach(function (other) {
+          other.classList.remove("kb-push-left", "kb-push-right");
+        });
+      });
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     initLangSwitch();
     initDownloadCv();
+    initCardFan();
   });
 })();
