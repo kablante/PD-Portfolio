@@ -1,0 +1,88 @@
+/* Katarina Blante — site layout (home / about / project pages, footer nav, aurora bg, language toggle) */
+
+html,body{height:100%}
+body{overflow-x:hidden}
+
+.kb-page{position:relative;min-height:100vh;display:flex;flex-direction:column;font-family:var(--font-body);color:var(--text-body)}
+
+/* ---------- Fixed aurora background ---------- */
+.kb-bg{position:fixed;inset:0;z-index:0;pointer-events:none}
+.kb-aurora{position:relative;isolation:isolate;overflow:hidden;background:var(--surface-page);width:100%;height:100%}
+.kb-aurora__mesh{position:absolute;inset:-20%;background:var(--gradient-mesh);filter:blur(var(--blur-field));opacity:.55;animation:kb-drift var(--duration-drift) var(--ease-drift) infinite alternate}
+.kb-aurora__stars{position:absolute;inset:0;background-repeat:repeat;opacity:.7}
+.kb-aurora__grain{position:absolute;inset:0;background-image:var(--grain-url);opacity:var(--grain-opacity);mix-blend-mode:overlay;pointer-events:none}
+
+@keyframes kb-drift{from{transform:translate3d(-2%,-1%,0) scale(1.05)}to{transform:translate3d(3%,2%,0) scale(1.14)}}
+@keyframes kb-rise-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@media (prefers-reduced-motion:reduce){.kb-aurora__mesh{animation:none}}
+
+/* ---------- Language toggle (bilingual content) ----------
+   Every bilingual pair is two bare `<span data-lang="…">` text runs with no
+   other class, so a single specificity level handles them everywhere —
+   headings/paragraphs get their block layout from their own tag, this only
+   ever toggles the inline text run inside. */
+[data-lang="pt"]{display:none}
+html[data-active-lang="pt"] [data-lang="en"]{display:none}
+html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
+
+/* ---------- Home ---------- */
+.kb-home-cards{flex:none;overflow:hidden;padding-top:clamp(48px,8vh,96px)}
+.kb-home-cards__row{display:flex;justify-content:center;align-items:flex-start;gap:10px;padding:0 clamp(20px,4vw,40px);max-width:1800px;margin:0 auto}
+
+.kb-project-card{all:unset;box-sizing:border-box;cursor:pointer;flex:1 1 0;min-width:0;max-width:349px;height:56vh;margin-top:var(--card-mt,0);border-radius:30px;background:#e9e9e9;box-shadow:0px 6px 30px 10px rgba(0,0,0,.3);transform:rotate(var(--card-rot,0deg));transform-origin:50% 0;transition:transform 240ms cubic-bezier(.22,.61,.36,1);display:flex;flex-direction:column;justify-content:flex-end;padding:28px}
+.kb-project-card:hover{transform:rotate(var(--card-rot,0deg)) translateY(22px)}
+.kb-project-card__eyebrow{display:block;font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;color:rgba(13,3,66,.55)}
+.kb-project-card__title{display:block;margin-top:8px;font-family:var(--font-display);font-size:26px;line-height:1.05;color:#0d0342}
+
+.kb-hero-lockup{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(20px,4vh,56px);padding:clamp(16px,3vh,48px) clamp(24px,5vw,64px)}
+.kb-hero-lockup img{display:block;width:min(78vw,970px);max-height:26vh;height:auto;object-fit:contain}
+
+/* ---------- About / Project shared content column ---------- */
+.kb-content{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:clamp(56px,7vw,104px) clamp(24px,5vw,64px) clamp(72px,9vw,120px);animation:kb-rise-in 480ms cubic-bezier(.22,.61,.36,1) both;flex:1}
+.kb-back-link{all:unset;cursor:pointer;font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--kb-cyan);display:inline-block}
+.kb-back-link:hover{color:var(--kb-butter)}
+
+/* About */
+.kb-about-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:clamp(32px,5vw,64px);margin-top:32px;align-items:start}
+.kb-about-eyebrow{display:block;font-family:var(--font-mono);font-size:12px;letter-spacing:.16em;color:var(--kb-lavender)}
+.kb-about-grid h1{font-family:var(--font-display);font-size:clamp(40px,6vw,76px);line-height:1;color:var(--text-strong);margin:16px 0 0;text-wrap:pretty}
+.kb-about-grid p{font-size:18px;line-height:1.6;font-weight:300;color:var(--text-body);max-width:64ch;margin:16px 0 0;text-wrap:pretty}
+.kb-about-grid p:first-of-type{margin-top:24px}
+.kb-hand-note{display:block;font-family:var(--font-hand);font-size:34px;color:var(--kb-butter);margin-top:32px}
+.kb-about-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:32px}
+.kb-portrait-slot{border-radius:16px;border:1px solid var(--border-hairline);background:var(--gradient-nebula);height:clamp(320px,42vw,520px);display:flex;align-items:flex-end;padding:20px}
+.kb-slot-label{font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;color:rgba(255,255,255,.72)}
+
+/* Project */
+.kb-project-meta{display:block;font-family:var(--font-mono);font-size:12px;letter-spacing:.16em;color:var(--kb-lavender);margin-top:32px}
+.kb-project-title{font-family:var(--font-display);font-size:clamp(40px,6.4vw,84px);line-height:1;color:var(--text-strong);margin:16px 0 0;max-width:20ch;text-wrap:pretty}
+.kb-project-lede{font-size:20px;line-height:1.55;font-weight:300;color:var(--text-body);max-width:64ch;margin:24px 0 0;text-wrap:pretty}
+.kb-project-shot{border-radius:16px;border:1px solid var(--border-hairline);background:var(--gradient-nebula);height:clamp(240px,34vw,460px);margin-top:clamp(32px,4vw,56px);display:flex;align-items:flex-end;padding:20px}
+.kb-project-blocks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:clamp(24px,4vw,48px);margin-top:clamp(40px,5vw,72px)}
+.kb-project-blocks h2{font-family:var(--font-display);font-size:26px;line-height:1.1;color:var(--text-strong);margin:0}
+.kb-project-blocks p{font-size:17px;line-height:1.6;font-weight:300;color:var(--text-body);margin:12px 0 0;text-wrap:pretty}
+.kb-project-stats{display:flex;flex-wrap:wrap;gap:clamp(24px,5vw,72px);margin-top:clamp(40px,5vw,72px);padding-top:32px;border-top:1px solid var(--border-hairline)}
+.kb-project-stats__value{display:block;font-family:var(--font-display);font-size:44px;line-height:1;color:var(--kb-butter)}
+.kb-project-stats__label{display:block;font-size:14px;color:var(--text-muted);margin-top:8px}
+.kb-project-actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:clamp(40px,5vw,72px)}
+
+/* ---------- Footer nav bar (present on every page) ---------- */
+.kb-footerbar{position:relative;z-index:10;flex:none;height:64px;background:var(--kb-void);display:flex;align-items:center;gap:16px;padding:0 19px;border-top:1px solid var(--border-hairline)}
+.kb-footerbar__logo{all:unset;cursor:pointer;flex:none;display:flex;align-items:center;margin-right:8px}
+.kb-footerbar__logo img{display:block;width:auto;height:46px}
+.kb-footerbar__actions{flex:none;display:flex;align-items:center;gap:8px;--control-height:36px;--border-hairline:#aeaeae;--surface-card:transparent;color:#e9e9e9}
+
+.kb-lang-switch{position:relative;width:80px;height:36px;border-radius:30px;box-shadow:inset 0 0 0 1px #aeaeae;flex:none;background:none;border:0;padding:0}
+.kb-lang-switch__knob{position:absolute;top:0;left:0;width:43px;height:36px;border-radius:30px;background:var(--kb-blush);transition:transform 240ms cubic-bezier(.22,.61,.36,1);transform:translateX(0)}
+html[data-active-lang="pt"] .kb-lang-switch__knob{transform:translateX(37px)}
+.kb-lang-switch button{all:unset;cursor:pointer;position:absolute;top:0;width:43px;height:36px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:500;color:#aeaeae}
+.kb-lang-switch button[data-lang-btn="en"]{left:0;color:#0d0342}
+.kb-lang-switch button[data-lang-btn="pt"]{right:0}
+html[data-active-lang="pt"] .kb-lang-switch button[data-lang-btn="en"]{color:#aeaeae}
+html[data-active-lang="pt"] .kb-lang-switch button[data-lang-btn="pt"]{color:#0d0342}
+
+.kb-footerbar__copy{flex:1;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:clamp(12px,1.3vw,18px);color:#3f9bd8}
+
+@media (max-width:640px){
+  .kb-footerbar__copy{display:none}
+}
