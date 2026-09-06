@@ -62,9 +62,44 @@
     });
   }
 
+  // Confirmed from Aave's own DevTools (inline style on .styles_cardWrapper
+  // caught mid-transition): on hover the card's lean animates back to
+  // upright while it scales up, e.g. rotateZ(2.596deg) -> scale(1.025),
+  // over ~0.8s ease-out, reversing on mouseleave. That's a Web Animations
+  // API call (DevTools reports it as a "Script Animation", not CSS), so it
+  // runs here rather than as a CSS transition.
+  var HOVER_SCALE = 1.025;
+  var HOVER_DURATION = 800;
+
+  function initCardHoverStraighten() {
+    var cards = Array.prototype.slice.call(document.querySelectorAll(".kb-home-cards__row .kb-project-card"));
+    if (!cards.length) return;
+    cards.forEach(function (card) {
+      var rot = parseFloat(getComputedStyle(card).getPropertyValue("--card-rot")) || 0;
+      var restTransform = "rotate(" + rot + "deg) scale(1)";
+      var hoverTransform = "rotate(0deg) scale(" + HOVER_SCALE + ")";
+      var current = null;
+      card.addEventListener("mouseenter", function () {
+        if (current) current.cancel();
+        current = card.animate(
+          [{ transform: restTransform }, { transform: hoverTransform }],
+          { duration: HOVER_DURATION, easing: "ease-out", fill: "both" }
+        );
+      });
+      card.addEventListener("mouseleave", function () {
+        if (current) current.cancel();
+        current = card.animate(
+          [{ transform: hoverTransform }, { transform: restTransform }],
+          { duration: HOVER_DURATION, easing: "ease-out", fill: "both" }
+        );
+      });
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     initLangSwitch();
     initDownloadCv();
     initCardTilt();
+    initCardHoverStraighten();
   });
 })();
