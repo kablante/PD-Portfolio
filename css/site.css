@@ -76,7 +76,7 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
 /* Holographic glare: a soft cyan highlight that follows the cursor
    (--pointer-x/--pointer-y, set by initCardTilt in site.js), faded in only
    while hovering — the "brilho de carta física". */
-.kb-project-card__glare{position:absolute;inset:0;z-index:2;opacity:0;pointer-events:none;mix-blend-mode:hard-light;transition:opacity 300ms ease-out;background:radial-gradient(circle at var(--pointer-x,50%) var(--pointer-y,50%),var(--kb-butter) 0%,transparent 75%)}
+.kb-project-card__glare{position:absolute;inset:0;z-index:2;opacity:0;pointer-events:none;mix-blend-mode:overlay;transition:opacity 300ms ease-out;background:radial-gradient(circle at var(--pointer-x,50%) var(--pointer-y,50%),var(--kb-butter) 0%,transparent 75%)}
 .kb-project-card:hover .kb-project-card__glare{opacity:.6}
 /* Holographic edge: same pointer-tracked spotlight, but masked down to a
    thin bright ring right on the card's border — like foil catching light
