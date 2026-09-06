@@ -188,10 +188,74 @@
     });
   }
 
+  // Site-wide cursor spotlight: a soft light patch that follows the mouse
+  // on every page, like a flashlight over the dark aurora background.
+  // Injected as a canvas rather than markup so it applies everywhere
+  // without touching any page's HTML.
+  var SPOTLIGHT_RADIUS = 220;
+  var SPOTLIGHT_BRIGHTNESS = 0.14;
+  var SPOTLIGHT_COLOR = "#48f7fa"; // --kb-cyan
+
+  function hexToRgb(hex) {
+    var n = parseInt(hex.slice(1), 16);
+    return ((n >> 16) & 255) + "," + ((n >> 8) & 255) + "," + (n & 255);
+  }
+
+  function initCursorSpotlight() {
+    if (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) return;
+
+    var canvas = document.createElement("canvas");
+    canvas.setAttribute("aria-hidden", "true");
+    canvas.style.position = "fixed";
+    canvas.style.inset = "0";
+    canvas.style.width = "100%";
+    canvas.style.height = "100%";
+    canvas.style.pointerEvents = "none";
+    canvas.style.zIndex = "9999";
+    document.body.appendChild(canvas);
+
+    var ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    var mouseX = -1000;
+    var mouseY = -1000;
+    var rgb = hexToRgb(SPOTLIGHT_COLOR);
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (mouseX !== -1000) {
+        var gradient = ctx.createRadialGradient(mouseX, mouseY, 0, mouseX, mouseY, SPOTLIGHT_RADIUS);
+        gradient.addColorStop(0, "rgba(" + rgb + "," + SPOTLIGHT_BRIGHTNESS + ")");
+        gradient.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+      requestAnimationFrame(draw);
+    }
+
+    resize();
+    window.addEventListener("resize", resize);
+    window.addEventListener("mousemove", function (e) {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    });
+    window.addEventListener("mouseleave", function () {
+      mouseX = -1000;
+      mouseY = -1000;
+    });
+    requestAnimationFrame(draw);
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     initLangSwitch();
     initDownloadCv();
     initCardTilt();
     initCardSpread();
+    initCursorSpotlight();
   });
 })();
