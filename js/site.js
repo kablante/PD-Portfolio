@@ -62,37 +62,129 @@
     });
   }
 
-  // Confirmed from Aave's own DevTools (inline style on .styles_cardWrapper
-  // caught mid-transition): on hover the card's lean animates back to
-  // upright while it scales up, e.g. rotateZ(2.596deg) -> scale(1.025),
-  // over ~0.8s ease-out, reversing on mouseleave. That's a Web Animations
-  // API call (DevTools reports it as a "Script Animation", not CSS), so it
-  // runs here rather than as a CSS transition.
-  var HOVER_SCALE = 1.025;
-  var HOVER_DURATION = 800;
+  // Reverse-engineered from Aave's own bundled source (their card-spread
+  // component, module 46518): hovering or focusing card h re-targets every
+  // card i by delta = i - h. The hovered card straightens and scales up;
+  // its neighbors get pushed by an amount inversely proportional to their
+  // distance from it (closer neighbors move much more than far ones), each
+  // side with a different constant, plus a small extra lean. There's no
+  // z-index change anywhere in their source — the "swallow" look comes
+  // purely from a near neighbor sliding, via its larger translateX, past
+  // and underneath a farther neighbor that barely moved (DOM order alone
+  // decides who's on top, same as our own card order).
+  //
+  // Their x values are percentages of the animated element's own width
+  // (a fixed 275px there); ours is decoupled from the slot (see the CSS
+  // comment on .kb-project-card), so the percentages here are read against
+  // .kb-project-card__tilt's actual width instead, converted to px.
+  //
+  // Their transition is Motion's `{type:"spring",bounce:0,duration:.3}` —
+  // a critically damped spring. CSS/WAAPI have no native spring easing, so
+  // it's reproduced with a small spring stepper below, using Motion's own
+  // initial-guess formula for a bounce:0 spring's angular frequency,
+  // omega = 5 / duration, which is exact for the critically damped case.
+  var REST_ROTATION_FALLBACK = 0;
+  var RIGHT_SPREAD_PCT = 33.9757; // Aave's flat constant for viewport >=1082px
+  var LEFT_SPREAD_PCT = 5;
+  var ROTATE_STEP_DEG = 2.5;
+  var ACTIVE_SCALE = 1.025;
+  var SPRING_OMEGA = 5 / 0.3; // duration 0.3s, bounce 0
 
-  function initCardHoverStraighten() {
-    var cards = Array.prototype.slice.call(document.querySelectorAll(".kb-home-cards__row .kb-project-card"));
+  function initCardSpread() {
+    var row = document.querySelector(".kb-home-cards__row");
+    if (!row) return;
+    var cards = Array.prototype.slice.call(row.querySelectorAll(".kb-project-card"));
     if (!cards.length) return;
-    cards.forEach(function (card) {
-      var rot = parseFloat(getComputedStyle(card).getPropertyValue("--card-rot")) || 0;
-      var restTransform = "rotate(" + rot + "deg) scale(1)";
-      var hoverTransform = "rotate(0deg) scale(" + HOVER_SCALE + ")";
-      var current = null;
-      card.addEventListener("mouseenter", function () {
-        if (current) current.cancel();
-        current = card.animate(
-          [{ transform: restTransform }, { transform: hoverTransform }],
-          { duration: HOVER_DURATION, easing: "ease-out", fill: "both" }
-        );
+
+    var restRotation = cards.map(function (card) {
+      return parseFloat(getComputedStyle(card).getPropertyValue("--card-rot")) || REST_ROTATION_FALLBACK;
+    });
+    var tilts = cards.map(function (card) {
+      return card.querySelector(".kb-project-card__tilt");
+    });
+    var springs = cards.map(function (_, i) {
+      return { x: 0, rot: restRotation[i], scale: 1, vx: 0, vrot: 0, vscale: 0 };
+    });
+    var targets = cards.map(function (_, i) {
+      return { x: 0, rot: restRotation[i], scale: 1 };
+    });
+    var activeIndex; // undefined = nothing hovered/focused
+    var rafId = null;
+    var lastTime = null;
+
+    function recomputeTargets() {
+      cards.forEach(function (card, i) {
+        if (activeIndex === undefined) {
+          targets[i] = { x: 0, rot: restRotation[i], scale: 1 };
+          return;
+        }
+        var delta = i - activeIndex;
+        if (delta === 0) {
+          targets[i] = { x: 0, rot: 0, scale: ACTIVE_SCALE };
+          return;
+        }
+        var distance = Math.abs(delta);
+        if (delta < 0) {
+          targets[i] = {
+            x: -LEFT_SPREAD_PCT / distance,
+            rot: restRotation[i] - ROTATE_STEP_DEG / distance,
+            scale: 1
+          };
+        } else {
+          var wrapCorrection = delta === cards.length - 1 ? 0.25 : 1;
+          targets[i] = {
+            x: (RIGHT_SPREAD_PCT / distance) * wrapCorrection,
+            rot: restRotation[i] + ROTATE_STEP_DEG / distance,
+            scale: 1
+          };
+        }
       });
-      card.addEventListener("mouseleave", function () {
-        if (current) current.cancel();
-        current = card.animate(
-          [{ transform: hoverTransform }, { transform: restTransform }],
-          { duration: HOVER_DURATION, easing: "ease-out", fill: "both" }
-        );
+    }
+
+    function step(now) {
+      if (lastTime === null) lastTime = now;
+      var dt = Math.min((now - lastTime) / 1000, 1 / 30);
+      lastTime = now;
+      var settled = true;
+
+      cards.forEach(function (card, i) {
+        var s = springs[i];
+        var t = targets[i];
+        ["x", "rot", "scale"].forEach(function (key) {
+          var vKey = "v" + key;
+          var accel = -SPRING_OMEGA * SPRING_OMEGA * (s[key] - t[key]) - 2 * SPRING_OMEGA * s[vKey];
+          s[vKey] += accel * dt;
+          s[key] += s[vKey] * dt;
+          if (Math.abs(s[key] - t[key]) > (key === "scale" ? 0.0005 : 0.01) || Math.abs(s[vKey]) > (key === "scale" ? 0.0005 : 0.01)) {
+            settled = false;
+          }
+        });
+        var tiltWidth = tilts[i] ? tilts[i].offsetWidth : 0;
+        var px = (s.x / 100) * tiltWidth;
+        card.style.transform = "translateX(" + px.toFixed(2) + "px) rotate(" + s.rot.toFixed(3) + "deg) scale(" + s.scale.toFixed(4) + ")";
       });
+
+      if (!settled) {
+        rafId = requestAnimationFrame(step);
+      } else {
+        rafId = null;
+        lastTime = null;
+      }
+    }
+
+    function kick() {
+      recomputeTargets();
+      if (rafId === null) {
+        lastTime = null;
+        rafId = requestAnimationFrame(step);
+      }
+    }
+
+    cards.forEach(function (card, i) {
+      card.addEventListener("mouseenter", function () { activeIndex = i; kick(); });
+      card.addEventListener("mouseleave", function () { activeIndex = undefined; kick(); });
+      card.addEventListener("focus", function () { activeIndex = i; kick(); });
+      card.addEventListener("blur", function () { activeIndex = undefined; kick(); });
     });
   }
 
@@ -100,6 +192,6 @@
     initLangSwitch();
     initDownloadCv();
     initCardTilt();
-    initCardHoverStraighten();
+    initCardSpread();
   });
 })();
