@@ -44,12 +44,15 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
 /* Matches the real Aave "Working at" component (pulled from its rendered
    DOM): cards sit side by side with normal gaps, not overlapping — each
    just carries its own small, near-random lean (--card-rot, copied from
-   Aave's own inline rotateZ values). The outer <a> owns that static lean;
-   the inner .kb-project-card__tilt owns the pointer-tracked 3D tilt, kept
-   on a separate layer so the two transforms never fight each other.
-   Box-shadow never changes between states — no hover glow. */
-.kb-project-card{all:unset;box-sizing:border-box;cursor:pointer;position:relative;overflow:hidden;flex:1 1 0;min-width:0;max-width:220px;height:min(56vh,420px);border-radius:30px;background:#e9e9e9;box-shadow:0px 6px 30px 10px rgba(0,0,0,.3);transform:rotate(var(--card-rot,0deg));transform-origin:50% 50%;transition:transform 350ms var(--ease-soft)}
-.kb-project-card__tilt{position:relative;width:100%;height:100%;display:flex;flex-direction:column;justify-content:flex-end;padding:22px;transform:perspective(800px);transition:transform 300ms ease-out}
+   Aave's own inline rotateZ values). The outer <a> only sizes/positions
+   the card and owns that static 2D lean; the visible card shape itself —
+   background, radius, shadow, clipping — lives on the inner
+   .kb-project-card__tilt, because THAT'S the element the pointer-tracked
+   3D tilt applies to. If the shape stayed on the outer element, only the
+   image inside would appear to move; the whole card needs to tilt as one
+   rigid object. Box-shadow never changes between states — no hover glow. */
+.kb-project-card{all:unset;box-sizing:border-box;cursor:pointer;display:block;position:relative;flex:1 1 0;min-width:0;max-width:220px;height:min(56vh,420px);transform:rotate(var(--card-rot,0deg));transform-origin:50% 50%;transition:transform 350ms var(--ease-soft)}
+.kb-project-card__tilt{position:relative;overflow:hidden;width:100%;height:100%;border-radius:30px;background:#e9e9e9;box-shadow:0px 6px 30px 10px rgba(0,0,0,.3);display:flex;flex-direction:column;justify-content:flex-end;padding:22px;transform:perspective(800px);transition:transform 300ms ease-out,box-shadow 300ms ease-out}
 .kb-project-card__img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;-webkit-user-drag:none;user-select:none}
 .kb-project-card__grain{position:absolute;inset:0;background-image:var(--grain-url);opacity:.35;mix-blend-mode:overlay;pointer-events:none;z-index:0}
 .kb-project-card__scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(13,3,66,0) 30%,rgba(13,3,66,.88) 100%);z-index:0}
