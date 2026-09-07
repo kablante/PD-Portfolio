@@ -99,10 +99,13 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
    while hovering — the "brilho de carta física". */
 .kb-project-card__glare{position:absolute;inset:0;z-index:2;opacity:0;pointer-events:none;mix-blend-mode:overlay;transition:opacity 300ms ease-out;background:radial-gradient(circle at var(--pointer-x,50%) var(--pointer-y,50%),var(--kb-butter) 0%,transparent 75%)}
 .kb-project-card:hover .kb-project-card__glare{opacity:.6}
-/* Holographic edge: the nebula gradient (same one used on the about/project
-   placeholder slots) masked down to a thin bright ring right on the card's
-   border — like foil catching light at the edge of a trading card. */
-.kb-project-card__glare-ring{position:absolute;inset:0;z-index:3;padding:3px;border-radius:inherit;opacity:0;pointer-events:none;transition:opacity 300ms ease-out;background:var(--gradient-nebula);filter:brightness(1.7);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+/* Holographic edge: same pointer-tracked spotlight as before, recolored to
+   --gradient-nebula's own stops (indigo → violet → deep magenta, same
+   progression used on the about/project placeholder slots) instead of the
+   white/cyan/magenta it had, then masked down to a thin bright ring right
+   on the card's border — like foil catching light at the edge of a trading
+   card. */
+.kb-project-card__glare-ring{position:absolute;inset:0;z-index:3;padding:3px;border-radius:inherit;opacity:0;pointer-events:none;transition:opacity 300ms ease-out;background:radial-gradient(160px 160px at var(--pointer-x,50%) var(--pointer-y,50%),var(--kb-indigo) 0%,#6b2a9e 46%,var(--kb-magenta-deep) 80%,transparent 100%);filter:brightness(1.7);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
 .kb-project-card:hover .kb-project-card__glare-ring{opacity:.85}
 .kb-project-card__title{position:relative;z-index:1;display:block;font-family:var(--font-display);font-size:22px;line-height:1.05;color:var(--text-strong)}
 .kb-project-card__desc{position:relative;z-index:1;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;margin-top:8px;font-size:13px;line-height:1.45;font-weight:300;color:rgba(255,255,255,.82)}
