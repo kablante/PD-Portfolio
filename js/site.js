@@ -266,6 +266,92 @@
     requestAnimationFrame(draw);
   }
 
+  // Mouse-driven depth parallax on the fixed aurora background: sets
+  // --kb-px/--kb-py (-0.5..0.5) on .kb-bg, which site.css's kb-aurora__mesh
+  // and kb-aurora__stars read via the standalone `translate` property so
+  // each layer drifts a different amount without touching kb-drift's own
+  // `transform` animation (or the page-transition classes' own `transform`
+  // below — `translate` and `transform` compose independently). Skipped on
+  // touch (no hover/mouse) and when the user has asked for reduced motion.
+  function initAuroraParallax() {
+    var bg = document.querySelector(".kb-bg");
+    if (!bg) return;
+    if (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) return;
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    window.addEventListener("mousemove", function (e) {
+      var px = e.clientX / window.innerWidth - 0.5;
+      var py = e.clientY / window.innerHeight - 0.5;
+      bg.style.setProperty("--kb-px", px.toFixed(3));
+      bg.style.setProperty("--kb-py", py.toFixed(3));
+    });
+  }
+
+  // Home → About exit transition: fake a scroll-down (hero drifts up and
+  // fades), a parallax drift on the aurora background, and the bottom nav
+  // bar sliding up to a top position — then hand off to the real
+  // navigation once the animation has played (see .kb-leaving-about in
+  // site.css). Reduced-motion users skip straight to the plain link.
+  var ABOUT_TRANSITION_MS = 680;
+
+  function initAboutTransition() {
+    var homePage = document.querySelector(".kb-page--home");
+    if (!homePage) return;
+    var aboutLink = homePage.querySelector(".kb-hero-lockup .kb-btn--primary");
+    if (!aboutLink) return;
+    var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) return;
+    var navigating = false;
+    aboutLink.addEventListener("click", function (e) {
+      var href = aboutLink.getAttribute("href");
+      if (!href) return;
+      e.preventDefault();
+      if (navigating) return;
+      navigating = true;
+      homePage.classList.add("kb-leaving-about");
+      window.setTimeout(function () {
+        window.location.href = href;
+      }, ABOUT_TRANSITION_MS);
+    });
+  }
+
+  // Content page → Home exit transition: the mirror of the one above.
+  // Every link that leads back to the home page — the "← Back to home"
+  // link, the footerbar logo, no matter which — plays the reverse
+  // animation first (content drifts down/fades, aurora parallaxes back,
+  // top bar slides down to a bottom position) and only then navigates.
+  var HOME_TRANSITION_MS = 680;
+
+  function isHomeHref(href) {
+    if (!href) return false;
+    var path = href.split("#")[0].split("?")[0];
+    return path === "index.html" || path === "../index.html" || path === "./index.html";
+  }
+
+  function initHomeReturnTransition() {
+    var page = document.querySelector(".kb-page:not(.kb-page--home)");
+    if (!page) return;
+    var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) return;
+    var links = Array.prototype.slice.call(page.querySelectorAll("a[href]")).filter(function (a) {
+      return isHomeHref(a.getAttribute("href"));
+    });
+    if (!links.length) return;
+    var navigating = false;
+    links.forEach(function (link) {
+      link.addEventListener("click", function (e) {
+        var href = link.getAttribute("href");
+        e.preventDefault();
+        if (navigating) return;
+        navigating = true;
+        page.classList.add("kb-leaving-home");
+        window.setTimeout(function () {
+          window.location.href = href;
+        }, HOME_TRANSITION_MS);
+      });
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     initLangSwitch();
     initDownloadCv();
@@ -273,5 +359,8 @@
     initCardTilt();
     initCardSpread();
     initCursorSpotlight();
+    initAuroraParallax();
+    initAboutTransition();
+    initHomeReturnTransition();
   });
 })();
