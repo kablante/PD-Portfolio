@@ -237,7 +237,7 @@ export function useCardSpreadEffects(rowRef: RefObject<HTMLDivElement | null>) {
 
 const SPOTLIGHT_RADIUS = 220
 const SPOTLIGHT_BRIGHTNESS = 0.14
-const SPOTLIGHT_COLOR = '#48f7fa' // --kb-cyan
+const SPOTLIGHT_COLOR = '#fff9ad' // --kb-butter (brand yellow)
 
 function hexToRgb(hex: string) {
   const n = Number.parseInt(hex.slice(1), 16)
