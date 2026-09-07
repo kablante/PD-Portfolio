@@ -49,10 +49,10 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
    eases in instead of snapping straight to rest. */
 /* fill-mode intentionally omitted (defaults to none): a forwards/both fill
    would keep overriding transform/opacity after the animation ends, at a
-   cascade priority above normal rules — which silently blocks the
-   .kb-leaving-about exit transition on this same element from ever
-   starting. The 100% keyframe already matches the element's own resting
-   style, so dropping the fill causes no visible jump once it finishes. */
+   cascade priority above normal rules — which would silently block any
+   future exit transition on this same element from ever starting. The
+   100% keyframe already matches the element's own resting style, so
+   dropping the fill causes no visible jump once it finishes. */
 .kb-home-main{position:relative;z-index:1;height:calc(100vh - 64px);display:flex;flex-direction:column;overflow:hidden;animation:kb-rise-in 480ms cubic-bezier(.22,.61,.36,1)}
 
 /* Cards bleed above the viewport on purpose (cropped by .kb-page--home's
@@ -117,22 +117,6 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
 .kb-hero-lockup{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(12px,3vh,40px);padding:clamp(8px,2vh,32px) clamp(24px,5vw,64px)}
 .kb-hero-lockup__logo{display:block;width:min(70vw,860px);max-height:20vh;height:auto;object-fit:contain}
 
-/* ---------- Home → About exit transition ----------
-   Clicking "About me" fakes a scroll-down: the hero content drifts up and
-   fades, the aurora mesh/stars drift at a different rate for parallax
-   depth, and the bottom nav bar slides up to where a top bar would sit —
-   only then does the real navigation to about.html happen (see site.js). */
-.kb-page--home.kb-leaving-about .kb-home-main{transition:transform 640ms var(--ease-in-out),opacity 640ms var(--ease-in-out);transform:translateY(-14vh);opacity:0}
-.kb-page--home.kb-leaving-about .kb-aurora__mesh{transition:transform 720ms var(--ease-in-out);transform:translate3d(0,-7%,0) scale(1.22)}
-.kb-page--home.kb-leaving-about .kb-aurora__stars{transition:transform 720ms var(--ease-in-out),opacity 720ms var(--ease-in-out);transform:translate3d(0,-4%,0);opacity:.25}
-.kb-page--home.kb-leaving-about .kb-footerbar--bottom{transition:transform 640ms var(--ease-in-out) 60ms;transform:translateY(calc(-100vh + 64px))}
-@media (prefers-reduced-motion:reduce){
-  .kb-page--home.kb-leaving-about .kb-home-main,
-  .kb-page--home.kb-leaving-about .kb-aurora__mesh,
-  .kb-page--home.kb-leaving-about .kb-aurora__stars,
-  .kb-page--home.kb-leaving-about .kb-footerbar--bottom{transition:none}
-}
-
 /* ---------- Content page → Home exit transition (reverse) ----------
    The mirror of the transition above: any link back to the home page —
    the back-link, the footerbar logo, whichever the user takes — drifts
@@ -190,7 +174,6 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
    else — it's the persistent piece of chrome on every page. */
 .kb-footerbar{position:fixed;left:0;right:0;z-index:20;height:64px;display:flex;align-items:center;gap:16px;padding:0 19px;background:var(--surface-glass);backdrop-filter:blur(var(--blur-glass));-webkit-backdrop-filter:blur(var(--blur-glass))}
 .kb-footerbar::after{content:"";position:absolute;inset:0;pointer-events:none;background-image:var(--grain-url);opacity:var(--grain-opacity);mix-blend-mode:overlay}
-.kb-footerbar--bottom{bottom:0;border-top:1px solid var(--border-soft)}
 .kb-footerbar--top{top:0;border-bottom:1px solid var(--border-soft)}
 
 /* Home nav starts docked to the bottom of the first viewport (translated
