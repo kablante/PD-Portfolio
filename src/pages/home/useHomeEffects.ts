@@ -41,24 +41,6 @@ export function downloadCvPlaceholder(lang: Lang) {
   window.alert(lang === 'pt' ? 'Currículo (PDF) — placeholder' : 'CV (PDF) — placeholder')
 }
 
-/** Home nav dock is hidden until the user scrolls past the hero, then
- * slides in from the left edge (CSS drives the actual transform/opacity via
- * the `is-stuck` class this returns). */
-export function useFooterbarStuck(threshold = 24) {
-  const [isStuck, setIsStuck] = useState(false)
-
-  useEffect(() => {
-    function update() {
-      setIsStuck(window.scrollY > threshold)
-    }
-    update()
-    window.addEventListener('scroll', update, { passive: true })
-    return () => window.removeEventListener('scroll', update)
-  }, [threshold])
-
-  return isStuck
-}
-
 const MAX_TILT_DEG = 10
 const RIGHT_SPREAD_PCT = 33.9757 // Aave's flat constant for viewport >=1082px
 const LEFT_SPREAD_PCT = 5

@@ -174,33 +174,21 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
 
 /* ---------- Nav/footer bar ----------
    Fixed to the top on about/project pages — the persistent piece of chrome
-   on those pages. The home page instead gets a floating glass dock (see
-   .kb-footerbar--float-left below), not this full-width bar. */
+   on those pages. The home page instead has just the language switch,
+   docked to the top-right corner (see .kb-lang-dock below). */
 /* Half the alpha of --surface-glass (kept local rather than touching the
    shared token, which also backs cards/toasts elsewhere). */
 .kb-footerbar{position:fixed;left:0;right:0;z-index:20;height:64px;display:flex;align-items:center;gap:16px;padding:0 19px;background:rgba(26,12,92,.275);backdrop-filter:blur(var(--blur-glass));-webkit-backdrop-filter:blur(var(--blur-glass));overflow:hidden}
 .kb-footerbar::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background-image:var(--grain-url);opacity:var(--grain-opacity);mix-blend-mode:overlay}
 .kb-footerbar--top{top:0;border-bottom:1px solid var(--border-soft)}
 
-/* ---------- Home nav: floating glass dock, left edge ----------
-   A vertical pill, vertically centered on the left edge, independent of
-   the page's scroll position (unlike the old top/bottom-docked bar, "left"
-   isn't a scroll state). It stays hidden until the user has scrolled past
-   the hero, then slides in from off-screen and fades up — .is-stuck is
-   toggled by site.js (initHomeFooterbarScroll in site.js, unchanged by
-   this layout). Heavier blur + saturation and a soft glow ring is what
-   sells the "glass" read over a flat tinted panel. */
-.kb-footerbar--float-left{left:24px;right:auto;top:50%;bottom:auto;height:auto;width:64px;flex-direction:column;padding:20px 0;gap:20px;border-radius:999px;background:rgba(26,12,92,.32);backdrop-filter:blur(24px) saturate(160%);-webkit-backdrop-filter:blur(24px) saturate(160%);border:1px solid rgba(255,255,255,.16);box-shadow:0 24px 64px rgba(8,1,42,.55),inset 0 1px 0 rgba(255,255,255,.1);opacity:0;transform:translate(-140%,-50%);transition:transform 900ms cubic-bezier(.16,1,.3,1),opacity 900ms cubic-bezier(.16,1,.3,1)}
-.kb-footerbar--float-left.is-stuck{opacity:1;transform:translate(0,-50%)}
-@media (prefers-reduced-motion:reduce){.kb-footerbar--float-left{transition:none}}
-
 .kb-footerbar__logo{all:unset;cursor:pointer;flex:none;display:flex;align-items:center;margin-right:8px}
 .kb-footerbar__logo img{display:block;width:auto;height:46px}
-.kb-footerbar--float-left .kb-footerbar__logo{margin-right:0}
-.kb-footerbar--float-left .kb-footerbar__logo img{height:auto;width:30px}
 
 .kb-footerbar__actions{flex:none;display:flex;align-items:center;gap:8px;--control-height:36px;--border-hairline:#aeaeae;--surface-card:transparent;color:#e9e9e9}
-.kb-footerbar--float-left .kb-footerbar__actions{flex-direction:column}
+
+/* ---------- Home nav: language switch only, top-right corner ---------- */
+.kb-lang-dock{position:fixed;top:24px;right:24px;z-index:20}
 
 .kb-lang-switch{position:relative;width:80px;height:36px;border-radius:30px;box-shadow:inset 0 0 0 1px #aeaeae;flex:none;background:none;border:0;padding:0}
 .kb-lang-switch__knob{position:absolute;top:0;left:0;width:43px;height:36px;border-radius:30px;background:var(--kb-blush);transition:transform 240ms cubic-bezier(.22,.61,.36,1),background var(--duration-base) var(--ease-soft),box-shadow var(--duration-base) var(--ease-soft);transform:translateX(0)}
@@ -211,19 +199,8 @@ html[data-active-lang="pt"] .kb-lang-switch__knob{transform:translateX(37px)}
 .kb-lang-switch button[data-lang-btn="pt"]{right:0}
 html[data-active-lang="pt"] .kb-lang-switch button[data-lang-btn="en"]{color:#aeaeae}
 html[data-active-lang="pt"] .kb-lang-switch button[data-lang-btn="pt"]{color:#0d0342}
-/* Stacked EN-over-PT in the vertical dock instead of side-by-side — same
-   dimensions transposed (80×36 → 36×80), same 37px knob travel, just along
-   the other axis, so the toggle logic in site.js needs no changes. */
-.kb-footerbar--float-left .kb-lang-switch{width:36px;height:80px;margin:4px 0}
-.kb-footerbar--float-left .kb-lang-switch__knob{width:36px;height:43px;transform:translateY(0)}
-.kb-footerbar--float-left .kb-lang-switch button{width:36px;height:43px;top:auto}
-.kb-footerbar--float-left .kb-lang-switch button[data-lang-btn="en"]{top:0;left:0}
-.kb-footerbar--float-left .kb-lang-switch button[data-lang-btn="pt"]{bottom:0;right:auto;left:0}
-html[data-active-lang="pt"] .kb-footerbar--float-left .kb-lang-switch__knob{transform:translateY(37px)}
 
 .kb-footerbar__copy{flex:1;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:clamp(11px,0.9vw,14px);color:var(--kb-lavender)}
-/* No room for the copyright line in a 64px-wide vertical dock. */
-.kb-footerbar--float-left .kb-footerbar__copy{display:none}
 
 @media (max-width:640px){
   .kb-footerbar__copy{display:none}
