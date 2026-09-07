@@ -1,10 +1,5 @@
 /* Katarina Blante — site layout (home / about / project pages, footer nav, aurora bg, language toggle) */
 
-/* Cross-document transition between pages (index.html <-> about.html etc).
-   Chromium-only today (126+); Firefox/Safari just navigate normally with
-   no animation, so this is a pure enhancement, never a requirement. */
-@view-transition{navigation:auto}
-
 html,body{height:100%}
 body{overflow-x:hidden}
 body.kb-no-scroll{overflow:hidden;height:100vh}
@@ -17,7 +12,7 @@ body.kb-no-scroll{overflow:hidden;height:100vh}
 .kb-page--home{height:100vh;overflow:hidden}
 
 /* ---------- Fixed aurora background ---------- */
-.kb-bg{position:fixed;inset:0;z-index:0;pointer-events:none;view-transition-name:kb-bg}
+.kb-bg{position:fixed;inset:0;z-index:0;pointer-events:none}
 .kb-aurora{position:relative;isolation:isolate;overflow:hidden;background:var(--surface-page);width:100%;height:100%}
 /* Depth parallax: mesh (far) and stars (near) each drift opposite the
    pointer by a different amount, via the standalone `translate` property
@@ -42,7 +37,16 @@ html[data-active-lang="pt"] [data-lang="en"]{display:none}
 html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
 
 /* ---------- Home ---------- */
-.kb-home-main{position:relative;z-index:1;height:calc(100vh - 64px);display:flex;flex-direction:column;overflow:hidden}
+/* Same entrance treatment .kb-content uses on about/project pages, so
+   arriving here after the reverse exit transition (or on a fresh load)
+   eases in instead of snapping straight to rest. */
+/* fill-mode intentionally omitted (defaults to none): a forwards/both fill
+   would keep overriding transform/opacity after the animation ends, at a
+   cascade priority above normal rules — which silently blocks the
+   .kb-leaving-about exit transition on this same element from ever
+   starting. The 100% keyframe already matches the element's own resting
+   style, so dropping the fill causes no visible jump once it finishes. */
+.kb-home-main{position:relative;z-index:1;height:calc(100vh - 64px);display:flex;flex-direction:column;overflow:hidden;animation:kb-rise-in 480ms cubic-bezier(.22,.61,.36,1)}
 
 /* Cards bleed above the viewport on purpose (cropped by .kb-page--home's
    own clip, not by a tight box here) — the negative margin pulls them up,
@@ -106,9 +110,47 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
 .kb-hero-lockup{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(12px,3vh,40px);padding:clamp(8px,2vh,32px) clamp(24px,5vw,64px)}
 .kb-hero-lockup__logo{display:block;width:min(70vw,860px);max-height:20vh;height:auto;object-fit:contain}
 
+/* ---------- Home → About exit transition ----------
+   Clicking "About me" fakes a scroll-down: the hero content drifts up and
+   fades, the aurora mesh/stars drift at a different rate for parallax
+   depth, and the bottom nav bar slides up to where a top bar would sit —
+   only then does the real navigation to about.html happen (see site.js). */
+.kb-page--home.kb-leaving-about .kb-home-main{transition:transform 640ms var(--ease-in-out),opacity 640ms var(--ease-in-out);transform:translateY(-14vh);opacity:0}
+.kb-page--home.kb-leaving-about .kb-aurora__mesh{transition:transform 720ms var(--ease-in-out);transform:translate3d(0,-7%,0) scale(1.22)}
+.kb-page--home.kb-leaving-about .kb-aurora__stars{transition:transform 720ms var(--ease-in-out),opacity 720ms var(--ease-in-out);transform:translate3d(0,-4%,0);opacity:.25}
+.kb-page--home.kb-leaving-about .kb-footerbar--bottom{transition:transform 640ms var(--ease-in-out) 60ms;transform:translateY(calc(-100vh + 64px))}
+@media (prefers-reduced-motion:reduce){
+  .kb-page--home.kb-leaving-about .kb-home-main,
+  .kb-page--home.kb-leaving-about .kb-aurora__mesh,
+  .kb-page--home.kb-leaving-about .kb-aurora__stars,
+  .kb-page--home.kb-leaving-about .kb-footerbar--bottom{transition:none}
+}
+
+/* ---------- Content page → Home exit transition (reverse) ----------
+   The mirror of the transition above: any link back to the home page —
+   the back-link, the footerbar logo, whichever the user takes — drifts
+   the content down and fades it, parallaxes the aurora back the other
+   way, and slides the top nav bar down to where the bottom bar sits on
+   the home screen. Applies to about.html and every project page, since
+   they all share this same footer/back-link chrome. */
+.kb-page.kb-leaving-home .kb-content{transition:transform 640ms var(--ease-in-out),opacity 640ms var(--ease-in-out);transform:translateY(10vh);opacity:0}
+.kb-page.kb-leaving-home .kb-aurora__mesh{transition:transform 720ms var(--ease-in-out);transform:translate3d(0,6%,0) scale(.94)}
+.kb-page.kb-leaving-home .kb-aurora__stars{transition:transform 720ms var(--ease-in-out),opacity 720ms var(--ease-in-out);transform:translate3d(0,3%,0);opacity:.25}
+.kb-page.kb-leaving-home .kb-footerbar--top{transition:transform 640ms var(--ease-in-out) 60ms;transform:translateY(calc(100vh - 64px))}
+@media (prefers-reduced-motion:reduce){
+  .kb-page.kb-leaving-home .kb-content,
+  .kb-page.kb-leaving-home .kb-aurora__mesh,
+  .kb-page.kb-leaving-home .kb-aurora__stars,
+  .kb-page.kb-leaving-home .kb-footerbar--top{transition:none}
+}
+
 /* ---------- About / Project shared content column ---------- */
 /* +64px reserves room for the fixed top nav bar on these pages */
-.kb-content{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:calc(64px + clamp(56px,7vw,104px)) clamp(24px,5vw,64px) clamp(72px,9vw,120px);animation:kb-rise-in 480ms cubic-bezier(.22,.61,.36,1) both}
+/* fill-mode intentionally omitted — see the note on .kb-home-main: a
+   forwards/both fill would keep this animation overriding transform/
+   opacity forever, blocking the .kb-leaving-home exit transition below
+   from ever starting. */
+.kb-content{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:calc(64px + clamp(56px,7vw,104px)) clamp(24px,5vw,64px) clamp(72px,9vw,120px);animation:kb-rise-in 480ms cubic-bezier(.22,.61,.36,1)}
 .kb-back-link{all:unset;cursor:pointer;font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--kb-cyan);display:inline-block}
 .kb-back-link:hover{color:var(--kb-butter)}
 
@@ -143,7 +185,7 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
 .kb-footerbar::after{content:"";position:absolute;inset:0;pointer-events:none;background-image:var(--grain-url);opacity:var(--grain-opacity);mix-blend-mode:overlay}
 .kb-footerbar--bottom{bottom:0;border-top:1px solid var(--border-soft)}
 .kb-footerbar--top{top:0;border-bottom:1px solid var(--border-soft)}
-.kb-footerbar__logo{all:unset;cursor:pointer;flex:none;display:flex;align-items:center;margin-right:8px;view-transition-name:kb-footer-logo}
+.kb-footerbar__logo{all:unset;cursor:pointer;flex:none;display:flex;align-items:center;margin-right:8px}
 .kb-footerbar__logo img{display:block;width:auto;height:46px}
 .kb-footerbar__actions{flex:none;display:flex;align-items:center;gap:8px;--control-height:36px;--border-hairline:#aeaeae;--surface-card:transparent;color:#e9e9e9}
 
