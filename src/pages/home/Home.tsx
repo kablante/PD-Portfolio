@@ -1,32 +1,24 @@
 import { useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { DynamicFrameLayout } from '@/components/ui/dynamic-frame-layout'
+import AuroraBackground from '@/components/shared/AuroraBackground'
+import { GrainCanvas } from '@/components/ui/grain-canvas'
 import '@/styles/kb-tokens.css'
 import '@/styles/kb-components.css'
 import '@/styles/kb-site.css'
-import { getDynamicFrameItems } from './dynamicFrameDemoFrames'
+import BentoGrid from './BentoGrid'
 import { homeProjects, projectImageTransitionName } from './projects'
-import { starsBackgroundImage } from './starsBackground'
-import { useAuroraParallax, useCardSpreadEffects, useCursorSpotlight, useLang } from './useHomeEffects'
+import { useCardSpreadEffects, useCursorSpotlight, useLang } from './useHomeEffects'
 
 export default function Home() {
-  const bgRef = useRef<HTMLDivElement>(null)
   const rowRef = useRef<HTMLDivElement>(null)
   const { lang, setLang } = useLang()
 
   useCardSpreadEffects(rowRef)
   useCursorSpotlight()
-  useAuroraParallax(bgRef)
 
   return (
     <div className="kb-page kb-page--home">
-      <div className="kb-bg" aria-hidden="true" ref={bgRef}>
-        <div className="kb-aurora">
-          <span className="kb-aurora__mesh" />
-          <span className="kb-aurora__stars" style={{ backgroundImage: starsBackgroundImage }} />
-          <span className="kb-aurora__grain" />
-        </div>
-      </div>
+      <AuroraBackground />
 
       <div className="kb-home-main">
         <div className="kb-home-cards">
@@ -48,7 +40,7 @@ export default function Home() {
                     draggable={false}
                     style={{ viewTransitionName: projectImageTransitionName(project.slug) }}
                   />
-                  <span className="kb-project-card__grain" aria-hidden="true" />
+                  <GrainCanvas className="kb-project-card__grain" />
                   <span className="kb-project-card__scrim" aria-hidden="true" />
                   <span className="kb-project-card__glare" aria-hidden="true" />
                   <span className="kb-project-card__glare-ring" aria-hidden="true" />
@@ -84,14 +76,7 @@ export default function Home() {
         </div>
       </div>
       <div className="kb-home-blank">
-        <div className="kb-home-blank__inner">
-          <DynamicFrameLayout
-            frames={getDynamicFrameItems(lang)}
-            className="w-full h-full"
-            hoverSize={6}
-            gapSize={4}
-          />
-        </div>
+        <BentoGrid lang={lang} />
       </div>
       <div className="kb-lang-dock">
         <div role="group" aria-label="Language" className="kb-lang-switch">

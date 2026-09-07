@@ -1,12 +1,11 @@
 import { Download } from 'lucide-react'
-import { useRef } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
+import AuroraBackground from '@/components/shared/AuroraBackground'
 import '@/styles/kb-tokens.css'
 import '@/styles/kb-components.css'
 import '@/styles/kb-site.css'
 import { homeProjects, projectImageTransitionName } from '../home/projects'
-import { starsBackgroundImage } from '../home/starsBackground'
-import { downloadCvPlaceholder, useAuroraParallax, useCursorSpotlight, useLang } from '../home/useHomeEffects'
+import { downloadCvPlaceholder, useCursorSpotlight, useLang } from '../home/useHomeEffects'
 
 /** Project case-study pages aren't built yet - this is deliberately just the
  * site chrome (aurora background, top nav bar, back link) so each card has
@@ -14,23 +13,15 @@ import { downloadCvPlaceholder, useAuroraParallax, useCursorSpotlight, useLang }
 export default function ProjectPage() {
   const { slug } = useParams()
   const project = homeProjects.find((p) => p.slug === slug)
-  const bgRef = useRef<HTMLDivElement>(null)
   const { lang, setLang } = useLang()
 
   useCursorSpotlight()
-  useAuroraParallax(bgRef)
 
   if (!project) return <Navigate to="/" replace />
 
   return (
     <div className="kb-page">
-      <div className="kb-bg" aria-hidden="true" ref={bgRef}>
-        <div className="kb-aurora">
-          <span className="kb-aurora__mesh" />
-          <span className="kb-aurora__stars" style={{ backgroundImage: starsBackgroundImage }} />
-          <span className="kb-aurora__grain" />
-        </div>
-      </div>
+      <AuroraBackground />
 
       <div className="kb-footerbar kb-footerbar--top">
         <Link to="/" className="kb-footerbar__logo" aria-label="Katarina Blante — home">

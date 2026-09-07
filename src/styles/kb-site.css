@@ -10,12 +10,9 @@ body{overflow-x:hidden}
    into) so the page scrolls instead of being clipped. */
 .kb-page--home{min-height:100vh}
 
-/* Second section: a full-screen video grid over the fixed aurora
-   background. Used to be an empty scroll spacer - .kb-home-blank__inner
-   is what DynamicFrameLayout sizes itself to (it fills 100% of its
-   parent, so that parent needs a concrete height, not just min-height). */
-.kb-home-blank{position:relative;z-index:1;min-height:100vh;display:flex;align-items:center;padding:clamp(24px,5vw,64px)}
-.kb-home-blank__inner{width:100%;height:min(80vh,900px)}
+/* Second section: the bento profile grid (see BentoGrid.tsx), centered
+   over the fixed background. Used to be an empty scroll spacer. */
+.kb-home-blank{position:relative;z-index:1;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:clamp(24px,5vw,64px)}
 
 /* ---------- Fixed aurora background ---------- */
 .kb-bg{position:fixed;inset:0;z-index:0;pointer-events:none}
@@ -24,18 +21,26 @@ body{overflow-x:hidden}
    background's perceived brightness everywhere it's used. */
 .kb-bg::after{content:"";position:absolute;inset:0;background:rgba(0,0,0,.5)}
 .kb-aurora{position:relative;isolation:isolate;overflow:hidden;background:var(--surface-page);width:100%;height:100%}
-/* Depth parallax: mesh (far) and stars (near) each drift opposite the
-   pointer by a different amount, via the standalone `translate` property
-   so it composes with kb-drift's own `transform` animation instead of
-   fighting it. --kb-px/--kb-py (unitless, -0.5..0.5) are set on .kb-bg by
-   initAuroraParallax in site.js; grain is a flat texture and stays put. */
-.kb-aurora__mesh{position:absolute;inset:-20%;background:var(--gradient-mesh);filter:blur(var(--blur-field));opacity:.55;animation:kb-drift var(--duration-drift) var(--ease-drift) infinite alternate;translate:calc(var(--kb-px,0) * -6px) calc(var(--kb-py,0) * -6px);transition:translate 400ms ease-out}
-.kb-aurora__stars{position:absolute;inset:0;background-repeat:repeat;opacity:.7;translate:calc(var(--kb-px,0) * -16px) calc(var(--kb-py,0) * -16px);transition:translate 400ms ease-out}
+/* Glow orbs, ported from the KPop Carrd Figma bento layout's background
+   (5 blurred pulsing radial blobs over a solid void) and recolored onto
+   the site's own accent tokens - keeps --kb-void as the base tone, per
+   the brief, instead of adopting the file's own near-black. Depth
+   parallax: each orb drifts opposite the pointer via the standalone
+   `translate` property, same --kb-px/--kb-py set on .kb-bg by
+   initAuroraParallax as the old mesh/stars used, so it composes with the
+   orb's own bloom-pulse `transform` animation instead of fighting it. */
+.kb-aurora__orb{position:absolute;border-radius:50%;pointer-events:none;animation:kb-orb-drift 4s ease-in-out infinite;translate:calc(var(--kb-px,0) * -14px) calc(var(--kb-py,0) * -14px);transition:translate 400ms ease-out}
+.kb-aurora__orb--1{left:5%;top:-5%;width:560px;height:560px;background:radial-gradient(circle,var(--kb-magenta),transparent 70%);filter:blur(110px);opacity:.55;animation-duration:4s}
+.kb-aurora__orb--2{left:50%;top:10%;width:650px;height:650px;background:radial-gradient(circle,var(--kb-lavender),transparent 70%);filter:blur(140px);opacity:.48;animation-duration:4.7s;animation-delay:.4s}
+.kb-aurora__orb--3{left:75%;top:55%;width:420px;height:420px;background:radial-gradient(circle,var(--kb-cyan),transparent 70%);filter:blur(95px);opacity:.4;animation-duration:5.4s;animation-delay:.8s}
+.kb-aurora__orb--4{left:25%;top:65%;width:400px;height:400px;background:radial-gradient(circle,var(--kb-magenta-deep),transparent 70%);filter:blur(85px);opacity:.42;animation-duration:6.1s;animation-delay:1.2s}
+.kb-aurora__orb--5{left:85%;top:5%;width:300px;height:300px;background:radial-gradient(circle,var(--kb-blush),transparent 70%);filter:blur(70px);opacity:.32;animation-duration:6.8s;animation-delay:1.6s}
 .kb-aurora__grain{position:absolute;inset:0;background-image:var(--grain-url);opacity:var(--grain-opacity);mix-blend-mode:overlay;pointer-events:none}
 
-@keyframes kb-drift{from{transform:translate3d(-2%,-1%,0) scale(1.05)}to{transform:translate3d(3%,2%,0) scale(1.14)}}
+@keyframes kb-orb-drift{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+@keyframes kb-bloom-pulse{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:1;transform:scale(1.12)}}
 @keyframes kb-rise-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-@media (prefers-reduced-motion:reduce){.kb-aurora__mesh{animation:none}}
+@media (prefers-reduced-motion:reduce){.kb-aurora__orb{animation:none}}
 
 /* ---------- Language toggle (bilingual content) ----------
    Every bilingual pair is two bare `<span data-lang="…">` text runs with no
@@ -94,7 +99,9 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
 .kb-project-card{all:unset;box-sizing:border-box;cursor:pointer;display:flex;justify-content:center;position:relative;flex:1 1 0;min-width:0;max-width:clamp(60px,20.5vw,220px);height:min(66vh,560px);transform:rotate(var(--card-rot,0deg));transform-origin:50% 50%}
 .kb-project-card__tilt{position:relative;overflow:hidden;flex:none;width:clamp(90px,31vw,340px);height:100%;border-radius:30px;background:#e9e9e9;box-shadow:0px 6px 30px 10px rgba(0,0,0,.3);display:flex;flex-direction:column;justify-content:flex-end;padding:22px;transform:perspective(800px);transition:transform 300ms ease-out,box-shadow 300ms ease-out}
 .kb-project-card__img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;-webkit-user-drag:none;user-select:none}
-.kb-project-card__grain{position:absolute;inset:0;background-image:var(--grain-url);opacity:.55;mix-blend-mode:overlay;pointer-events:none;z-index:0;transition:opacity 300ms ease-out}
+/* Canvas-based two-pass risograph grain (GrainCanvas), swapped in for the
+   old flat feTurbulence texture - heavier, coarser stipple. */
+.kb-project-card__grain{position:absolute;inset:0;width:100%;height:100%;opacity:.55;mix-blend-mode:overlay;pointer-events:none;z-index:0;transition:opacity 300ms ease-out}
 .kb-project-card:hover .kb-project-card__grain{opacity:0}
 .kb-project-card__scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(13,3,66,0) 30%,rgba(13,3,66,.88) 100%);z-index:0}
 /* Holographic glare: a soft cyan highlight that follows the cursor
@@ -215,6 +222,67 @@ html[data-active-lang="pt"] .kb-lang-switch button[data-lang-btn="pt"]{color:#0d
   .kb-footerbar__copy{display:none}
 }
 
+/* ---------- Bento profile grid (home's second section) ----------
+   Ported from the KPop Carrd Figma export's bento layout, reskinned onto
+   the site's own tokens/fonts. Each card keeps its own static rotation and
+   a distinct accent border/glow; useScrollParallax folds a translateY into
+   the same transform per card, at its own speed. */
+.kb-bento{position:relative;z-index:1;display:grid;isolation:isolate;width:100%;max-width:1060px;gap:18px;grid-template-columns:260px 1fr 1fr 200px;grid-template-rows:auto 1fr auto;grid-template-areas:"photo name name tz" "photo intro intro intro" "btns skills skills skills"}
+
+.kb-bento-card{position:relative;overflow:hidden;background:var(--surface-glass);backdrop-filter:blur(var(--blur-glass));-webkit-backdrop-filter:blur(var(--blur-glass))}
+.kb-bento-card__eyebrow{display:block;font-family:var(--font-mono);font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--kb-lavender);opacity:.75;margin-bottom:10px}
+.kb-bento-card__eyebrow--cyan{color:var(--kb-cyan)}
+
+/* Photo card */
+.kb-bento-card--photo{grid-area:photo;border-radius:32px;border:2px solid rgba(254,106,216,.5);box-shadow:0 0 60px rgba(254,106,216,.25),0 0 120px rgba(254,106,216,.1);padding:0}
+.kb-bento-card__slot{position:absolute;inset:0;border-radius:30px;border:0;height:auto;min-height:420px;align-items:flex-start}
+.kb-bento-card__handle{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);padding:8px 22px;border-radius:999px;background:rgba(254,106,216,.22);border:1.5px solid rgba(254,106,216,.55);backdrop-filter:blur(10px);font-family:var(--font-mono);font-size:1rem;color:var(--kb-blush);letter-spacing:.14em;white-space:nowrap;box-shadow:0 0 20px rgba(254,106,216,.35);z-index:5}
+
+/* Name card */
+.kb-bento-card--name{grid-area:name;border-radius:28px;border:2px solid rgba(183,140,245,.42);padding:36px 40px;box-shadow:0 0 50px rgba(183,140,245,.18)}
+.kb-bento-card__name{margin:0 0 16px;font-family:var(--font-display);font-weight:400;font-size:clamp(3rem,5.5vw,4.6rem);line-height:.98;background:linear-gradient(110deg,var(--kb-blush) 0%,var(--kb-magenta) 35%,var(--kb-lavender) 70%,var(--kb-cyan) 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 26px rgba(254,106,216,.4))}
+.kb-bento-card__meta{display:flex;align-items:center;gap:12px;font-family:var(--font-mono);font-size:.95rem;color:var(--kb-lavender);opacity:.7;letter-spacing:.05em}
+.kb-bento-card__dot{width:4px;height:4px;border-radius:50%;background:var(--kb-magenta);box-shadow:0 0 8px rgba(254,106,216,.9)}
+.kb-bento-card__rule{margin-top:22px;height:2px;width:55%;background:linear-gradient(90deg,rgba(254,106,216,.8) 0%,rgba(72,247,250,.3) 60%,transparent 100%)}
+
+/* Timezone card */
+.kb-bento-card--tz{grid-area:tz;border-radius:26px;border:2px solid rgba(72,247,250,.42);padding:28px 24px;box-shadow:0 0 40px rgba(72,247,250,.18);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+.kb-bento-card__clock{font-family:var(--font-mono);font-weight:300;font-size:clamp(1.4rem,2vw,1.9rem);color:var(--kb-cyan);letter-spacing:0;text-shadow:0 0 24px rgba(72,247,250,.8);font-variant-numeric:tabular-nums;white-space:nowrap}
+.kb-bento-card__tz-label{font-family:var(--font-mono);font-size:.85rem;color:var(--kb-lavender);opacity:.55;letter-spacing:.1em}
+.kb-bento-card__online{display:flex;align-items:center;gap:7px;margin-top:4px;font-family:var(--font-mono);font-size:.85rem;color:var(--kb-cyan);opacity:.7}
+.kb-bento-card__online-dot{width:8px;height:8px;border-radius:50%;background:var(--kb-cyan);box-shadow:0 0 10px rgba(72,247,250,.9);animation:kb-bloom-pulse 2s ease-in-out infinite}
+
+/* Intro card */
+.kb-bento-card--intro{grid-area:intro;border-radius:28px;border:2px solid rgba(249,172,204,.3);padding:34px 42px;box-shadow:0 0 50px rgba(249,172,204,.1)}
+.kb-bento-card__intro-text{margin:0;font-size:clamp(1.05rem,1.5vw,1.3rem);font-weight:300;color:var(--text-body);line-height:1.75}
+.kb-bento-card__intro-text em{color:var(--kb-blush);font-family:var(--font-display);font-style:normal}
+
+/* Buttons card */
+.kb-bento-card--btns{grid-area:btns;border-radius:26px;border:2px solid rgba(254,106,216,.4);padding:28px 26px;box-shadow:0 0 40px rgba(254,106,216,.15);display:flex;flex-direction:column;gap:14px;justify-content:center}
+.kb-bento-btn{width:100%;padding:16px 24px;border-radius:999px;font-family:var(--font-body);font-size:1.05rem;font-weight:500;letter-spacing:.03em;cursor:pointer;transition:transform .25s ease,box-shadow .25s ease,background .25s ease}
+.kb-bento-btn--primary{border:2px solid rgba(254,106,216,.6);background:linear-gradient(130deg,rgba(254,106,216,.85) 0%,rgba(183,140,245,.85) 100%);color:var(--kb-white);box-shadow:0 0 24px rgba(254,106,216,.4)}
+.kb-bento-btn--primary:hover{transform:translateY(-3px);box-shadow:0 0 40px rgba(254,106,216,.6)}
+.kb-bento-btn--ghost{border:2px solid rgba(183,140,245,.5);background:transparent;color:var(--kb-lavender)}
+.kb-bento-btn--ghost:hover{background:rgba(183,140,245,.14);transform:translateY(-3px);box-shadow:0 0 28px rgba(183,140,245,.3)}
+
+/* Skills card */
+.kb-bento-card--skills{grid-area:skills;border-radius:28px;border:2px solid rgba(183,140,245,.3);padding:32px 36px;box-shadow:0 0 40px rgba(183,140,245,.1)}
+.kb-bento-card__tags{display:flex;flex-wrap:wrap;gap:10px}
+.kb-bento-tag{padding:10px 22px;border-radius:999px;font-family:var(--font-mono);font-size:.95rem;letter-spacing:.05em;transition:transform .2s ease}
+.kb-bento-tag:hover{transform:translateY(-3px) scale(1.05)}
+.kb-bento-tag--magenta{background:rgba(254,106,216,.15);border:1.5px solid rgba(254,106,216,.5);color:var(--kb-blush)}
+.kb-bento-tag--violet{background:rgba(41,25,143,.4);border:1.5px solid rgba(183,140,245,.5);color:var(--kb-lavender)}
+.kb-bento-tag--cyan{background:rgba(72,247,250,.1);border:1.5px solid rgba(72,247,250,.45);color:var(--kb-cyan)}
+.kb-bento-tag--pink{background:rgba(249,172,204,.12);border:1.5px solid rgba(249,172,204,.45);color:var(--kb-blush)}
+
+@keyframes kb-float-up{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+@media (max-width:780px){
+  .kb-bento{grid-template-columns:180px 1fr;grid-template-rows:auto;grid-template-areas:"photo name" "tz tz" "intro intro" "btns btns" "skills skills"}
+}
+@media (max-width:520px){
+  .kb-bento{grid-template-columns:1fr;grid-template-areas:"name" "photo" "tz" "intro" "btns" "skills"}
+}
 /* ---------- Hero card -> project header container transform ----------
    Home -> ProjectPage navigation goes through React Router's `viewTransition`
    Link prop, which wraps the route change in document.startViewTransition().
