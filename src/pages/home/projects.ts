@@ -7,6 +7,14 @@ export interface HomeProject {
   descPt: string
 }
 
+/** Shared `view-transition-name` so the card image on Home and the header
+ * image on its ProjectPage are treated as the same element by the View
+ * Transitions API - that's what produces the container-transform morph
+ * instead of a plain cross-fade. Must stay unique per project. */
+export function projectImageTransitionName(slug: string) {
+  return `project-image-${slug}`
+}
+
 export const homeProjects: HomeProject[] = [
   {
     slug: 'aurora-bank',

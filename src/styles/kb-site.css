@@ -151,6 +151,12 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
 .kb-back-link{all:unset;cursor:pointer;font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--kb-cyan);display:inline-block}
 .kb-back-link:hover{color:var(--kb-butter)}
 
+/* Project header image - the shared-element target for the home card's
+   container-transform (see projectImageTransitionName / the View
+   Transitions API rules at the bottom of this file). */
+.kb-project-header{border-radius:16px;overflow:hidden;height:clamp(240px,34vw,460px);margin-top:clamp(32px,4vw,56px)}
+.kb-project-header__img{width:100%;height:100%;object-fit:cover;display:block}
+
 /* About */
 .kb-about-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:clamp(32px,5vw,64px);margin-top:32px;align-items:start}
 .kb-about-eyebrow{display:block;font-family:var(--font-mono);font-size:12px;letter-spacing:.16em;color:var(--kb-lavender)}
@@ -207,4 +213,19 @@ html[data-active-lang="pt"] .kb-lang-switch button[data-lang-btn="pt"]{color:#0d
 
 @media (max-width:640px){
   .kb-footerbar__copy{display:none}
+}
+
+/* ---------- Hero card -> project header container transform ----------
+   Home -> ProjectPage navigation goes through React Router's `viewTransition`
+   Link prop, which wraps the route change in document.startViewTransition().
+   The card image and the project header image share a view-transition-name
+   (projectImageTransitionName in projects.ts) so the browser treats them as
+   one element and morphs position/size/shape between them instead of
+   cross-fading two unrelated boxes - a native "container transform". Browsers
+   without View Transitions support (older Firefox) just navigate normally,
+   no animation, no breakage. */
+::view-transition-group(*){animation-duration:480ms;animation-timing-function:var(--ease-soft)}
+::view-transition-old(root),::view-transition-new(root){animation-duration:320ms}
+@media (prefers-reduced-motion:reduce){
+  ::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}
 }

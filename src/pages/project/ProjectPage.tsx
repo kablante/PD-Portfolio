@@ -4,7 +4,7 @@ import { Link, Navigate, useParams } from 'react-router-dom'
 import '@/styles/kb-tokens.css'
 import '@/styles/kb-components.css'
 import '@/styles/kb-site.css'
-import { homeProjects } from '../home/projects'
+import { homeProjects, projectImageTransitionName } from '../home/projects'
 import { starsBackgroundImage } from '../home/starsBackground'
 import { downloadCvPlaceholder, useAuroraParallax, useCursorSpotlight, useLang } from '../home/useHomeEffects'
 
@@ -72,10 +72,19 @@ export default function ProjectPage() {
       </div>
 
       <div className="kb-content">
-        <Link to="/" className="kb-back-link">
+        <Link to="/" className="kb-back-link" viewTransition>
           <span data-lang="en">← Back to home</span>
           <span data-lang="pt">← Voltar ao início</span>
         </Link>
+
+        <div className="kb-project-header">
+          <img
+            className="kb-project-header__img"
+            src={project.image}
+            alt=""
+            style={{ viewTransitionName: projectImageTransitionName(project.slug) }}
+          />
+        </div>
       </div>
     </div>
   )

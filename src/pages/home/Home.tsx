@@ -5,7 +5,7 @@ import '@/styles/kb-tokens.css'
 import '@/styles/kb-components.css'
 import '@/styles/kb-site.css'
 import { getDynamicFrameItems } from './dynamicFrameDemoFrames'
-import { homeProjects } from './projects'
+import { homeProjects, projectImageTransitionName } from './projects'
 import { starsBackgroundImage } from './starsBackground'
 import { useAuroraParallax, useCardSpreadEffects, useCursorSpotlight, useLang } from './useHomeEffects'
 
@@ -36,6 +36,7 @@ export default function Home() {
                 key={project.slug}
                 to={`/projects/${project.slug}`}
                 className="kb-project-card"
+                viewTransition
                 style={{ '--card-rot': project.rotation } as React.CSSProperties}
               >
                 <div className="kb-project-card__tilt">
@@ -45,6 +46,7 @@ export default function Home() {
                     alt=""
                     loading="lazy"
                     draggable={false}
+                    style={{ viewTransitionName: projectImageTransitionName(project.slug) }}
                   />
                   <span className="kb-project-card__grain" aria-hidden="true" />
                   <span className="kb-project-card__scrim" aria-hidden="true" />
