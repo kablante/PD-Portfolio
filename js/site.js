@@ -251,11 +251,32 @@
     requestAnimationFrame(draw);
   }
 
+  // Mouse-driven depth parallax on the fixed aurora background: sets
+  // --kb-px/--kb-py (-0.5..0.5) on .kb-bg, which site.css's kb-aurora__mesh
+  // and kb-aurora__stars read via the standalone `translate` property so
+  // each layer drifts a different amount without touching kb-drift's own
+  // `transform` animation. Skipped on touch (no hover/mouse) and when the
+  // user has asked for reduced motion.
+  function initAuroraParallax() {
+    var bg = document.querySelector(".kb-bg");
+    if (!bg) return;
+    if (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) return;
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    window.addEventListener("mousemove", function (e) {
+      var px = e.clientX / window.innerWidth - 0.5;
+      var py = e.clientY / window.innerHeight - 0.5;
+      bg.style.setProperty("--kb-px", px.toFixed(3));
+      bg.style.setProperty("--kb-py", py.toFixed(3));
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     initLangSwitch();
     initDownloadCv();
     initCardTilt();
     initCardSpread();
     initCursorSpotlight();
+    initAuroraParallax();
   });
 })();
