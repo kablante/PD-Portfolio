@@ -34,10 +34,11 @@
     });
   }
 
-  // Home nav bar starts docked at the bottom of the first viewport and
-  // slides up to dock at the top once the page has scrolled past it
-  // (.kb-footerbar--home's CSS transform/border do the actual sliding —
-  // this just toggles the class that switches between the two states).
+  // Home nav is a floating dock, hidden until the user has scrolled past
+  // the hero, then it slides in from the left edge and fades up
+  // (.kb-footerbar--float-left's CSS transform/opacity do the actual
+  // animating — this just toggles the class that switches between the two
+  // states).
   function initHomeFooterbarScroll() {
     var bar = document.querySelector("[data-scroll-footerbar]");
     if (!bar) return;
