@@ -1,3 +1,4 @@
+import { Download } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Blob, Sparkle4, SmallDiamond } from './bentoDecor'
 import { type Lang, downloadCvPlaceholder } from './useHomeEffects'
@@ -13,7 +14,7 @@ const TIMEZONE = 'America/Sao_Paulo'
 function TimezoneClock() {
   const [now, setNow] = useState(() => new Date())
   useEffect(() => {
-    const id = window.setInterval(() => setNow(new Date()), 1000)
+    const id = window.setInterval(() => setNow(new Date()), 15000)
     return () => window.clearInterval(id)
   }, [])
   return (
@@ -22,19 +23,18 @@ function TimezoneClock() {
         timeZone: TIMEZONE,
         hour: '2-digit',
         minute: '2-digit',
-        second: '2-digit',
       }).format(now)}
     </>
   )
 }
 
 const SKILLS: Array<{ label: string; hue: 'magenta' | 'violet' | 'cyan' | 'pink' }> = [
-  { label: 'Product Design', hue: 'magenta' },
-  { label: 'Design Systems', hue: 'violet' },
-  { label: 'Figma', hue: 'cyan' },
-  { label: 'Prototyping', hue: 'pink' },
-  { label: 'User Research', hue: 'violet' },
-  { label: 'UX Writing', hue: 'magenta' },
+  { label: 'AI-Assisted Design Workflows', hue: 'magenta' },
+  { label: 'Enterprise UX Design', hue: 'violet' },
+  { label: 'Cross-functional Collaboration', hue: 'cyan' },
+  { label: 'Figma', hue: 'pink' },
+  { label: 'GitHub', hue: 'violet' },
+  { label: 'User Research', hue: 'magenta' },
 ]
 
 export default function BentoGrid({ lang }: { lang: Lang }) {
@@ -77,16 +77,16 @@ export default function BentoGrid({ lang }: { lang: Lang }) {
 
       <div className="kb-bento-card kb-bento-card--name" ref={nameRef} style={{ gridArea: 'name' }}>
         <span className="kb-bento-card__eyebrow">
-          <span data-lang="en">✦ profile</span>
-          <span data-lang="pt">✦ perfil</span>
+          <span data-lang="en">✦ Who?</span>
+          <span data-lang="pt">✦ Quem?</span>
         </span>
         <h1 className="kb-bento-card__name">Katarina Blante</h1>
         <div className="kb-bento-card__meta">
           <span data-lang="en">she / her</span>
           <span data-lang="pt">ela / dela</span>
           <span className="kb-bento-card__dot" aria-hidden="true" />
-          <span data-lang="en">product designer</span>
-          <span data-lang="pt">designer de produto</span>
+          <span data-lang="en">Brazilian</span>
+          <span data-lang="pt">brasileira</span>
         </div>
         <div className="kb-bento-card__rule" aria-hidden="true" />
         <SmallDiamond
@@ -104,26 +104,48 @@ export default function BentoGrid({ lang }: { lang: Lang }) {
         <div className="kb-bento-card__clock">
           <TimezoneClock />
         </div>
-        <span className="kb-bento-card__tz-label">São Paulo · GMT-3</span>
-        <div className="kb-bento-card__online">
-          <span className="kb-bento-card__online-dot" aria-hidden="true" />
-          <span data-lang="en">online</span>
-          <span data-lang="pt">online</span>
-        </div>
+        <span className="kb-bento-card__tz-label">GMT-3</span>
       </div>
 
       <div className="kb-bento-card kb-bento-card--intro" ref={introRef} style={{ gridArea: 'intro' }}>
-        <p className="kb-bento-card__intro-text">
-          <span data-lang="en">
-            I design the screens between "I need this" and "it's done" — signup flows, dashboards, the parts of a
-            product people actually spend their day in.{' '}
-            <em>Six years, mostly fintech and marketplaces.</em>
-          </span>
-          <span data-lang="pt">
-            Desenho as telas entre "eu preciso disso" e "está feito" — fluxos de cadastro, dashboards, as partes de
-            um produto em que as pessoas realmente passam o dia. <em>Seis anos, principalmente fintech e marketplaces.</em>
-          </span>
-        </p>
+        <div className="kb-bento-card__intro-text">
+          <p>
+            <span data-lang="en">
+              <em>(Full disclosure: I vibe-coded this site.)</em> Don't worry, the rest of my work goes through more
+              than vibes.
+            </span>
+            <span data-lang="pt">
+              <em>(Aviso sincero: eu vibe-codei este site.)</em> Pode ficar tranquilo, o resto do meu trabalho passa
+              por bem mais do que vibe.
+            </span>
+          </p>
+          <p>
+            <span data-lang="en">
+              I design <em>(B2B products with complex requirements)</em> and business rules. My most recent project
+              was for a Silicon Valley hardware manufacturer, designed to coordinate data across production lines,
+              builds, and equipment for multiple concurrent user roles. In real projects, there are no easy answers.
+              That's where a designer doesn't lose to AI.
+            </span>
+            <span data-lang="pt">
+              Eu desenho <em>(produtos B2B com requisitos complexos)</em> e regras de negócio. Meu projeto mais
+              recente foi para uma fabricante de hardware do Vale do Silício, pensado para coordenar dados entre
+              linhas de produção, builds e equipamentos, para múltiplos perfis de usuário simultâneos. Em projetos
+              reais, não existem respostas fáceis. É aí que um designer não perde para a IA.
+            </span>
+          </p>
+          <p>
+            <span data-lang="en">
+              I work <em>(close to engineering)</em>: GitHub, dev teams, AI-assisted tools are part of the job, not
+              someone else's. Right now I'm also building product management fundamentals: sharper problem framing,
+              better trade-off calls.
+            </span>
+            <span data-lang="pt">
+              Eu trabalho <em>(perto da engenharia)</em>: GitHub, times de dev, ferramentas com IA fazem parte do
+              trabalho, não são tarefa de outra pessoa. Agora também estou construindo fundamentos de product
+              management: enquadrar problemas com mais precisão, tomar decisões de trade-off melhores.
+            </span>
+          </p>
+        </div>
         <Sparkle4
           size={20}
           color="var(--kb-lavender)"
@@ -137,12 +159,15 @@ export default function BentoGrid({ lang }: { lang: Lang }) {
           className="kb-bento-btn kb-bento-btn--primary"
           onClick={() => window.open('https://www.linkedin.com/in/katarinablante/', '_blank')}
         >
-          <span data-lang="en">✉ get in touch</span>
-          <span data-lang="pt">✉ fale comigo</span>
+          <svg width={20} height={20} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.446-2.136 2.94v5.666H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 1 1 0-4.124 2.062 2.062 0 0 1 0 4.124zM7.114 20.452H3.558V9h3.556v11.452z" />
+          </svg>
+          LinkedIn
         </button>
         <button type="button" className="kb-bento-btn kb-bento-btn--ghost" onClick={() => downloadCvPlaceholder(lang)}>
-          <span data-lang="en">⬇ download CV</span>
-          <span data-lang="pt">⬇ baixar currículo</span>
+          <Download size={20} aria-hidden="true" />
+          <span data-lang="en">Download CV</span>
+          <span data-lang="pt">Baixar currículo</span>
         </button>
       </div>
 

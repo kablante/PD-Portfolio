@@ -20,7 +20,7 @@ export const homeProjects: HomeProject[] = [
     slug: 'aurora-bank',
     image: '/assets/projects/aurora-bank.png',
     rotation: '-3.859deg',
-    title: 'Aurora Bank',
+    title: 'Venturus',
     descEn:
       'Aurora asked for a faster signup. What people actually needed was to know where they were in the process, and what would happen next.',
     descPt:
@@ -30,7 +30,7 @@ export const homeProjects: HomeProject[] = [
     slug: 'petal',
     image: '/assets/projects/petal.jpg',
     rotation: '1.891deg',
-    title: 'Petal',
+    title: 'Venturus',
     descEn:
       'Every plant app I found sent guilt. Petal reframes care as a weekly rhythm you can miss without failing.',
     descPt:
@@ -40,28 +40,30 @@ export const homeProjects: HomeProject[] = [
     slug: 'cosmos-learn',
     image: '/assets/projects/cosmos-learn.png',
     rotation: '-0.207deg',
-    title: 'Cosmos Learn',
+    title: 'Boavista',
     descEn:
-      'Most of these students study between 11pm and 2am, on a phone, with one hand. The desktop-first platform they had ignored all of that.',
+      "Boavista's landing page wasn't converting. Marketing had three days and no budget for a redo. I proposed one anyway, and it doubled the conversion rate.",
     descPt:
-      'A maioria desses alunos estuda entre 23h e 2h, no celular, com uma mão só. A plataforma que eles tinham era feita para desktop e ignorava tudo isso.',
+      'A landing page da Boavista não estava convertendo. O marketing tinha três dias e nenhum orçamento para refazer. Propus uma mesmo assim, e ela dobrou a taxa de conversão.',
   },
   {
     slug: 'verao',
     image: '/assets/projects/verao.png',
     rotation: '2.596deg',
-    title: 'Verão',
-    descEn: 'Six properties, one booking flow, and a guest who is usually deciding on a bus with bad signal.',
-    descPt: 'Seis unidades, um fluxo de reserva e um hóspede que normalmente decide dentro do ônibus, com sinal ruim.',
+    title: 'For She',
+    descEn:
+      'Hackathon das Manas gave us a weekend to design a platform for women entering tech. We placed 1st, with an honorable mention for global impact.',
+    descPt:
+      'O Hackathon das Manas nos deu um fim de semana para desenhar uma plataforma para mulheres entrando em tech. Ficamos em 1º lugar, com menção honrosa por impacto global.',
   },
   {
     slug: 'nebula-studio',
     image: '/assets/projects/nebula-studio.png',
     rotation: '-3.466deg',
-    title: 'Nébula Studio',
+    title: 'Fortal City Game',
     descEn:
-      'A three-person motion studio with beautiful work and a portfolio nobody could scan. The fix was editing, not decoration.',
+      'A mobile advergame for local Fortaleza businesses, built in three days for the Sebrae Dev Program. Sunny-beach-city tourism, minus the beach cliché.',
     descPt:
-      'Um estúdio de motion de três pessoas, com trabalhos bonitos e um portfólio que ninguém conseguia percorrer. A solução foi edição, não decoração.',
+      'Um advergame mobile para negócios locais de Fortaleza, construído em três dias para o Sebrae Dev Program. Turismo de cidade praiana e ensolarada, sem o clichê de praia.',
   },
 ]

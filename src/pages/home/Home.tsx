@@ -1,7 +1,6 @@
 import { useRef } from 'react'
 import { Link } from 'react-router-dom'
 import AuroraBackground from '@/components/shared/AuroraBackground'
-import { GrainCanvas } from '@/components/ui/grain-canvas'
 import '@/styles/kb-tokens.css'
 import '@/styles/kb-components.css'
 import '@/styles/kb-site.css'
@@ -40,7 +39,6 @@ export default function Home() {
                     draggable={false}
                     style={{ viewTransitionName: projectImageTransitionName(project.slug) }}
                   />
-                  <GrainCanvas className="kb-project-card__grain" />
                   <span className="kb-project-card__scrim" aria-hidden="true" />
                   <span className="kb-project-card__glare" aria-hidden="true" />
                   <span className="kb-project-card__glare-ring" aria-hidden="true" />
