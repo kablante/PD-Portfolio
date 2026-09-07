@@ -279,6 +279,43 @@
     });
   }
 
+  // Content page → Home exit transition: the mirror of the one above.
+  // Every link that leads back to the home page — the "← Back to home"
+  // link, the footerbar logo, no matter which — plays the reverse
+  // animation first (content drifts down/fades, aurora parallaxes back,
+  // top bar slides down to a bottom position) and only then navigates.
+  var HOME_TRANSITION_MS = 680;
+
+  function isHomeHref(href) {
+    if (!href) return false;
+    var path = href.split("#")[0].split("?")[0];
+    return path === "index.html" || path === "../index.html" || path === "./index.html";
+  }
+
+  function initHomeReturnTransition() {
+    var page = document.querySelector(".kb-page:not(.kb-page--home)");
+    if (!page) return;
+    var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) return;
+    var links = Array.prototype.slice.call(page.querySelectorAll("a[href]")).filter(function (a) {
+      return isHomeHref(a.getAttribute("href"));
+    });
+    if (!links.length) return;
+    var navigating = false;
+    links.forEach(function (link) {
+      link.addEventListener("click", function (e) {
+        var href = link.getAttribute("href");
+        e.preventDefault();
+        if (navigating) return;
+        navigating = true;
+        page.classList.add("kb-leaving-home");
+        window.setTimeout(function () {
+          window.location.href = href;
+        }, HOME_TRANSITION_MS);
+      });
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     initLangSwitch();
     initDownloadCv();
@@ -286,5 +323,6 @@
     initCardSpread();
     initCursorSpotlight();
     initAboutTransition();
+    initHomeReturnTransition();
   });
 })();
