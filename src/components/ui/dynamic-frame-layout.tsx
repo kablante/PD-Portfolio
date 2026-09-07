@@ -1,9 +1,15 @@
 import { motion } from 'framer-motion'
+import type { ReactNode } from 'react'
 import { useState } from 'react'
 
 interface Frame {
   id: number
-  image: string
+  /** Renders as an image tile. Omit when using `content` for a non-media
+   * cell (buttons, text, tags, etc.) instead. */
+  image?: string
+  /** Arbitrary cell content - buttons, text, tags, a clock, anything.
+   * Takes over the whole cell in place of the image/frame chrome below. */
+  content?: ReactNode
   defaultPos: { x: number; y: number; w: number; h: number }
   corner?: string
   edgeHorizontal?: string
@@ -14,7 +20,8 @@ interface Frame {
 }
 
 interface FrameComponentProps {
-  image: string
+  image?: string
+  content?: ReactNode
   width: number | string
   height: number | string
   className?: string
@@ -29,6 +36,7 @@ interface FrameComponentProps {
 
 function FrameComponent({
   image,
+  content,
   width,
   height,
   className = '',
@@ -50,29 +58,35 @@ function FrameComponent({
       }}
     >
       <div className="relative w-full h-full overflow-hidden">
-        <div
-          className="absolute inset-0 flex items-center justify-center"
-          style={{
-            zIndex: 1,
-            transition: 'all 0.3s ease-in-out',
-            padding: showFrame ? `${borderThickness}px` : '0',
-            width: showFrame ? `${borderSize}%` : '100%',
-            height: showFrame ? `${borderSize}%` : '100%',
-            left: showFrame ? `${(100 - borderSize) / 2}%` : '0',
-            top: showFrame ? `${(100 - borderSize) / 2}%` : '0',
-          }}
-        >
+        {content ? (
+          <div className="absolute inset-0 overflow-hidden" style={{ zIndex: 1 }}>
+            {content}
+          </div>
+        ) : (
           <div
-            className="w-full h-full overflow-hidden"
+            className="absolute inset-0 flex items-center justify-center"
             style={{
-              transform: `scale(${mediaSize})`,
-              transformOrigin: 'center',
-              transition: 'transform 0.3s ease-in-out',
+              zIndex: 1,
+              transition: 'all 0.3s ease-in-out',
+              padding: showFrame ? `${borderThickness}px` : '0',
+              width: showFrame ? `${borderSize}%` : '100%',
+              height: showFrame ? `${borderSize}%` : '100%',
+              left: showFrame ? `${(100 - borderSize) / 2}%` : '0',
+              top: showFrame ? `${(100 - borderSize) / 2}%` : '0',
             }}
           >
-            <img className="w-full h-full object-cover" src={image} alt="" draggable={false} />
+            <div
+              className="w-full h-full overflow-hidden"
+              style={{
+                transform: `scale(${mediaSize})`,
+                transformOrigin: 'center',
+                transition: 'transform 0.3s ease-in-out',
+              }}
+            >
+              <img className="w-full h-full object-cover" src={image} alt="" draggable={false} />
+            </div>
           </div>
-        </div>
+        )}
 
         {showFrame && (
           <div className="absolute inset-0" style={{ zIndex: 2 }}>
@@ -143,13 +157,12 @@ interface DynamicFrameLayoutProps {
 }
 
 export function DynamicFrameLayout({
-  frames: initialFrames,
+  frames,
   className,
   showFrames = false,
   hoverSize = 6,
   gapSize = 4,
 }: DynamicFrameLayoutProps) {
-  const [frames] = useState<Frame[]>(initialFrames)
   const [hovered, setHovered] = useState<{ row: number; col: number } | null>(null)
 
   const getRowSizes = () => {
@@ -201,6 +214,7 @@ export function DynamicFrameLayout({
           >
             <FrameComponent
               image={frame.image}
+              content={frame.content}
               width="100%"
               height="100%"
               className="absolute inset-0"

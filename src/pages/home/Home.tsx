@@ -4,7 +4,7 @@ import { DynamicFrameLayout } from '@/components/ui/dynamic-frame-layout'
 import '@/styles/kb-tokens.css'
 import '@/styles/kb-components.css'
 import '@/styles/kb-site.css'
-import { dynamicFrameDemoFrames } from './dynamicFrameDemoFrames'
+import { getDynamicFrameItems } from './dynamicFrameDemoFrames'
 import { homeProjects } from './projects'
 import { starsBackgroundImage } from './starsBackground'
 import { useAuroraParallax, useCardSpreadEffects, useCursorSpotlight, useLang } from './useHomeEffects'
@@ -12,7 +12,7 @@ import { useAuroraParallax, useCardSpreadEffects, useCursorSpotlight, useLang } 
 export default function Home() {
   const bgRef = useRef<HTMLDivElement>(null)
   const rowRef = useRef<HTMLDivElement>(null)
-  const { setLang } = useLang()
+  const { lang, setLang } = useLang()
 
   useCardSpreadEffects(rowRef)
   useCursorSpotlight()
@@ -83,7 +83,12 @@ export default function Home() {
       </div>
       <div className="kb-home-blank">
         <div className="kb-home-blank__inner">
-          <DynamicFrameLayout frames={dynamicFrameDemoFrames} className="w-full h-full" hoverSize={6} gapSize={4} />
+          <DynamicFrameLayout
+            frames={getDynamicFrameItems(lang)}
+            className="w-full h-full"
+            hoverSize={6}
+            gapSize={4}
+          />
         </div>
       </div>
       <div className="kb-lang-dock">
