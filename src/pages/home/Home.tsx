@@ -1,8 +1,10 @@
 import { useRef } from 'react'
 import { Link } from 'react-router-dom'
+import { DynamicFrameLayout } from '@/components/ui/dynamic-frame-layout'
 import '@/styles/kb-tokens.css'
 import '@/styles/kb-components.css'
 import '@/styles/kb-site.css'
+import { dynamicFrameDemoFrames } from './dynamicFrameDemoFrames'
 import { homeProjects } from './projects'
 import { starsBackgroundImage } from './starsBackground'
 import { useAuroraParallax, useCardSpreadEffects, useCursorSpotlight, useLang } from './useHomeEffects'
@@ -79,7 +81,11 @@ export default function Home() {
           </span>
         </div>
       </div>
-      <div className="kb-home-blank" aria-hidden="true" />
+      <div className="kb-home-blank">
+        <div className="kb-home-blank__inner">
+          <DynamicFrameLayout frames={dynamicFrameDemoFrames} className="w-full h-full" hoverSize={6} gapSize={4} />
+        </div>
+      </div>
       <div className="kb-lang-dock">
         <div role="group" aria-label="Language" className="kb-lang-switch">
           <span className="kb-lang-switch__knob" aria-hidden="true" />

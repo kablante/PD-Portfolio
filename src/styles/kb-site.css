@@ -10,9 +10,12 @@ body{overflow-x:hidden}
    into) so the page scrolls instead of being clipped. */
 .kb-page--home{min-height:100vh}
 
-/* A second, empty screen's worth of height purely so scrolling has
-   somewhere to go — the fixed aurora background is what shows the motion. */
-.kb-home-blank{position:relative;z-index:1;min-height:100vh}
+/* Second section: a full-screen video grid over the fixed aurora
+   background. Used to be an empty scroll spacer - .kb-home-blank__inner
+   is what DynamicFrameLayout sizes itself to (it fills 100% of its
+   parent, so that parent needs a concrete height, not just min-height). */
+.kb-home-blank{position:relative;z-index:1;min-height:100vh;display:flex;align-items:center;padding:clamp(24px,5vw,64px)}
+.kb-home-blank__inner{width:100%;height:min(80vh,900px)}
 
 /* ---------- Fixed aurora background ---------- */
 .kb-bg{position:fixed;inset:0;z-index:0;pointer-events:none}
