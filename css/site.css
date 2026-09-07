@@ -103,23 +103,32 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
 }
 
 /* ---------- Card drop-in ----------
-   On load, every card falls in from off-screen above together, overshoots
-   its resting spot like a bungee cord, and settles — one fall, one kick,
-   done. The keyframe reads --card-rot throughout, so it lands exactly on
-   the same lean the base rule already gives each card at rest. `backwards`
-   fill is needed so cards stay hidden above the frame for the (shared,
-   zero) delay instead of flashing at rest immediately — `forwards`/`both`
-   is deliberately avoided, since either would keep overriding this
-   element's transform forever, which is what silently broke the home/
-   about exit transitions earlier. */
+   On load, every card falls in from off-screen above together and
+   overshoots its resting spot like a bungee cord — but each card carries
+   its own --wobble (how far its rotation swings past --card-rot before
+   settling) and its own --drop (how far it overshoots vertically), plus a
+   slightly different duration/delay, so five cards catching the same
+   "gravity" still read as five separate physical bodies instead of one
+   rigid shape repeated five times. Keyframes read --card-rot throughout,
+   so every card still lands on exactly the lean the base rule already
+   gives it at rest. `backwards` fill is needed so cards stay hidden above
+   the frame during their (tiny, per-card) delay instead of flashing at
+   rest immediately — `forwards`/`both` is deliberately avoided, since
+   either would keep overriding this element's transform forever, which is
+   what silently broke the home/about exit transitions earlier. */
 @keyframes kb-card-fall{
   0%{transform:translateY(-140vh) rotate(var(--card-rot,0deg));opacity:0}
-  58%{transform:translateY(7%) rotate(var(--card-rot,0deg));opacity:1}
-  76%{transform:translateY(-3%) rotate(var(--card-rot,0deg))}
-  90%{transform:translateY(1%) rotate(var(--card-rot,0deg))}
+  56%{transform:translateY(var(--drop,7%)) rotate(calc(var(--card-rot,0deg) + var(--wobble,6deg)));opacity:1}
+  74%{transform:translateY(calc(var(--drop,7%)*-0.45)) rotate(calc(var(--card-rot,0deg) - var(--wobble,6deg)*0.6))}
+  89%{transform:translateY(calc(var(--drop,7%)*0.15)) rotate(calc(var(--card-rot,0deg) + var(--wobble,6deg)*0.25))}
   100%{transform:translateY(0) rotate(var(--card-rot,0deg));opacity:1}
 }
-.kb-home-cards__row .kb-project-card{animation:kb-card-fall 950ms cubic-bezier(.22,.61,.36,1) backwards}
+.kb-home-cards__row .kb-project-card{animation:kb-card-fall 900ms cubic-bezier(.22,.61,.36,1) backwards}
+.kb-home-cards__row .kb-project-card:nth-child(1){--wobble:7deg;--drop:6%;animation-duration:880ms;animation-delay:0ms}
+.kb-home-cards__row .kb-project-card:nth-child(2){--wobble:-9deg;--drop:9%;animation-duration:960ms;animation-delay:25ms}
+.kb-home-cards__row .kb-project-card:nth-child(3){--wobble:5deg;--drop:5%;animation-duration:900ms;animation-delay:10ms}
+.kb-home-cards__row .kb-project-card:nth-child(4){--wobble:-7deg;--drop:8%;animation-duration:940ms;animation-delay:35ms}
+.kb-home-cards__row .kb-project-card:nth-child(5){--wobble:9deg;--drop:7%;animation-duration:920ms;animation-delay:15ms}
 @media (prefers-reduced-motion:reduce){
   .kb-home-cards__row .kb-project-card{animation:none}
 }
