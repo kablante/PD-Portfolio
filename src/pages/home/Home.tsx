@@ -1,5 +1,6 @@
 import { Download } from 'lucide-react'
 import { useRef } from 'react'
+import { Link } from 'react-router-dom'
 import '@/styles/kb-tokens.css'
 import '@/styles/kb-components.css'
 import '@/styles/kb-site.css'
@@ -38,9 +39,9 @@ export default function Home() {
         <div className="kb-home-cards">
           <div className="kb-home-cards__row" ref={rowRef}>
             {homeProjects.map((project) => (
-              <a
+              <Link
                 key={project.slug}
-                href={`projects/${project.slug}.html`}
+                to={`/projects/${project.slug}`}
                 className="kb-project-card"
                 style={{ '--card-rot': project.rotation } as React.CSSProperties}
               >
@@ -65,7 +66,7 @@ export default function Home() {
                     <span data-lang="pt">{project.descPt}</span>
                   </p>
                 </div>
-              </a>
+              </Link>
             ))}
           </div>
         </div>
@@ -89,9 +90,9 @@ export default function Home() {
       </div>
       <div className="kb-home-blank" aria-hidden="true" />
       <div className={`kb-footerbar kb-footerbar--float-left${isStuck ? ' is-stuck' : ''}`}>
-        <a href="/" className="kb-footerbar__logo" aria-label="Katarina Blante — home">
+        <Link to="/" className="kb-footerbar__logo" aria-label="Katarina Blante — home">
           <img src="/assets/logo-kb-mark.svg" alt="k·B" />
-        </a>
+        </Link>
 
         <div className="kb-footerbar__actions">
           <button

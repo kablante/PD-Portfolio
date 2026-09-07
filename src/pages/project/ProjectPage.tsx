@@ -1,0 +1,82 @@
+import { Download } from 'lucide-react'
+import { useRef } from 'react'
+import { Link, Navigate, useParams } from 'react-router-dom'
+import '@/styles/kb-tokens.css'
+import '@/styles/kb-components.css'
+import '@/styles/kb-site.css'
+import { homeProjects } from '../home/projects'
+import { starsBackgroundImage } from '../home/starsBackground'
+import { downloadCvPlaceholder, useAuroraParallax, useCursorSpotlight, useLang } from '../home/useHomeEffects'
+
+/** Project case-study pages aren't built yet - this is deliberately just the
+ * site chrome (aurora background, top nav bar, back link) so each card has
+ * somewhere real to land instead of a dead link. */
+export default function ProjectPage() {
+  const { slug } = useParams()
+  const project = homeProjects.find((p) => p.slug === slug)
+  const bgRef = useRef<HTMLDivElement>(null)
+  const { lang, setLang } = useLang()
+
+  useCursorSpotlight()
+  useAuroraParallax(bgRef)
+
+  if (!project) return <Navigate to="/" replace />
+
+  return (
+    <div className="kb-page">
+      <div className="kb-bg" aria-hidden="true" ref={bgRef}>
+        <div className="kb-aurora">
+          <span className="kb-aurora__mesh" />
+          <span className="kb-aurora__stars" style={{ backgroundImage: starsBackgroundImage }} />
+          <span className="kb-aurora__grain" />
+        </div>
+      </div>
+
+      <div className="kb-footerbar kb-footerbar--top">
+        <Link to="/" className="kb-footerbar__logo" aria-label="Katarina Blante — home">
+          <img src="/assets/logo-kb-mark.svg" alt="k·B" />
+        </Link>
+
+        <div className="kb-footerbar__actions">
+          <button
+            type="button"
+            className="kb-icon-btn kb-icon-btn--outline"
+            aria-label="LinkedIn"
+            onClick={() => window.open('https://www.linkedin.com/in/katarinablante/', '_blank')}
+          >
+            <svg width={20} height={20} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.446-2.136 2.94v5.666H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 1 1 0-4.124 2.062 2.062 0 0 1 0 4.124zM7.114 20.452H3.558V9h3.556v11.452z" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            className="kb-icon-btn kb-icon-btn--outline"
+            aria-label="Download CV"
+            onClick={() => downloadCvPlaceholder(lang)}
+          >
+            <Download size={20} aria-hidden="true" />
+          </button>
+        </div>
+
+        <div role="group" aria-label="Language" className="kb-lang-switch">
+          <span className="kb-lang-switch__knob" aria-hidden="true" />
+          <button type="button" data-lang-btn="en" onClick={() => setLang('en')}>
+            EN
+          </button>
+          <button type="button" data-lang-btn="pt" onClick={() => setLang('pt')}>
+            PT
+          </button>
+        </div>
+
+        <span className="kb-footerbar__copy">© 2026 Katarina Blante · product designer</span>
+      </div>
+
+      <div className="kb-content">
+        <Link to="/" className="kb-back-link">
+          <span data-lang="en">← Back to home</span>
+          <span data-lang="pt">← Voltar ao início</span>
+        </Link>
+      </div>
+    </div>
+  )
+}
