@@ -35,7 +35,13 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
 /* Same entrance treatment .kb-content uses on about/project pages, so
    arriving here after the reverse exit transition (or on a fresh load)
    eases in instead of snapping straight to rest. */
-.kb-home-main{position:relative;z-index:1;height:calc(100vh - 64px);display:flex;flex-direction:column;overflow:hidden;animation:kb-rise-in 480ms cubic-bezier(.22,.61,.36,1) both}
+/* fill-mode intentionally omitted (defaults to none): a forwards/both fill
+   would keep overriding transform/opacity after the animation ends, at a
+   cascade priority above normal rules — which silently blocks the
+   .kb-leaving-about exit transition on this same element from ever
+   starting. The 100% keyframe already matches the element's own resting
+   style, so dropping the fill causes no visible jump once it finishes. */
+.kb-home-main{position:relative;z-index:1;height:calc(100vh - 64px);display:flex;flex-direction:column;overflow:hidden;animation:kb-rise-in 480ms cubic-bezier(.22,.61,.36,1)}
 
 /* Cards bleed above the viewport on purpose (cropped by .kb-page--home's
    own clip, not by a tight box here) — the negative margin pulls them up,
@@ -135,7 +141,11 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
 
 /* ---------- About / Project shared content column ---------- */
 /* +64px reserves room for the fixed top nav bar on these pages */
-.kb-content{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:calc(64px + clamp(56px,7vw,104px)) clamp(24px,5vw,64px) clamp(72px,9vw,120px);animation:kb-rise-in 480ms cubic-bezier(.22,.61,.36,1) both}
+/* fill-mode intentionally omitted — see the note on .kb-home-main: a
+   forwards/both fill would keep this animation overriding transform/
+   opacity forever, blocking the .kb-leaving-home exit transition below
+   from ever starting. */
+.kb-content{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:calc(64px + clamp(56px,7vw,104px)) clamp(24px,5vw,64px) clamp(72px,9vw,120px);animation:kb-rise-in 480ms cubic-bezier(.22,.61,.36,1)}
 .kb-back-link{all:unset;cursor:pointer;font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--kb-cyan);display:inline-block}
 .kb-back-link:hover{color:var(--kb-butter)}
 
