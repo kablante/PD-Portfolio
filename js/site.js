@@ -34,6 +34,21 @@
     });
   }
 
+  // Home nav bar starts docked at the bottom of the first viewport and
+  // slides up to dock at the top once the page has scrolled past it
+  // (.kb-footerbar--home's CSS transform/border do the actual sliding —
+  // this just toggles the class that switches between the two states).
+  function initHomeFooterbarScroll() {
+    var bar = document.querySelector("[data-scroll-footerbar]");
+    if (!bar) return;
+    var threshold = 24;
+    function update() {
+      bar.classList.toggle("is-stuck", window.scrollY > threshold);
+    }
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+  }
+
   // Matches Aave's own "Working at Aave Labs" cards: the card's own lean
   // (--card-rot) never changes, and hovering adds a pointer-tracked 3D
   // tilt on a separate inner layer plus a holo glare that follows the
@@ -254,6 +269,7 @@
   document.addEventListener("DOMContentLoaded", function () {
     initLangSwitch();
     initDownloadCv();
+    initHomeFooterbarScroll();
     initCardTilt();
     initCardSpread();
     initCursorSpotlight();
