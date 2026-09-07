@@ -1,9 +1,9 @@
 import { motion } from 'framer-motion'
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 
 interface Frame {
   id: number
-  video: string
+  image: string
   defaultPos: { x: number; y: number; w: number; h: number }
   corner?: string
   edgeHorizontal?: string
@@ -11,11 +11,10 @@ interface Frame {
   mediaSize: number
   borderThickness?: number
   borderSize?: number
-  isHovered: boolean
 }
 
 interface FrameComponentProps {
-  video: string
+  image: string
   width: number | string
   height: number | string
   className?: string
@@ -26,11 +25,10 @@ interface FrameComponentProps {
   borderThickness: number
   borderSize: number
   showFrame: boolean
-  isHovered: boolean
 }
 
 function FrameComponent({
-  video,
+  image,
   width,
   height,
   className = '',
@@ -41,18 +39,7 @@ function FrameComponent({
   borderThickness,
   borderSize,
   showFrame,
-  isHovered,
 }: FrameComponentProps) {
-  const videoRef = useRef<HTMLVideoElement>(null)
-
-  useEffect(() => {
-    if (isHovered) {
-      videoRef.current?.play()
-    } else {
-      videoRef.current?.pause()
-    }
-  }, [isHovered])
-
   return (
     <div
       className={`relative ${className}`}
@@ -83,7 +70,7 @@ function FrameComponent({
               transition: 'transform 0.3s ease-in-out',
             }}
           >
-            <video className="w-full h-full object-cover" src={video} loop muted playsInline ref={videoRef} />
+            <img className="w-full h-full object-cover" src={image} alt="" draggable={false} />
           </div>
         </div>
 
@@ -213,7 +200,7 @@ export function DynamicFrameLayout({
             onMouseLeave={() => setHovered(null)}
           >
             <FrameComponent
-              video={frame.video}
+              image={frame.image}
               width="100%"
               height="100%"
               className="absolute inset-0"
@@ -224,7 +211,6 @@ export function DynamicFrameLayout({
               borderThickness={frame.borderThickness ?? 0}
               borderSize={frame.borderSize ?? 100}
               showFrame={showFrames}
-              isHovered={hovered?.row === row && hovered?.col === col}
             />
           </motion.div>
         )
