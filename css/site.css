@@ -32,7 +32,10 @@ html[data-active-lang="pt"] [data-lang="en"]{display:none}
 html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
 
 /* ---------- Home ---------- */
-.kb-home-main{position:relative;z-index:1;height:calc(100vh - 64px);display:flex;flex-direction:column;overflow:hidden}
+/* Same entrance treatment .kb-content uses on about/project pages, so
+   arriving here after the reverse exit transition (or on a fresh load)
+   eases in instead of snapping straight to rest. */
+.kb-home-main{position:relative;z-index:1;height:calc(100vh - 64px);display:flex;flex-direction:column;overflow:hidden;animation:kb-rise-in 480ms cubic-bezier(.22,.61,.36,1) both}
 
 /* Cards bleed above the viewport on purpose (cropped by .kb-page--home's
    own clip, not by a tight box here) — the negative margin pulls them up,
