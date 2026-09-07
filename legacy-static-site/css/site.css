@@ -2,20 +2,32 @@
 
 html,body{height:100%}
 body{overflow-x:hidden}
-body.kb-no-scroll{overflow:hidden;height:100vh}
 
 .kb-page{position:relative;min-height:100vh;font-family:var(--font-body);color:var(--text-body)}
 
-/* Home is the one screen with no scroll at all: it's clipped to exactly the
-   viewport, and the card row is allowed to bleed past its top edge on
-   purpose (see .kb-home-cards below) — this outer clip is what crops it. */
-.kb-page--home{height:100vh;overflow:hidden}
+/* Home's first viewport keeps its old exact-height composition; the page
+   itself is free to grow past 100vh (.kb-home-blank below is what it grows
+   into) so the page scrolls instead of being clipped. */
+.kb-page--home{min-height:100vh}
+
+/* A second, empty screen's worth of height purely so scrolling has
+   somewhere to go — the fixed aurora background is what shows the motion. */
+.kb-home-blank{position:relative;z-index:1;min-height:100vh}
 
 /* ---------- Fixed aurora background ---------- */
 .kb-bg{position:fixed;inset:0;z-index:0;pointer-events:none}
+/* Flat scrim over the whole field, on top of the mesh/stars but below
+   nothing (kb-bg itself sits behind all page content) — halves the
+   background's perceived brightness everywhere it's used. */
+.kb-bg::after{content:"";position:absolute;inset:0;background:rgba(0,0,0,.5)}
 .kb-aurora{position:relative;isolation:isolate;overflow:hidden;background:var(--surface-page);width:100%;height:100%}
-.kb-aurora__mesh{position:absolute;inset:-20%;background:var(--gradient-mesh);filter:blur(var(--blur-field));opacity:.55;animation:kb-drift var(--duration-drift) var(--ease-drift) infinite alternate}
-.kb-aurora__stars{position:absolute;inset:0;background-repeat:repeat;opacity:.7}
+/* Depth parallax: mesh (far) and stars (near) each drift opposite the
+   pointer by a different amount, via the standalone `translate` property
+   so it composes with kb-drift's own `transform` animation instead of
+   fighting it. --kb-px/--kb-py (unitless, -0.5..0.5) are set on .kb-bg by
+   initAuroraParallax in site.js; grain is a flat texture and stays put. */
+.kb-aurora__mesh{position:absolute;inset:-20%;background:var(--gradient-mesh);filter:blur(var(--blur-field));opacity:.55;animation:kb-drift var(--duration-drift) var(--ease-drift) infinite alternate;translate:calc(var(--kb-px,0) * -6px) calc(var(--kb-py,0) * -6px);transition:translate 400ms ease-out}
+.kb-aurora__stars{position:absolute;inset:0;background-repeat:repeat;opacity:.7;translate:calc(var(--kb-px,0) * -16px) calc(var(--kb-py,0) * -16px);transition:translate 400ms ease-out}
 .kb-aurora__grain{position:absolute;inset:0;background-image:var(--grain-url);opacity:var(--grain-opacity);mix-blend-mode:overlay;pointer-events:none}
 
 @keyframes kb-drift{from{transform:translate3d(-2%,-1%,0) scale(1.05)}to{transform:translate3d(3%,2%,0) scale(1.14)}}
@@ -32,7 +44,16 @@ html[data-active-lang="pt"] [data-lang="en"]{display:none}
 html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
 
 /* ---------- Home ---------- */
-.kb-home-main{position:relative;z-index:1;height:calc(100vh - 64px);display:flex;flex-direction:column;overflow:hidden}
+/* Same entrance treatment .kb-content uses on about/project pages, so
+   arriving here after the reverse exit transition (or on a fresh load)
+   eases in instead of snapping straight to rest. */
+/* fill-mode intentionally omitted (defaults to none): a forwards/both fill
+   would keep overriding transform/opacity after the animation ends, at a
+   cascade priority above normal rules — which would silently block any
+   future exit transition on this same element from ever starting. The
+   100% keyframe already matches the element's own resting style, so
+   dropping the fill causes no visible jump once it finishes. */
+.kb-home-main{position:relative;z-index:1;height:calc(100vh - 64px);display:flex;flex-direction:column;overflow:hidden;animation:kb-rise-in 480ms cubic-bezier(.22,.61,.36,1)}
 
 /* Cards bleed above the viewport on purpose (cropped by .kb-page--home's
    own clip, not by a tight box here) — the negative margin pulls them up,
@@ -67,8 +88,8 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
    frame-by-frame with a spring stepper (Aave uses Motion's
    `{type:"spring",bounce:0,duration:.3}`, which CSS/WAAPI can't express
    natively). */
-.kb-project-card{all:unset;box-sizing:border-box;cursor:pointer;display:flex;justify-content:center;position:relative;flex:1 1 0;min-width:0;max-width:clamp(56px,19vw,200px);height:min(62vh,510px);transform:rotate(var(--card-rot,0deg));transform-origin:50% 50%}
-.kb-project-card__tilt{position:relative;overflow:hidden;flex:none;width:clamp(85px,29vw,310px);height:100%;border-radius:30px;background:#e9e9e9;box-shadow:0px 6px 30px 10px rgba(0,0,0,.3);display:flex;flex-direction:column;justify-content:flex-end;padding:22px;transform:perspective(800px);transition:transform 300ms ease-out,box-shadow 300ms ease-out}
+.kb-project-card{all:unset;box-sizing:border-box;cursor:pointer;display:flex;justify-content:center;position:relative;flex:1 1 0;min-width:0;max-width:clamp(60px,20.5vw,220px);height:min(66vh,560px);transform:rotate(var(--card-rot,0deg));transform-origin:50% 50%}
+.kb-project-card__tilt{position:relative;overflow:hidden;flex:none;width:clamp(90px,31vw,340px);height:100%;border-radius:30px;background:#e9e9e9;box-shadow:0px 6px 30px 10px rgba(0,0,0,.3);display:flex;flex-direction:column;justify-content:flex-end;padding:22px;transform:perspective(800px);transition:transform 300ms ease-out,box-shadow 300ms ease-out}
 .kb-project-card__img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;-webkit-user-drag:none;user-select:none}
 .kb-project-card__grain{position:absolute;inset:0;background-image:var(--grain-url);opacity:.55;mix-blend-mode:overlay;pointer-events:none;z-index:0;transition:opacity 300ms ease-out}
 .kb-project-card:hover .kb-project-card__grain{opacity:0}
@@ -96,9 +117,31 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
 .kb-hero-lockup{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(12px,3vh,40px);padding:clamp(8px,2vh,32px) clamp(24px,5vw,64px)}
 .kb-hero-lockup__logo{display:block;width:min(70vw,860px);max-height:20vh;height:auto;object-fit:contain}
 
+/* ---------- Content page → Home exit transition (reverse) ----------
+   The mirror of the transition above: any link back to the home page —
+   the back-link, the footerbar logo, whichever the user takes — drifts
+   the content down and fades it, parallaxes the aurora back the other
+   way, and slides the top nav bar down to where the bottom bar sits on
+   the home screen. Applies to about.html and every project page, since
+   they all share this same footer/back-link chrome. */
+.kb-page.kb-leaving-home .kb-content{transition:transform 640ms var(--ease-in-out),opacity 640ms var(--ease-in-out);transform:translateY(10vh);opacity:0}
+.kb-page.kb-leaving-home .kb-aurora__mesh{transition:transform 720ms var(--ease-in-out);transform:translate3d(0,6%,0) scale(.94)}
+.kb-page.kb-leaving-home .kb-aurora__stars{transition:transform 720ms var(--ease-in-out),opacity 720ms var(--ease-in-out);transform:translate3d(0,3%,0);opacity:.25}
+.kb-page.kb-leaving-home .kb-footerbar--top{transition:transform 640ms var(--ease-in-out) 60ms;transform:translateY(calc(100vh - 64px))}
+@media (prefers-reduced-motion:reduce){
+  .kb-page.kb-leaving-home .kb-content,
+  .kb-page.kb-leaving-home .kb-aurora__mesh,
+  .kb-page.kb-leaving-home .kb-aurora__stars,
+  .kb-page.kb-leaving-home .kb-footerbar--top{transition:none}
+}
+
 /* ---------- About / Project shared content column ---------- */
 /* +64px reserves room for the fixed top nav bar on these pages */
-.kb-content{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:calc(64px + clamp(56px,7vw,104px)) clamp(24px,5vw,64px) clamp(72px,9vw,120px);animation:kb-rise-in 480ms cubic-bezier(.22,.61,.36,1) both}
+/* fill-mode intentionally omitted — see the note on .kb-home-main: a
+   forwards/both fill would keep this animation overriding transform/
+   opacity forever, blocking the .kb-leaving-home exit transition below
+   from ever starting. */
+.kb-content{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:calc(64px + clamp(56px,7vw,104px)) clamp(24px,5vw,64px) clamp(72px,9vw,120px);animation:kb-rise-in 480ms cubic-bezier(.22,.61,.36,1)}
 .kb-back-link{all:unset;cursor:pointer;font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--kb-cyan);display:inline-block}
 .kb-back-link:hover{color:var(--kb-butter)}
 
@@ -127,15 +170,34 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
 .kb-project-actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:clamp(40px,5vw,72px)}
 
 /* ---------- Nav/footer bar ----------
-   Fixed to the bottom of the home screen, fixed to the top everywhere
-   else — it's the persistent piece of chrome on every page. */
-.kb-footerbar{position:fixed;left:0;right:0;z-index:20;height:64px;display:flex;align-items:center;gap:16px;padding:0 19px;background:var(--surface-glass);backdrop-filter:blur(var(--blur-glass));-webkit-backdrop-filter:blur(var(--blur-glass))}
-.kb-footerbar::after{content:"";position:absolute;inset:0;pointer-events:none;background-image:var(--grain-url);opacity:var(--grain-opacity);mix-blend-mode:overlay}
-.kb-footerbar--bottom{bottom:0;border-top:1px solid var(--border-soft)}
+   Fixed to the top on about/project pages — the persistent piece of chrome
+   on those pages. The home page instead gets a floating glass dock (see
+   .kb-footerbar--float-left below), not this full-width bar. */
+/* Half the alpha of --surface-glass (kept local rather than touching the
+   shared token, which also backs cards/toasts elsewhere). */
+.kb-footerbar{position:fixed;left:0;right:0;z-index:20;height:64px;display:flex;align-items:center;gap:16px;padding:0 19px;background:rgba(26,12,92,.275);backdrop-filter:blur(var(--blur-glass));-webkit-backdrop-filter:blur(var(--blur-glass));overflow:hidden}
+.kb-footerbar::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background-image:var(--grain-url);opacity:var(--grain-opacity);mix-blend-mode:overlay}
 .kb-footerbar--top{top:0;border-bottom:1px solid var(--border-soft)}
+
+/* ---------- Home nav: floating glass dock, left edge ----------
+   A vertical pill, vertically centered on the left edge, independent of
+   the page's scroll position (unlike the old top/bottom-docked bar, "left"
+   isn't a scroll state). It stays hidden until the user has scrolled past
+   the hero, then slides in from off-screen and fades up — .is-stuck is
+   toggled by site.js (initHomeFooterbarScroll in site.js, unchanged by
+   this layout). Heavier blur + saturation and a soft glow ring is what
+   sells the "glass" read over a flat tinted panel. */
+.kb-footerbar--float-left{left:24px;right:auto;top:50%;bottom:auto;height:auto;width:64px;flex-direction:column;padding:20px 0;gap:20px;border-radius:999px;background:rgba(26,12,92,.32);backdrop-filter:blur(24px) saturate(160%);-webkit-backdrop-filter:blur(24px) saturate(160%);border:1px solid rgba(255,255,255,.16);box-shadow:0 24px 64px rgba(8,1,42,.55),inset 0 1px 0 rgba(255,255,255,.1);opacity:0;transform:translate(-140%,-50%);transition:transform 900ms cubic-bezier(.16,1,.3,1),opacity 900ms cubic-bezier(.16,1,.3,1)}
+.kb-footerbar--float-left.is-stuck{opacity:1;transform:translate(0,-50%)}
+@media (prefers-reduced-motion:reduce){.kb-footerbar--float-left{transition:none}}
+
 .kb-footerbar__logo{all:unset;cursor:pointer;flex:none;display:flex;align-items:center;margin-right:8px}
 .kb-footerbar__logo img{display:block;width:auto;height:46px}
+.kb-footerbar--float-left .kb-footerbar__logo{margin-right:0}
+.kb-footerbar--float-left .kb-footerbar__logo img{height:auto;width:30px}
+
 .kb-footerbar__actions{flex:none;display:flex;align-items:center;gap:8px;--control-height:36px;--border-hairline:#aeaeae;--surface-card:transparent;color:#e9e9e9}
+.kb-footerbar--float-left .kb-footerbar__actions{flex-direction:column}
 
 .kb-lang-switch{position:relative;width:80px;height:36px;border-radius:30px;box-shadow:inset 0 0 0 1px #aeaeae;flex:none;background:none;border:0;padding:0}
 .kb-lang-switch__knob{position:absolute;top:0;left:0;width:43px;height:36px;border-radius:30px;background:var(--kb-blush);transition:transform 240ms cubic-bezier(.22,.61,.36,1),background var(--duration-base) var(--ease-soft),box-shadow var(--duration-base) var(--ease-soft);transform:translateX(0)}
@@ -146,8 +208,19 @@ html[data-active-lang="pt"] .kb-lang-switch__knob{transform:translateX(37px)}
 .kb-lang-switch button[data-lang-btn="pt"]{right:0}
 html[data-active-lang="pt"] .kb-lang-switch button[data-lang-btn="en"]{color:#aeaeae}
 html[data-active-lang="pt"] .kb-lang-switch button[data-lang-btn="pt"]{color:#0d0342}
+/* Stacked EN-over-PT in the vertical dock instead of side-by-side — same
+   dimensions transposed (80×36 → 36×80), same 37px knob travel, just along
+   the other axis, so the toggle logic in site.js needs no changes. */
+.kb-footerbar--float-left .kb-lang-switch{width:36px;height:80px;margin:4px 0}
+.kb-footerbar--float-left .kb-lang-switch__knob{width:36px;height:43px;transform:translateY(0)}
+.kb-footerbar--float-left .kb-lang-switch button{width:36px;height:43px;top:auto}
+.kb-footerbar--float-left .kb-lang-switch button[data-lang-btn="en"]{top:0;left:0}
+.kb-footerbar--float-left .kb-lang-switch button[data-lang-btn="pt"]{bottom:0;right:auto;left:0}
+html[data-active-lang="pt"] .kb-footerbar--float-left .kb-lang-switch__knob{transform:translateY(37px)}
 
 .kb-footerbar__copy{flex:1;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:clamp(11px,0.9vw,14px);color:var(--kb-lavender)}
+/* No room for the copyright line in a 64px-wide vertical dock. */
+.kb-footerbar--float-left .kb-footerbar__copy{display:none}
 
 @media (max-width:640px){
   .kb-footerbar__copy{display:none}

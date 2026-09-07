@@ -1,0 +1,295 @@
+/* Katarina Blante — site layout (home / about / project pages, footer nav, aurora bg, language toggle) */
+
+html,body{height:100%}
+body{overflow-x:hidden}
+
+.kb-page{position:relative;min-height:100vh;font-family:var(--font-body);color:var(--text-body)}
+
+/* Home's first viewport keeps its old exact-height composition; the page
+   itself is free to grow past 100vh (.kb-home-blank below is what it grows
+   into) so the page scrolls instead of being clipped. */
+.kb-page--home{min-height:100vh}
+
+/* Second section: the bento profile grid (see BentoGrid.tsx), centered
+   over the fixed background. Used to be an empty scroll spacer. */
+.kb-home-blank{position:relative;z-index:1;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:clamp(24px,5vw,64px)}
+
+/* ---------- Fixed aurora background ---------- */
+.kb-bg{position:fixed;inset:0;z-index:0;pointer-events:none}
+/* Flat scrim over the whole field, on top of the mesh/stars but below
+   nothing (kb-bg itself sits behind all page content) — halves the
+   background's perceived brightness everywhere it's used. */
+.kb-bg::after{content:"";position:absolute;inset:0;background:rgba(0,0,0,.2)}
+.kb-aurora{position:relative;isolation:isolate;overflow:hidden;background:var(--surface-page);width:100%;height:100%}
+/* Glow orbs, ported from the KPop Carrd Figma bento layout's background
+   (5 blurred pulsing radial blobs over a solid void) and recolored onto
+   the site's own accent tokens - keeps --kb-void as the base tone, per
+   the brief, instead of adopting the file's own near-black. Depth
+   parallax: each orb drifts opposite the pointer via the standalone
+   `translate` property, same --kb-px/--kb-py set on .kb-bg by
+   initAuroraParallax as the old mesh/stars used, so it composes with the
+   orb's own bloom-pulse `transform` animation instead of fighting it. */
+.kb-aurora__orb{position:absolute;border-radius:50%;pointer-events:none;animation:kb-orb-drift 4s ease-in-out infinite;translate:calc(var(--kb-px,0) * -14px) calc(var(--kb-py,0) * -14px);transition:translate 400ms ease-out}
+.kb-aurora__orb--1{left:5%;top:-5%;width:560px;height:560px;background:radial-gradient(circle,var(--kb-magenta),transparent 70%);filter:blur(90px);opacity:.85;animation-duration:4s}
+.kb-aurora__orb--2{left:50%;top:10%;width:650px;height:650px;background:radial-gradient(circle,var(--kb-lavender),transparent 70%);filter:blur(110px);opacity:.75;animation-duration:4.7s;animation-delay:.4s}
+.kb-aurora__orb--3{left:75%;top:55%;width:420px;height:420px;background:radial-gradient(circle,var(--kb-cyan),transparent 70%);filter:blur(80px);opacity:.65;animation-duration:5.4s;animation-delay:.8s}
+.kb-aurora__orb--4{left:25%;top:65%;width:400px;height:400px;background:radial-gradient(circle,var(--kb-magenta-deep),transparent 70%);filter:blur(70px);opacity:.7;animation-duration:6.1s;animation-delay:1.2s}
+.kb-aurora__orb--5{left:85%;top:5%;width:300px;height:300px;background:radial-gradient(circle,var(--kb-blush),transparent 70%);filter:blur(60px);opacity:.55;animation-duration:6.8s;animation-delay:1.6s}
+.kb-aurora__grain{position:absolute;inset:0;background-image:var(--grain-url);opacity:.4;mix-blend-mode:overlay;pointer-events:none}
+
+@keyframes kb-orb-drift{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+@keyframes kb-bloom-pulse{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:1;transform:scale(1.12)}}
+@keyframes kb-rise-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@media (prefers-reduced-motion:reduce){.kb-aurora__orb{animation:none}}
+
+/* ---------- Language toggle (bilingual content) ----------
+   Every bilingual pair is two bare `<span data-lang="…">` text runs with no
+   other class, so a single specificity level handles them everywhere —
+   headings/paragraphs get their block layout from their own tag, this only
+   ever toggles the inline text run inside. */
+[data-lang="pt"]{display:none}
+html[data-active-lang="pt"] [data-lang="en"]{display:none}
+html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
+
+/* ---------- Home ---------- */
+/* Same entrance treatment .kb-content uses on about/project pages, so
+   arriving here after the reverse exit transition (or on a fresh load)
+   eases in instead of snapping straight to rest. */
+/* fill-mode intentionally omitted (defaults to none): a forwards/both fill
+   would keep overriding transform/opacity after the animation ends, at a
+   cascade priority above normal rules — which would silently block any
+   future exit transition on this same element from ever starting. The
+   100% keyframe already matches the element's own resting style, so
+   dropping the fill causes no visible jump once it finishes. */
+.kb-home-main{position:relative;z-index:1;height:calc(100vh - 64px);display:flex;flex-direction:column;overflow:hidden;animation:kb-rise-in 480ms cubic-bezier(.22,.61,.36,1)}
+
+/* Cards bleed above the viewport on purpose (cropped by .kb-page--home's
+   own clip, not by a tight box here) — the negative margin pulls them up,
+   the parent's generous height leaves slack below so the hover lift never
+   gets clipped at the bottom. */
+.kb-home-cards{flex:none;margin-top:-16vh}
+/* No gap: each card's *slot* is deliberately narrower than the card
+   itself (see .kb-project-card), which is what makes them overlap. */
+.kb-home-cards__row{display:flex;justify-content:center;align-items:flex-start;padding:0 clamp(20px,4vw,40px);max-width:1800px;margin:0 auto}
+
+/* Matches the real Aave "Working at" component (reverse-engineered from
+   its rendered DOM/CSS and its bundled source): each card's *slot* in the
+   row (.kb-project-card, ~20% of the row like Aave's .interactiveCard) is
+   deliberately narrower than the visible card itself (.kb-project-card__tilt,
+   a fixed width like Aave's 275px .cardWrapper) and centers it — that
+   mismatch is what makes cards overlap their neighbors at rest. It matters
+   on hover too: site.js's initCardSpread reproduces Aave's actual index-based
+   spread (hovered card straightens+grows in place; each neighbor is pushed
+   by an amount inversely proportional to its distance from the hovered
+   card). There's no z-index change anywhere in Aave's source — the
+   "swallow" look comes purely from a near neighbor's larger shift sliding
+   it past and underneath a farther, barely-moved neighbor, decided by
+   plain DOM order (later card = higher stacking), same as here. The outer
+   <a> owns the static 2D lean (--card-rot, copied from Aave's own inline
+   rotateZ values) and is what initCardSpread animates; the visible card
+   shape — background, radius, shadow, clipping — lives on the inner
+   .kb-project-card__tilt, because THAT'S the element the pointer-tracked
+   3D tilt applies to. If the shape stayed on the outer element, only the
+   image inside would appear to move; the whole card needs to tilt as one
+   rigid object. Box-shadow never changes between states — no hover glow.
+   No `transition` is set here for transform: initCardSpread drives it
+   frame-by-frame with a spring stepper (Aave uses Motion's
+   `{type:"spring",bounce:0,duration:.3}`, which CSS/WAAPI can't express
+   natively). */
+.kb-project-card{all:unset;box-sizing:border-box;cursor:pointer;display:flex;justify-content:center;position:relative;flex:1 1 0;min-width:0;max-width:clamp(60px,20.5vw,220px);height:min(66vh,560px);transform:rotate(var(--card-rot,0deg));transform-origin:50% 50%}
+.kb-project-card__tilt{position:relative;overflow:hidden;flex:none;width:clamp(90px,31vw,340px);height:100%;border-radius:30px;background:#e9e9e9;box-shadow:0px 6px 30px 10px rgba(0,0,0,.3);display:flex;flex-direction:column;justify-content:flex-end;padding:22px;transform:perspective(800px);transition:transform 300ms ease-out,box-shadow 300ms ease-out}
+.kb-project-card__img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;-webkit-user-drag:none;user-select:none}
+.kb-project-card__scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(13,3,66,0) 30%,rgba(13,3,66,.88) 100%);z-index:0}
+/* Holographic glare: a soft cyan highlight that follows the cursor
+   (--pointer-x/--pointer-y, set by initCardTilt in site.js), faded in only
+   while hovering — the "brilho de carta física". */
+.kb-project-card__glare{position:absolute;inset:0;z-index:2;opacity:0;pointer-events:none;mix-blend-mode:overlay;transition:opacity 300ms ease-out;background:radial-gradient(circle at var(--pointer-x,50%) var(--pointer-y,50%),var(--kb-butter) 0%,transparent 75%)}
+.kb-project-card:hover .kb-project-card__glare{opacity:.6}
+/* Holographic edge: same pointer-tracked spotlight as before, recolored to
+   --gradient-nebula's own stops (indigo → violet → deep magenta, same
+   progression used on the about/project placeholder slots) instead of the
+   white/cyan/magenta it had, then masked down to a thin bright ring right
+   on the card's border — like foil catching light at the edge of a trading
+   card. */
+.kb-project-card__glare-ring{position:absolute;inset:0;z-index:3;padding:3px;border-radius:inherit;opacity:0;pointer-events:none;transition:opacity 300ms ease-out;background:radial-gradient(160px 160px at var(--pointer-x,50%) var(--pointer-y,50%),var(--kb-indigo) 0%,#6b2a9e 46%,var(--kb-magenta-deep) 80%,transparent 100%);filter:brightness(1.7);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.kb-project-card:hover .kb-project-card__glare-ring{opacity:.85}
+.kb-project-card__title{position:relative;z-index:1;display:block;font-family:var(--font-display);font-size:22px;line-height:1.05;color:var(--text-strong)}
+.kb-project-card__desc{position:relative;z-index:1;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;margin-top:8px;font-size:13px;line-height:1.45;font-weight:300;color:rgba(255,255,255,.82)}
+
+/* Five cards get too narrow for their copy to read below ~700px — the
+   card shapes still carry the layout, so drop the text instead of
+   letting it wrap over itself. */
+@media (max-width:700px){
+  .kb-project-card__title,.kb-project-card__desc{display:none}
+}
+
+.kb-hero-lockup{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(12px,3vh,40px);padding:clamp(8px,2vh,32px) clamp(24px,5vw,64px)}
+.kb-hero-lockup__logo{display:block;width:min(70vw,860px);max-height:20vh;height:auto;object-fit:contain}
+
+/* ---------- Content page → Home exit transition (reverse) ----------
+   The mirror of the transition above: any link back to the home page —
+   the back-link, the footerbar logo, whichever the user takes — drifts
+   the content down and fades it, parallaxes the aurora back the other
+   way, and slides the top nav bar down to where the bottom bar sits on
+   the home screen. Applies to about.html and every project page, since
+   they all share this same footer/back-link chrome. */
+.kb-page.kb-leaving-home .kb-content{transition:transform 640ms var(--ease-in-out),opacity 640ms var(--ease-in-out);transform:translateY(10vh);opacity:0}
+.kb-page.kb-leaving-home .kb-aurora__mesh{transition:transform 720ms var(--ease-in-out);transform:translate3d(0,6%,0) scale(.94)}
+.kb-page.kb-leaving-home .kb-aurora__stars{transition:transform 720ms var(--ease-in-out),opacity 720ms var(--ease-in-out);transform:translate3d(0,3%,0);opacity:.25}
+.kb-page.kb-leaving-home .kb-footerbar--top{transition:transform 640ms var(--ease-in-out) 60ms;transform:translateY(calc(100vh - 64px))}
+@media (prefers-reduced-motion:reduce){
+  .kb-page.kb-leaving-home .kb-content,
+  .kb-page.kb-leaving-home .kb-aurora__mesh,
+  .kb-page.kb-leaving-home .kb-aurora__stars,
+  .kb-page.kb-leaving-home .kb-footerbar--top{transition:none}
+}
+
+/* ---------- About / Project shared content column ---------- */
+/* +64px reserves room for the fixed top nav bar on these pages */
+/* fill-mode intentionally omitted — see the note on .kb-home-main: a
+   forwards/both fill would keep this animation overriding transform/
+   opacity forever, blocking the .kb-leaving-home exit transition below
+   from ever starting. */
+.kb-content{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:calc(64px + clamp(56px,7vw,104px)) clamp(24px,5vw,64px) clamp(72px,9vw,120px);animation:kb-rise-in 480ms cubic-bezier(.22,.61,.36,1)}
+.kb-back-link{all:unset;cursor:pointer;font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--kb-cyan);display:inline-block}
+.kb-back-link:hover{color:var(--kb-butter)}
+
+/* Project header image - the shared-element target for the home card's
+   container-transform (see projectImageTransitionName / the View
+   Transitions API rules at the bottom of this file). */
+.kb-project-header{border-radius:16px;overflow:hidden;height:clamp(240px,34vw,460px);margin-top:clamp(32px,4vw,56px)}
+.kb-project-header__img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* About */
+.kb-about-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:clamp(32px,5vw,64px);margin-top:32px;align-items:start}
+.kb-about-eyebrow{display:block;font-family:var(--font-mono);font-size:12px;letter-spacing:.16em;color:var(--kb-lavender)}
+.kb-about-grid h1{font-family:var(--font-display);font-size:clamp(40px,6vw,76px);line-height:1;color:var(--text-strong);margin:16px 0 0;text-wrap:pretty}
+.kb-about-grid p{font-size:18px;line-height:1.6;font-weight:300;color:var(--text-body);max-width:64ch;margin:16px 0 0;text-wrap:pretty}
+.kb-about-grid p:first-of-type{margin-top:24px}
+.kb-hand-note{display:block;font-family:var(--font-hand);font-size:34px;color:var(--kb-butter);margin-top:32px}
+.kb-about-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:32px}
+.kb-portrait-slot{border-radius:16px;border:1px solid var(--border-hairline);background:var(--gradient-nebula);height:clamp(320px,42vw,520px);display:flex;align-items:flex-end;padding:20px}
+.kb-slot-label{font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;color:rgba(255,255,255,.72)}
+
+/* Project */
+.kb-project-meta{display:block;font-family:var(--font-mono);font-size:12px;letter-spacing:.16em;color:var(--kb-lavender);margin-top:32px}
+.kb-project-title{font-family:var(--font-display);font-size:clamp(40px,6.4vw,84px);line-height:1;color:var(--text-strong);margin:16px 0 0;max-width:20ch;text-wrap:pretty}
+.kb-project-lede{font-size:20px;line-height:1.55;font-weight:300;color:var(--text-body);max-width:64ch;margin:24px 0 0;text-wrap:pretty}
+.kb-project-shot{border-radius:16px;border:1px solid var(--border-hairline);background:var(--gradient-nebula);height:clamp(240px,34vw,460px);margin-top:clamp(32px,4vw,56px);display:flex;align-items:flex-end;padding:20px}
+.kb-project-blocks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:clamp(24px,4vw,48px);margin-top:clamp(40px,5vw,72px)}
+.kb-project-blocks h2{font-family:var(--font-display);font-size:26px;line-height:1.1;color:var(--text-strong);margin:0}
+.kb-project-blocks p{font-size:17px;line-height:1.6;font-weight:300;color:var(--text-body);margin:12px 0 0;text-wrap:pretty}
+.kb-project-stats{display:flex;flex-wrap:wrap;gap:clamp(24px,5vw,72px);margin-top:clamp(40px,5vw,72px);padding-top:32px;border-top:1px solid var(--border-hairline)}
+.kb-project-stats__value{display:block;font-family:var(--font-display);font-size:44px;line-height:1;color:var(--kb-butter)}
+.kb-project-stats__label{display:block;font-size:14px;color:var(--text-muted);margin-top:8px}
+.kb-project-actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:clamp(40px,5vw,72px)}
+
+/* ---------- Nav/footer bar ----------
+   Fixed to the top on about/project pages — the persistent piece of chrome
+   on those pages. The home page instead has just the language switch,
+   docked to the top-right corner (see .kb-lang-dock below). */
+/* Half the alpha of --surface-glass (kept local rather than touching the
+   shared token, which also backs cards/toasts elsewhere). */
+.kb-footerbar{position:fixed;left:0;right:0;z-index:20;height:64px;display:flex;align-items:center;gap:16px;padding:0 19px;background:rgba(26,12,92,.275);backdrop-filter:blur(var(--blur-glass));-webkit-backdrop-filter:blur(var(--blur-glass));overflow:hidden}
+.kb-footerbar::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background-image:var(--grain-url);opacity:var(--grain-opacity);mix-blend-mode:overlay}
+.kb-footerbar--top{top:0;border-bottom:1px solid var(--border-soft)}
+
+.kb-footerbar__logo{all:unset;cursor:pointer;flex:none;display:flex;align-items:center;margin-right:8px}
+.kb-footerbar__logo img{display:block;width:auto;height:46px}
+
+.kb-footerbar__actions{flex:none;display:flex;align-items:center;gap:8px;--control-height:36px;--border-hairline:#aeaeae;--surface-card:transparent;color:#e9e9e9}
+
+/* ---------- Home nav: language switch only, top-right corner ---------- */
+.kb-lang-dock{position:fixed;top:24px;right:24px;z-index:20}
+
+.kb-lang-switch{position:relative;width:80px;height:36px;border-radius:30px;box-shadow:inset 0 0 0 1px #aeaeae;flex:none;background:none;border:0;padding:0}
+.kb-lang-switch__knob{position:absolute;top:0;left:0;width:43px;height:36px;border-radius:30px;background:var(--kb-blush);transition:transform 240ms cubic-bezier(.22,.61,.36,1),background var(--duration-base) var(--ease-soft),box-shadow var(--duration-base) var(--ease-soft);transform:translateX(0)}
+.kb-lang-switch:hover .kb-lang-switch__knob{background:var(--kb-butter);box-shadow:var(--glow-butter)}
+html[data-active-lang="pt"] .kb-lang-switch__knob{transform:translateX(37px)}
+.kb-lang-switch button{all:unset;cursor:pointer;position:absolute;top:0;width:43px;height:36px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:500;color:#aeaeae}
+.kb-lang-switch button[data-lang-btn="en"]{left:0;color:#0d0342}
+.kb-lang-switch button[data-lang-btn="pt"]{right:0}
+html[data-active-lang="pt"] .kb-lang-switch button[data-lang-btn="en"]{color:#aeaeae}
+html[data-active-lang="pt"] .kb-lang-switch button[data-lang-btn="pt"]{color:#0d0342}
+
+.kb-footerbar__copy{flex:1;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:clamp(11px,0.9vw,14px);color:var(--kb-lavender)}
+
+@media (max-width:640px){
+  .kb-footerbar__copy{display:none}
+}
+
+/* ---------- Bento profile grid (home's second section) ----------
+   Ported from the KPop Carrd Figma export's bento layout, reskinned onto
+   the site's own tokens/fonts. Each card keeps its own static rotation and
+   a distinct accent border/glow; useScrollParallax folds a translateY into
+   the same transform per card, at its own speed. */
+.kb-bento{position:relative;z-index:1;display:grid;isolation:isolate;width:100%;max-width:1060px;gap:18px;grid-template-columns:260px 1fr 1fr 200px;grid-template-rows:auto 1fr auto;grid-template-areas:"photo name name tz" "photo intro intro intro" "btns skills skills skills"}
+
+.kb-bento-card{position:relative;overflow:hidden;background:var(--surface-glass);backdrop-filter:blur(var(--blur-glass));-webkit-backdrop-filter:blur(var(--blur-glass))}
+.kb-bento-card__eyebrow{display:block;font-family:var(--font-mono);font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--kb-lavender);opacity:.75;margin-bottom:10px}
+.kb-bento-card__eyebrow--cyan{color:var(--kb-cyan)}
+
+/* Photo card */
+.kb-bento-card--photo{grid-area:photo;border-radius:32px;border:2px solid rgba(254,106,216,.5);box-shadow:0 0 60px rgba(254,106,216,.25),0 0 120px rgba(254,106,216,.1);padding:0}
+.kb-bento-card__slot{position:absolute;inset:0;border-radius:30px;border:0;height:auto;min-height:420px;align-items:flex-start}
+.kb-bento-card__handle{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);padding:8px 22px;border-radius:999px;background:rgba(254,106,216,.22);border:1.5px solid rgba(254,106,216,.55);backdrop-filter:blur(10px);font-family:var(--font-mono);font-size:1rem;color:var(--kb-blush);letter-spacing:.14em;white-space:nowrap;box-shadow:0 0 20px rgba(254,106,216,.35);z-index:5}
+
+/* Name card */
+.kb-bento-card--name{grid-area:name;border-radius:28px;border:2px solid rgba(183,140,245,.42);padding:36px 40px;box-shadow:0 0 50px rgba(183,140,245,.18)}
+.kb-bento-card__name{margin:0 0 16px;font-family:var(--font-display);font-weight:400;font-size:clamp(3rem,5.5vw,4.6rem);line-height:.98;background:linear-gradient(110deg,var(--kb-blush) 0%,var(--kb-magenta) 35%,var(--kb-lavender) 70%,var(--kb-cyan) 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 26px rgba(254,106,216,.4))}
+.kb-bento-card__meta{display:flex;align-items:center;gap:12px;font-family:var(--font-hand);font-size:2.2rem;color:var(--kb-lavender);opacity:.85}
+.kb-bento-card__dot{width:4px;height:4px;border-radius:50%;background:var(--kb-magenta);box-shadow:0 0 8px rgba(254,106,216,.9)}
+.kb-bento-card__rule{margin-top:22px;height:2px;width:55%;background:linear-gradient(90deg,rgba(254,106,216,.8) 0%,rgba(72,247,250,.3) 60%,transparent 100%)}
+
+/* Timezone card */
+.kb-bento-card--tz{grid-area:tz;border-radius:26px;border:2px solid rgba(72,247,250,.42);padding:28px 24px;box-shadow:0 0 40px rgba(72,247,250,.18);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+.kb-bento-card__clock{font-family:var(--font-mono);font-weight:300;font-size:clamp(1.4rem,2vw,1.9rem);color:var(--kb-cyan);letter-spacing:0;text-shadow:0 0 24px rgba(72,247,250,.8);font-variant-numeric:tabular-nums;white-space:nowrap}
+.kb-bento-card__tz-label{font-family:var(--font-mono);font-size:.85rem;color:var(--kb-lavender);opacity:.55;letter-spacing:.1em}
+
+/* Intro card */
+.kb-bento-card--intro{grid-area:intro;border-radius:28px;border:2px solid rgba(249,172,204,.3);padding:34px 42px;box-shadow:0 0 50px rgba(249,172,204,.1)}
+.kb-bento-card__intro-text{font-size:clamp(1.05rem,1.5vw,1.3rem);font-weight:300;color:var(--text-body);line-height:1.75}
+.kb-bento-card__intro-text p{margin:0 0 16px}
+.kb-bento-card__intro-text p:last-child{margin-bottom:0}
+.kb-bento-card__intro-text em{color:var(--kb-blush);font-family:var(--font-display);font-style:normal}
+
+/* Buttons card */
+.kb-bento-card--btns{grid-area:btns;border-radius:26px;border:2px solid rgba(254,106,216,.4);padding:28px 26px;box-shadow:0 0 40px rgba(254,106,216,.15);display:flex;flex-direction:column;gap:14px;justify-content:center}
+.kb-bento-btn{width:100%;padding:16px 24px;border-radius:999px;font-family:var(--font-body);font-size:1.05rem;font-weight:500;letter-spacing:.03em;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:10px;transition:transform .25s ease,box-shadow .25s ease,background .25s ease,color .25s ease}
+.kb-bento-btn--primary{border:2px solid transparent;background:linear-gradient(130deg,rgba(254,106,216,.85) 0%,rgba(183,140,245,.85) 100%);color:var(--kb-white);box-shadow:0 0 24px rgba(254,106,216,.4)}
+.kb-bento-btn--primary:hover{transform:translateY(-3px);background:var(--kb-butter);color:var(--kb-void);box-shadow:0 0 40px rgba(255,249,173,.6)}
+.kb-bento-btn--ghost{border:2px solid rgba(183,140,245,.5);background:transparent;color:var(--kb-lavender)}
+.kb-bento-btn--ghost:hover{border-color:var(--kb-cyan);color:var(--kb-cyan);background:rgba(72,247,250,.12);transform:translateY(-3px);box-shadow:var(--glow-cyan)}
+
+/* Skills card */
+.kb-bento-card--skills{grid-area:skills;border-radius:28px;border:2px solid rgba(183,140,245,.3);padding:32px 36px;box-shadow:0 0 40px rgba(183,140,245,.1)}
+.kb-bento-card__tags{display:flex;flex-wrap:wrap;gap:10px}
+.kb-bento-tag{padding:10px 22px;border-radius:999px;font-family:var(--font-mono);font-size:.95rem;letter-spacing:.05em;transition:transform .2s ease}
+.kb-bento-tag:hover{transform:translateY(-3px) scale(1.05)}
+.kb-bento-tag--magenta{background:rgba(254,106,216,.15);border:1.5px solid rgba(254,106,216,.5);color:var(--kb-blush)}
+.kb-bento-tag--violet{background:rgba(41,25,143,.4);border:1.5px solid rgba(183,140,245,.5);color:var(--kb-lavender)}
+.kb-bento-tag--cyan{background:rgba(72,247,250,.1);border:1.5px solid rgba(72,247,250,.45);color:var(--kb-cyan)}
+.kb-bento-tag--pink{background:rgba(249,172,204,.12);border:1.5px solid rgba(249,172,204,.45);color:var(--kb-blush)}
+
+@keyframes kb-float-up{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+@media (max-width:780px){
+  .kb-bento{grid-template-columns:180px 1fr;grid-template-rows:auto;grid-template-areas:"photo name" "tz tz" "intro intro" "btns btns" "skills skills"}
+}
+@media (max-width:520px){
+  .kb-bento{grid-template-columns:1fr;grid-template-areas:"name" "photo" "tz" "intro" "btns" "skills"}
+}
+/* ---------- Hero card -> project header container transform ----------
+   Home -> ProjectPage navigation goes through React Router's `viewTransition`
+   Link prop, which wraps the route change in document.startViewTransition().
+   The card image and the project header image share a view-transition-name
+   (projectImageTransitionName in projects.ts) so the browser treats them as
+   one element and morphs position/size/shape between them instead of
+   cross-fading two unrelated boxes - a native "container transform". Browsers
+   without View Transitions support (older Firefox) just navigate normally,
+   no animation, no breakage. */
+::view-transition-group(*){animation-duration:480ms;animation-timing-function:var(--ease-soft)}
+::view-transition-old(root),::view-transition-new(root){animation-duration:320ms}
+@media (prefers-reduced-motion:reduce){
+  ::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}
+}

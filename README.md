@@ -1,35 +1,32 @@
-# PD-Portfolio
+# React + TypeScript + Vite
 
-Katarina Blante's portfolio — a static, bilingual (EN/PT) site built from her
-"ethereal and nocturnal" brand design system.
+This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
 
-## Structure
+Currently, two official plugins are available:
 
-- `index.html` — home screen (five project cards + wordmark)
-- `about.html` — about me
-- `projects/` — one page per case study: `aurora-bank.html`, `petal.html`,
-  `cosmos-learn.html`, `verao.html`, `nebula-studio.html`
-- `css/tokens.css` — design tokens (colors, type, spacing, radii, effects)
-- `css/components.css` — component styles (buttons, cards, icon buttons, the
-  aurora field background, etc.)
-- `css/site.css` — page layout and the EN/PT language toggle
-- `js/site.js` — language toggle persistence, download-CV placeholder
-- `assets/` — logo lockups and the brand's licensed fonts (MADE Sunflower,
-  Promised Freedom)
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-## Running locally
+## React Compiler
 
-It's a static site — no build step. Serve the folder with any static file
-server, e.g.:
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
+## Expanding the Oxlint configuration
+
+If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+
+```json
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "typescript", "oxc"],
+  "options": {
+    "typeAware": true
+  },
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "react/only-export-components": ["warn", { "allowConstantExport": true }]
+  }
+}
 ```
-python3 -m http.server 8000
-```
 
-Then open `http://localhost:8000/`.
-
-## Language toggle
-
-Every page ships both English and Portuguese copy; the EN/PT switch in the
-footer swaps the visible language and remembers the choice (`localStorage`)
-across pages.
+See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
