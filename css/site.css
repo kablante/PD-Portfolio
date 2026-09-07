@@ -103,26 +103,23 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
 }
 
 /* ---------- Card drop-in ----------
-   On load, each card falls in from off-screen above and settles into its
-   own resting lean (--card-rot), one after another. The keyframe's own
-   end state reads --card-rot too, so it lands exactly on the same
-   rotation the base rule already gives it at rest. `backwards` fill is
-   needed so a card stays hidden above the frame during its stagger delay
-   instead of flashing at rest immediately — `forwards`/`both` is
-   deliberately avoided here, since either would keep overriding this
+   On load, every card falls in from off-screen above together, overshoots
+   its resting spot like a bungee cord, and settles — one fall, one kick,
+   done. The keyframe reads --card-rot throughout, so it lands exactly on
+   the same lean the base rule already gives each card at rest. `backwards`
+   fill is needed so cards stay hidden above the frame for the (shared,
+   zero) delay instead of flashing at rest immediately — `forwards`/`both`
+   is deliberately avoided, since either would keep overriding this
    element's transform forever, which is what silently broke the home/
    about exit transitions earlier. */
 @keyframes kb-card-fall{
   0%{transform:translateY(-140vh) rotate(var(--card-rot,0deg));opacity:0}
-  70%{opacity:1}
+  58%{transform:translateY(7%) rotate(var(--card-rot,0deg));opacity:1}
+  76%{transform:translateY(-3%) rotate(var(--card-rot,0deg))}
+  90%{transform:translateY(1%) rotate(var(--card-rot,0deg))}
   100%{transform:translateY(0) rotate(var(--card-rot,0deg));opacity:1}
 }
-.kb-home-cards__row .kb-project-card{animation:kb-card-fall 820ms cubic-bezier(.22,.61,.36,1) backwards}
-.kb-home-cards__row .kb-project-card:nth-child(1){animation-delay:0ms}
-.kb-home-cards__row .kb-project-card:nth-child(2){animation-delay:70ms}
-.kb-home-cards__row .kb-project-card:nth-child(3){animation-delay:140ms}
-.kb-home-cards__row .kb-project-card:nth-child(4){animation-delay:210ms}
-.kb-home-cards__row .kb-project-card:nth-child(5){animation-delay:280ms}
+.kb-home-cards__row .kb-project-card{animation:kb-card-fall 950ms cubic-bezier(.22,.61,.36,1) backwards}
 @media (prefers-reduced-motion:reduce){
   .kb-home-cards__row .kb-project-card{animation:none}
 }
