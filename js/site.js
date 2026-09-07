@@ -251,11 +251,40 @@
     requestAnimationFrame(draw);
   }
 
+  // Home → About exit transition: fake a scroll-down (hero drifts up and
+  // fades), a parallax drift on the aurora background, and the bottom nav
+  // bar sliding up to a top position — then hand off to the real
+  // navigation once the animation has played (see .kb-leaving-about in
+  // site.css). Reduced-motion users skip straight to the plain link.
+  var ABOUT_TRANSITION_MS = 680;
+
+  function initAboutTransition() {
+    var homePage = document.querySelector(".kb-page--home");
+    if (!homePage) return;
+    var aboutLink = homePage.querySelector(".kb-hero-lockup .kb-btn--primary");
+    if (!aboutLink) return;
+    var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) return;
+    var navigating = false;
+    aboutLink.addEventListener("click", function (e) {
+      var href = aboutLink.getAttribute("href");
+      if (!href) return;
+      e.preventDefault();
+      if (navigating) return;
+      navigating = true;
+      homePage.classList.add("kb-leaving-about");
+      window.setTimeout(function () {
+        window.location.href = href;
+      }, ABOUT_TRANSITION_MS);
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     initLangSwitch();
     initDownloadCv();
     initCardTilt();
     initCardSpread();
     initCursorSpotlight();
+    initAboutTransition();
   });
 })();

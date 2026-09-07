@@ -96,6 +96,22 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
 .kb-hero-lockup{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(12px,3vh,40px);padding:clamp(8px,2vh,32px) clamp(24px,5vw,64px)}
 .kb-hero-lockup__logo{display:block;width:min(70vw,860px);max-height:20vh;height:auto;object-fit:contain}
 
+/* ---------- Home → About exit transition ----------
+   Clicking "About me" fakes a scroll-down: the hero content drifts up and
+   fades, the aurora mesh/stars drift at a different rate for parallax
+   depth, and the bottom nav bar slides up to where a top bar would sit —
+   only then does the real navigation to about.html happen (see site.js). */
+.kb-page--home.kb-leaving-about .kb-home-main{transition:transform 640ms var(--ease-in-out),opacity 640ms var(--ease-in-out);transform:translateY(-14vh);opacity:0}
+.kb-page--home.kb-leaving-about .kb-aurora__mesh{transition:transform 720ms var(--ease-in-out);transform:translate3d(0,-7%,0) scale(1.22)}
+.kb-page--home.kb-leaving-about .kb-aurora__stars{transition:transform 720ms var(--ease-in-out),opacity 720ms var(--ease-in-out);transform:translate3d(0,-4%,0);opacity:.25}
+.kb-page--home.kb-leaving-about .kb-footerbar--bottom{transition:transform 640ms var(--ease-in-out) 60ms;transform:translateY(calc(-100vh + 64px))}
+@media (prefers-reduced-motion:reduce){
+  .kb-page--home.kb-leaving-about .kb-home-main,
+  .kb-page--home.kb-leaving-about .kb-aurora__mesh,
+  .kb-page--home.kb-leaving-about .kb-aurora__stars,
+  .kb-page--home.kb-leaving-about .kb-footerbar--bottom{transition:none}
+}
+
 /* ---------- About / Project shared content column ---------- */
 /* +64px reserves room for the fixed top nav bar on these pages */
 .kb-content{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:calc(64px + clamp(56px,7vw,104px)) clamp(24px,5vw,64px) clamp(72px,9vw,120px);animation:kb-rise-in 480ms cubic-bezier(.22,.61,.36,1) both}
