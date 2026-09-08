@@ -112,7 +112,7 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
    (--pointer-x/--pointer-y, set by initCardTilt in site.js), faded in only
    while hovering — the "brilho de carta física". */
 .kb-project-card__glare{position:absolute;inset:0;z-index:2;opacity:0;pointer-events:none;mix-blend-mode:overlay;transition:opacity 300ms ease-out;background:radial-gradient(circle at var(--pointer-x,50%) var(--pointer-y,50%),var(--kb-blush) 0%,transparent 75%)}
-.kb-project-card:hover .kb-project-card__glare{opacity:.6}
+.kb-project-card:hover .kb-project-card__glare{opacity:1}
 /* Holographic edge: same pointer-tracked spotlight as before, recolored to
    --gradient-nebula's own stops (indigo → violet → deep magenta, same
    progression used on the about/project placeholder slots) instead of the
@@ -121,7 +121,7 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
    card. */
 .kb-project-card__glare-ring{position:absolute;inset:0;z-index:3;padding:3px;border-radius:inherit;opacity:0;pointer-events:none;transition:opacity 300ms ease-out;background:radial-gradient(160px 160px at var(--pointer-x,50%) var(--pointer-y,50%),var(--kb-indigo) 0%,#6b2a9e 46%,var(--kb-magenta-deep) 80%,transparent 100%);filter:brightness(1.7);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
 .kb-project-card:hover .kb-project-card__glare-ring{opacity:.85}
-.kb-project-card__title{position:relative;z-index:1;display:inline-block;font-family:var(--font-display);font-size:25px;line-height:1.05;color:var(--text-strong);background:var(--kb-blue);border-radius:15px;padding:8px 16px}
+.kb-project-card__title{position:relative;z-index:1;display:inline-block;font-family:var(--font-display);font-size:25px;line-height:1.05;color:var(--text-strong);background:rgba(41,25,143,.72);border-radius:15px;padding:8px 16px;backdrop-filter:blur(var(--blur-glass));-webkit-backdrop-filter:blur(var(--blur-glass))}
 .kb-project-card__desc{display:none}
 
 /* Five cards get too narrow for their copy to read below ~700px — the
