@@ -6,13 +6,13 @@ body{overflow-x:hidden}
 .kb-page{position:relative;min-height:100vh;font-family:var(--font-body);color:var(--text-body)}
 
 /* Home's first viewport keeps its old exact-height composition; the page
-   itself is free to grow past 100vh (.kb-home-blank below is what it grows
+   itself is free to grow past 100vh (.kb-who-section below is what it grows
    into) so the page scrolls instead of being clipped. */
 .kb-page--home{min-height:100vh}
 
-/* Second section: the bento profile grid (see BentoGrid.tsx), centered
+/* Second section: the bento profile grid (see WhoSection.tsx), centered
    over the fixed background. Used to be an empty scroll spacer. */
-.kb-home-blank{position:relative;z-index:1;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:clamp(24px,5vw,64px)}
+.kb-who-section{position:relative;z-index:1;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:clamp(24px,5vw,64px)}
 
 /* ---------- Fixed aurora background ---------- */
 .kb-bg{position:fixed;inset:0;z-index:0;pointer-events:none}
@@ -218,171 +218,171 @@ html[data-active-lang="pt"] .kb-lang-switch button[data-lang-btn="pt"]{color:#0d
   .kb-footerbar__copy{display:none}
 }
 
-/* ---------- Bento profile composition (home's second section) ----------
+/* ---------- The Who section (home's second section) ----------
    Not a grid any more: a fixed-ratio canvas with every module placed in
    percentages, so the whole arrangement scales as one picture instead of
    reflowing. Type is sized in cqw against the canvas so the scale
    relationships between the name, the body copy and the chips hold at any
    width. Every text module owns an exclusive band; the only things that
    overlap are the actions card breaking the rail's corner and the decor. */
-.kb-bento{position:relative;z-index:1;width:min(1140px,100%);aspect-ratio:1140/1340;container-type:size}
-.kb-bento > *{position:absolute}
+.kb-who{position:relative;z-index:1;width:min(1140px,100%);aspect-ratio:1140/1340;container-type:size}
+.kb-who > *{position:absolute}
 
 /* --- Portrait: the one module that reads as a physical object. --- */
-.kb-bento__photo{left:11%;top:4.6%;width:26%;margin:0;transform:rotate(-4.2deg);
+.kb-who__photo{left:11%;top:4.6%;width:26%;margin:0;transform:rotate(-4.2deg);
   background:rgba(254,106,216,.16);border:2px solid rgba(254,106,216,.5);
   border-radius:30px;padding:10px 10px 0;
   box-shadow:0 18px 50px rgba(8,1,42,.5),0 0 60px rgba(254,106,216,.2)}
-.kb-bento__slot{aspect-ratio:3/4;border-radius:30px;
+.kb-who__slot{aspect-ratio:3/4;border-radius:30px;
   background:linear-gradient(155deg,rgba(41,25,143,.8),rgba(203,67,152,.45));
   display:flex;align-items:flex-start;justify-content:center;padding-top:9%}
-.kb-bento__slot span{font-family:var(--font-mono);font-size:1.85cqw;letter-spacing:.14em;
+.kb-who__slot span{font-family:var(--font-mono);font-size:1.85cqw;letter-spacing:.14em;
   color:rgba(255,255,255,.44);text-align:center;line-height:1.7}
-.kb-bento__handle{font-family:var(--font-mono);font-size:1.45cqw;letter-spacing:.1em;
+.kb-who__handle{font-family:var(--font-mono);font-size:1.45cqw;letter-spacing:.1em;
   color:var(--kb-blush);text-align:center;padding:3.6% 0 4.8%}
 
 /* --- Clock: a badge that breaks the portrait's lower-left corner. --- */
-.kb-bento__clock{left:4%;top:32.6%;width:11.5%;aspect-ratio:1;border-radius:50%;z-index:6;
+.kb-who__clock{left:4%;top:32.6%;width:11.5%;aspect-ratio:1;border-radius:50%;z-index:6;
   background:rgba(13,3,66,.86);border:2px solid rgba(72,247,250,.55);
   backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2%;
   box-shadow:0 0 40px rgba(72,247,250,.35)}
-.kb-bento__time{font-family:var(--font-mono);font-size:2.75cqw;color:var(--kb-cyan);
+.kb-who__time{font-family:var(--font-mono);font-size:2.75cqw;color:var(--kb-cyan);
   text-shadow:0 0 20px rgba(72,247,250,.85);font-variant-numeric:tabular-nums;line-height:1}
-.kb-bento__tz{font-family:var(--font-mono);font-size:1.4cqw;color:var(--kb-lavender);
+.kb-who__tz{font-family:var(--font-mono);font-size:1.4cqw;color:var(--kb-lavender);
   opacity:.65;letter-spacing:.1em}
 
 /* --- Name: bare text on the ground. Big enough to hold without a card;
    body copy never does this. --- */
-.kb-bento__name{left:41.5%;top:8.1%;width:55%}
-.kb-bento__eyebrow{display:block;font-family:var(--font-mono);font-size:1.7cqw;
+.kb-who__name{left:41.5%;top:8.1%;width:55%}
+.kb-who__eyebrow{display:block;font-family:var(--font-mono);font-size:1.7cqw;
   letter-spacing:.28em;text-transform:uppercase;color:var(--kb-lavender);opacity:.8;margin-bottom:1.4%}
-.kb-bento__h{margin:0;font-family:var(--font-display);font-weight:400;font-size:6.6cqw;
+.kb-who__h{margin:0;font-family:var(--font-display);font-weight:400;font-size:6.6cqw;
   line-height:.96;color:var(--kb-magenta);filter:drop-shadow(0 0 26px rgba(254,106,216,.45))}
-.kb-bento__meta{display:flex;align-items:center;gap:2%;margin-top:2.2%;
+.kb-who__meta{display:flex;align-items:center;gap:2%;margin-top:2.2%;
   font-family:var(--font-hand);font-size:3.4cqw;color:var(--kb-cyan);opacity:.92}
-.kb-bento__dot{width:5px;height:5px;border-radius:50%;background:var(--kb-cyan);
+.kb-who__dot{width:5px;height:5px;border-radius:50%;background:var(--kb-cyan);
   box-shadow:0 0 8px rgba(72,247,250,.9);flex:none}
 
 /* --- Skills rail and the body block share one glass surface: void fill,
    thin cyan edge, soft drop shadow rather than a glow. --- */
-.kb-bento__rail{left:41.5%;top:26.6%;width:42.5%;display:flex;flex-wrap:wrap;align-items:center;
+.kb-who__rail{left:41.5%;top:26.6%;width:42.5%;display:flex;flex-wrap:wrap;align-items:center;
   gap:8px;padding:1.2% 1.8%;border-radius:14px 30px 30px 30px;
   background:rgba(13,3,66,.72);border:2px solid rgba(72,247,250,.36);
   backdrop-filter:blur(var(--blur-glass));-webkit-backdrop-filter:blur(var(--blur-glass));
   box-shadow:0 16px 46px rgba(8,1,42,.45);z-index:4}
-.kb-bento__rail-label{font-family:var(--font-mono);font-size:1.5cqw;letter-spacing:.2em;
+.kb-who__rail-label{font-family:var(--font-mono);font-size:1.5cqw;letter-spacing:.2em;
   text-transform:uppercase;color:var(--kb-blush);opacity:.9;white-space:nowrap;flex:none;
   padding-right:8px;margin-bottom:8px}
-.kb-bento-tag{padding:.85% 1.6%;border-radius:var(--radius-pill);font-family:var(--font-mono);
+.kb-who-tag{padding:.85% 1.6%;border-radius:var(--radius-pill);font-family:var(--font-mono);
   font-size:1.5cqw;letter-spacing:.04em;white-space:nowrap;flex:none;transition:transform .2s}
-.kb-bento-tag:hover{transform:translateY(-2px)}
-.kb-bento-tag--magenta{background:rgba(254,106,216,.18);border:1.5px solid rgba(254,106,216,.5);color:var(--kb-blush)}
-.kb-bento-tag--violet{background:rgba(41,25,143,.55);border:1.5px solid rgba(183,140,245,.52);color:var(--kb-lavender)}
-.kb-bento-tag--cyan{background:rgba(72,247,250,.12);border:1.5px solid rgba(72,247,250,.45);color:var(--kb-cyan)}
-.kb-bento-tag--pink{background:rgba(249,172,204,.14);border:1.5px solid rgba(249,172,204,.45);color:var(--kb-blush)}
+.kb-who-tag:hover{transform:translateY(-2px)}
+.kb-who-tag--magenta{background:rgba(254,106,216,.18);border:1.5px solid rgba(254,106,216,.5);color:var(--kb-blush)}
+.kb-who-tag--violet{background:rgba(41,25,143,.55);border:1.5px solid rgba(183,140,245,.52);color:var(--kb-lavender)}
+.kb-who-tag--cyan{background:rgba(72,247,250,.12);border:1.5px solid rgba(72,247,250,.45);color:var(--kb-cyan)}
+.kb-who-tag--pink{background:rgba(249,172,204,.14);border:1.5px solid rgba(249,172,204,.45);color:var(--kb-blush)}
 
 /* --- Actions: the design system's own control metrics (--control-height,
    --text-sm, --space-5), clamped so they shrink rather than overflow when
    the canvas is narrower than 1140. --- */
-.kb-bento__actions{left:77%;top:22.1%;width:19%;padding:clamp(12px,1.6cqw,18px);
+.kb-who__actions{left:77%;top:22.1%;width:19%;padding:clamp(12px,1.6cqw,18px);
   border-radius:30px 30px 30px 14px;background:rgba(13,3,66,.72);
   border:2px solid rgba(254,106,216,.42);
   backdrop-filter:blur(var(--blur-glass));-webkit-backdrop-filter:blur(var(--blur-glass));
   box-shadow:0 0 40px rgba(254,106,216,.16);
   display:flex;flex-direction:column;gap:clamp(8px,1cqw,12px);z-index:5}
-.kb-bento-btn{width:100%;height:clamp(38px,3.9cqw,var(--control-height));
+.kb-who-btn{width:100%;height:clamp(38px,3.9cqw,var(--control-height));
   padding:0 clamp(14px,2.1cqw,var(--space-5));border-radius:var(--radius-pill);
   font-family:var(--font-body);font-size:clamp(12px,1.25cqw,var(--text-sm));
   font-weight:var(--weight-semibold);letter-spacing:var(--tracking-wide);cursor:pointer;
   display:inline-flex;align-items:center;justify-content:center;gap:var(--space-2);white-space:nowrap;
   transition:transform var(--duration-base) var(--ease-soft),box-shadow var(--duration-base) var(--ease-soft),background var(--duration-base) var(--ease-soft),color var(--duration-base) var(--ease-soft),border-color var(--duration-base) var(--ease-soft)}
-.kb-bento-btn svg{width:16px;height:16px;flex:none}
-.kb-bento-btn--primary{border:var(--border-width) solid transparent;color:var(--kb-white);
+.kb-who-btn svg{width:16px;height:16px;flex:none}
+.kb-who-btn--primary{border:var(--border-width) solid transparent;color:var(--kb-white);
   background:linear-gradient(130deg,rgba(254,106,216,.85),rgba(183,140,245,.85));
   box-shadow:0 0 24px rgba(254,106,216,.4)}
-.kb-bento-btn--primary:hover{transform:translateY(-3px);background:var(--kb-butter);
+.kb-who-btn--primary:hover{transform:translateY(-3px);background:var(--kb-butter);
   color:var(--kb-void);box-shadow:var(--glow-butter)}
-.kb-bento-btn--ghost{border:var(--border-width) solid rgba(183,140,245,.5);background:transparent;color:var(--kb-lavender)}
-.kb-bento-btn--ghost:hover{transform:translateY(-3px);border-color:var(--kb-cyan);
+.kb-who-btn--ghost{border:var(--border-width) solid rgba(183,140,245,.5);background:transparent;color:var(--kb-lavender)}
+.kb-who-btn--ghost:hover{transform:translateY(-3px);border-color:var(--kb-cyan);
   color:var(--kb-cyan);background:rgba(72,247,250,.12)}
 
 /* --- Aside: bare handwritten text, no fill or padding, so the block is
    exactly the words. Its first line carries a selection-highlight
    treatment: a filled band with a caret at each end, circle above at the
    start and below at the end, sized in em so it tracks the type. --- */
-.kb-bento__aside{left:13%;top:47.1%;width:67%;padding:0;z-index:5;text-align:left}
-.kb-bento__aside p{margin:0;font-family:var(--font-hand);font-size:3.1cqw;line-height:1.35;
+.kb-who__aside{left:13%;top:47.1%;width:67%;padding:0;z-index:5;text-align:left}
+.kb-who__aside p{margin:0;font-family:var(--font-hand);font-size:3.1cqw;line-height:1.35;
   color:var(--text-strong)}
-.kb-bento__sel{position:relative;background:rgba(254,106,216,.45);
+.kb-who__sel{position:relative;background:rgba(254,106,216,.45);
   padding:.06em .05em;border-radius:2px;
   box-decoration-break:clone;-webkit-box-decoration-break:clone}
-.kb-bento__grip{position:absolute;top:-.02em;bottom:-.02em;width:2.5px;
+.kb-who__grip{position:absolute;top:-.02em;bottom:-.02em;width:2.5px;
   background:var(--kb-magenta);border-radius:1px}
-.kb-bento__grip::after{content:"";position:absolute;left:50%;width:.44em;height:.44em;
+.kb-who__grip::after{content:"";position:absolute;left:50%;width:.44em;height:.44em;
   border-radius:50%;background:var(--kb-magenta);transform:translateX(-50%)}
-.kb-bento__grip--start{left:-1px}
-.kb-bento__grip--start::after{bottom:100%}
-.kb-bento__grip--end{right:-1px}
-.kb-bento__grip--end::after{top:100%}
+.kb-who__grip--start{left:-1px}
+.kb-who__grip--start::after{bottom:100%}
+.kb-who__grip--end{right:-1px}
+.kb-who__grip--end::after{top:100%}
 
 /* --- Body copy: the longest run, so it gets the widest block. --- */
-.kb-bento__body{left:10%;top:57.1%;width:74%;padding:3.2% 3.6%;border-radius:30px 30px 14px 30px;
+.kb-who__body{left:10%;top:57.1%;width:74%;padding:3.2% 3.6%;border-radius:30px 30px 14px 30px;
   background:rgba(13,3,66,.72);
   backdrop-filter:blur(var(--blur-glass));-webkit-backdrop-filter:blur(var(--blur-glass));
   box-shadow:0 16px 46px rgba(8,1,42,.45)}
-.kb-bento__dots{display:flex;gap:6px;margin-bottom:3%}
-.kb-bento__dots i{width:7px;height:7px;border-radius:50%;background:rgba(183,140,245,.7)}
-.kb-bento__body p{margin:0;font-size:2cqw;font-weight:var(--weight-light);line-height:1.75;
+.kb-who__dots{display:flex;gap:6px;margin-bottom:3%}
+.kb-who__dots i{width:7px;height:7px;border-radius:50%;background:rgba(183,140,245,.7)}
+.kb-who__body p{margin:0;font-size:2cqw;font-weight:var(--weight-light);line-height:1.75;
   color:var(--text-body)}
-.kb-bento__body p + p{margin-top:.95em}
-html[data-active-lang="pt"] .kb-bento__body p{font-size:1.85cqw}
+.kb-who__body p + p{margin-top:.95em}
+html[data-active-lang="pt"] .kb-who__body p{font-size:1.85cqw}
 
 /* --- Decor: loose confetti placed only in the gaps the modules leave.
    Without it the negative space reads as a hole rather than as air. --- */
-.kb-bento__decor{z-index:8;pointer-events:none}
-.kb-bento__pip{border-radius:50%;background:var(--kb-lavender);opacity:.55}
-.kb-bento__pip--a{left:38.5%;top:2.5%;width:9px;height:9px}
-.kb-bento__pip--b{left:97.5%;top:12%;width:11px;height:11px;background:var(--kb-blush);opacity:.5}
-.kb-bento__pip--c{left:87%;top:19.5%;width:9px;height:9px;background:var(--kb-cyan);opacity:.5}
-.kb-bento__pip--d{left:87%;top:44%;width:12px;height:12px;background:var(--kb-magenta);opacity:.42}
-.kb-bento__pip--e{left:96%;top:58%;width:9px;height:9px;opacity:.5}
-.kb-bento__pip--f{left:4%;top:2%;width:7px;height:7px;background:var(--kb-cyan);opacity:.5}
-.kb-bento__pip--g{left:91%;top:94%;width:10px;height:10px;background:var(--kb-blush);opacity:.45}
-.kb-bento__spark{filter:drop-shadow(0 0 10px rgba(249,172,204,.7))}
-.kb-bento__spark--a{left:92%;top:36%;width:3.2%;height:auto;color:var(--kb-blush)}
-.kb-bento__spark--b{left:88.5%;top:72%;width:2.6%;height:auto;opacity:.75;color:var(--kb-lavender)}
-.kb-bento__spark--c{left:3%;top:62%;width:2.6%;height:auto;opacity:.6;color:var(--kb-cyan)}
-.kb-bento__squiggle{left:87%;top:84%;width:9%;height:auto;opacity:.75}
-.kb-bento__blob{left:88%;top:50%;width:6.2%;height:auto;aspect-ratio:5/4;z-index:7;
+.kb-who__decor{z-index:8;pointer-events:none}
+.kb-who__pip{border-radius:50%;background:var(--kb-lavender);opacity:.55}
+.kb-who__pip--a{left:38.5%;top:2.5%;width:9px;height:9px}
+.kb-who__pip--b{left:97.5%;top:12%;width:11px;height:11px;background:var(--kb-blush);opacity:.5}
+.kb-who__pip--c{left:87%;top:19.5%;width:9px;height:9px;background:var(--kb-cyan);opacity:.5}
+.kb-who__pip--d{left:87%;top:44%;width:12px;height:12px;background:var(--kb-magenta);opacity:.42}
+.kb-who__pip--e{left:96%;top:58%;width:9px;height:9px;opacity:.5}
+.kb-who__pip--f{left:4%;top:2%;width:7px;height:7px;background:var(--kb-cyan);opacity:.5}
+.kb-who__pip--g{left:91%;top:94%;width:10px;height:10px;background:var(--kb-blush);opacity:.45}
+.kb-who__spark{filter:drop-shadow(0 0 10px rgba(249,172,204,.7))}
+.kb-who__spark--a{left:92%;top:36%;width:3.2%;height:auto;color:var(--kb-blush)}
+.kb-who__spark--b{left:88.5%;top:72%;width:2.6%;height:auto;opacity:.75;color:var(--kb-lavender)}
+.kb-who__spark--c{left:3%;top:62%;width:2.6%;height:auto;opacity:.6;color:var(--kb-cyan)}
+.kb-who__squiggle{left:87%;top:84%;width:9%;height:auto;opacity:.75}
+.kb-who__blob{left:88%;top:50%;width:6.2%;height:auto;aspect-ratio:5/4;z-index:7;
   border-radius:62% 38% 46% 54%/60% 44% 56% 40%;background:rgba(254,106,216,.5);
   box-shadow:0 0 26px rgba(254,106,216,.45)}
 
 /* --- Narrow: free positioning cannot hold, so the composition becomes a
    flow. The decor drops out; every module keeps its own shape. --- */
 @media (max-width:880px){
-  .kb-bento{aspect-ratio:auto;container-type:normal;display:flex;flex-direction:column;
+  .kb-who{aspect-ratio:auto;container-type:normal;display:flex;flex-direction:column;
     gap:20px;max-width:540px;align-items:stretch}
-  .kb-bento > *{position:static}
-  .kb-bento__decor,.kb-bento__blob{display:none}
-  .kb-bento__photo{width:76%;align-self:flex-start}
-  .kb-bento__slot span{font-size:11px}
-  .kb-bento__handle{font-size:12px;padding:14px 0 18px}
-  .kb-bento__clock{width:120px;align-self:flex-end;margin-top:-78px;gap:2px}
-  .kb-bento__time{font-size:22px}
-  .kb-bento__tz{font-size:10px}
-  .kb-bento__name,.kb-bento__rail,.kb-bento__actions,.kb-bento__aside,.kb-bento__body{width:100%}
-  .kb-bento__eyebrow{font-size:11px;margin-bottom:8px}
-  .kb-bento__h{font-size:clamp(40px,13vw,66px)}
-  .kb-bento__meta{font-size:24px;gap:10px;margin-top:12px}
-  .kb-bento__aside p{font-size:21px;line-height:1.4}
-  .kb-bento__body{padding:22px 24px;border-radius:30px}
-  .kb-bento__body p{font-size:15px}
-  .kb-bento__rail{border-radius:30px;padding:16px}
-  .kb-bento__rail-label,.kb-bento-tag{font-size:11px}
-  .kb-bento-tag{padding:7px 14px}
-  .kb-bento__actions{padding:20px;border-radius:30px;gap:12px}
-  .kb-bento-btn{font-size:var(--text-sm);height:var(--control-height);padding:0 var(--space-5)}
+  .kb-who > *{position:static}
+  .kb-who__decor,.kb-who__blob{display:none}
+  .kb-who__photo{width:76%;align-self:flex-start}
+  .kb-who__slot span{font-size:11px}
+  .kb-who__handle{font-size:12px;padding:14px 0 18px}
+  .kb-who__clock{width:120px;align-self:flex-end;margin-top:-78px;gap:2px}
+  .kb-who__time{font-size:22px}
+  .kb-who__tz{font-size:10px}
+  .kb-who__name,.kb-who__rail,.kb-who__actions,.kb-who__aside,.kb-who__body{width:100%}
+  .kb-who__eyebrow{font-size:11px;margin-bottom:8px}
+  .kb-who__h{font-size:clamp(40px,13vw,66px)}
+  .kb-who__meta{font-size:24px;gap:10px;margin-top:12px}
+  .kb-who__aside p{font-size:21px;line-height:1.4}
+  .kb-who__body{padding:22px 24px;border-radius:30px}
+  .kb-who__body p{font-size:15px}
+  .kb-who__rail{border-radius:30px;padding:16px}
+  .kb-who__rail-label,.kb-who-tag{font-size:11px}
+  .kb-who-tag{padding:7px 14px}
+  .kb-who__actions{padding:20px;border-radius:30px;gap:12px}
+  .kb-who-btn{font-size:var(--text-sm);height:var(--control-height);padding:0 var(--space-5)}
 }
 
 /* ---------- Hero card -> project header container transform ----------

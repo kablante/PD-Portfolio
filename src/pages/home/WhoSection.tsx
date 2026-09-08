@@ -2,11 +2,11 @@ import { Download } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { type Lang, downloadCvPlaceholder } from './useHomeEffects'
 
-/** Home's second section - the profile composition, ported from the Bento
- * Blob Lab artifact and reskinned onto Katarina's own tokens/fonts.
+/** The Who section - home's second screen, ported from the Bento Blob Lab
+ * artifact and reskinned onto Katarina's own tokens/fonts.
  *
  * It is no longer a grid: each module is placed in percentages on a
- * fixed-ratio canvas (see .kb-bento in kb-site.css), so the whole
+ * fixed-ratio canvas (see .kb-who in kb-site.css), so the whole
  * arrangement scales as one picture rather than reflowing column by column.
  * That also means there is no per-card scroll parallax any more - the
  * modules are positioned absolutely, so a transform on each one would fight
@@ -40,8 +40,8 @@ const SKILLS: Array<{ label: string; hue: 'magenta' | 'violet' | 'cyan' | 'pink'
   { label: 'User Research', hue: 'magenta' },
 ]
 
-/** The four-point sparkle from bentoDecor, inlined here so its size and
- * position stay with the rest of the decor in CSS rather than as props. */
+/** Four-point sparkle, sized and positioned from CSS with the rest of the
+ * decor rather than through props. */
 function Sparkle({ className }: { className: string }) {
   return (
     <svg className={className} viewBox="0 0 28 28" fill="currentColor" aria-hidden="true">
@@ -50,11 +50,11 @@ function Sparkle({ className }: { className: string }) {
   )
 }
 
-export default function BentoGrid({ lang }: { lang: Lang }) {
+export default function WhoSection({ lang }: { lang: Lang }) {
   return (
-    <div className="kb-bento">
-      <figure className="kb-bento__photo">
-        <div className="kb-bento__slot">
+    <div className="kb-who">
+      <figure className="kb-who__photo">
+        <div className="kb-who__slot">
           <span>
             <span data-lang="en">
               PORTRAIT
@@ -68,47 +68,47 @@ export default function BentoGrid({ lang }: { lang: Lang }) {
             </span>
           </span>
         </div>
-        <figcaption className="kb-bento__handle">@katarinablante</figcaption>
+        <figcaption className="kb-who__handle">@katarinablante</figcaption>
       </figure>
 
-      <div className="kb-bento__clock">
-        <span className="kb-bento__time">
+      <div className="kb-who__clock">
+        <span className="kb-who__time">
           <TimezoneClock />
         </span>
-        <span className="kb-bento__tz">GMT-3</span>
+        <span className="kb-who__tz">GMT-3</span>
       </div>
 
-      <header className="kb-bento__name">
-        <span className="kb-bento__eyebrow">
+      <header className="kb-who__name">
+        <span className="kb-who__eyebrow">
           <span data-lang="en">✦ Who?</span>
           <span data-lang="pt">✦ Quem?</span>
         </span>
-        <h2 className="kb-bento__h">Katarina Blante</h2>
-        <div className="kb-bento__meta">
+        <h2 className="kb-who__h">Katarina Blante</h2>
+        <div className="kb-who__meta">
           <span data-lang="en">she / her</span>
           <span data-lang="pt">ela / dela</span>
-          <span className="kb-bento__dot" aria-hidden="true" />
+          <span className="kb-who__dot" aria-hidden="true" />
           <span data-lang="en">Brazilian</span>
           <span data-lang="pt">brasileira</span>
         </div>
       </header>
 
-      <div className="kb-bento__rail">
-        <span className="kb-bento__rail-label">
+      <div className="kb-who__rail">
+        <span className="kb-who__rail-label">
           <span data-lang="en">✦ skills &amp; toolkit</span>
           <span data-lang="pt">✦ ferramentas</span>
         </span>
         {SKILLS.map((skill) => (
-          <span key={skill.label} className={`kb-bento-tag kb-bento-tag--${skill.hue}`}>
+          <span key={skill.label} className={`kb-who-tag kb-who-tag--${skill.hue}`}>
             {skill.label}
           </span>
         ))}
       </div>
 
-      <div className="kb-bento__actions">
+      <div className="kb-who__actions">
         <button
           type="button"
-          className="kb-bento-btn kb-bento-btn--primary"
+          className="kb-who-btn kb-who-btn--primary"
           onClick={() => window.open('https://www.linkedin.com/in/katarinablante/', '_blank')}
         >
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -116,29 +116,29 @@ export default function BentoGrid({ lang }: { lang: Lang }) {
           </svg>
           LinkedIn
         </button>
-        <button type="button" className="kb-bento-btn kb-bento-btn--ghost" onClick={() => downloadCvPlaceholder(lang)}>
+        <button type="button" className="kb-who-btn kb-who-btn--ghost" onClick={() => downloadCvPlaceholder(lang)}>
           <Download aria-hidden="true" />
           <span data-lang="en">Download CV</span>
           <span data-lang="pt">Baixar CV</span>
         </button>
       </div>
 
-      <div className="kb-bento__aside">
+      <div className="kb-who__aside">
         <p>
           <span data-lang="en">
-            <span className="kb-bento__sel">
+            <span className="kb-who__sel">
               Full disclosure: I vibe-coded this site.
-              <i className="kb-bento__grip kb-bento__grip--start" aria-hidden="true" />
-              <i className="kb-bento__grip kb-bento__grip--end" aria-hidden="true" />
+              <i className="kb-who__grip kb-who__grip--start" aria-hidden="true" />
+              <i className="kb-who__grip kb-who__grip--end" aria-hidden="true" />
             </span>
             <br />
             Don't worry, the rest of my work goes through more than vibes.
           </span>
           <span data-lang="pt">
-            <span className="kb-bento__sel">
+            <span className="kb-who__sel">
               Aviso sincero: eu vibe-codei este site.
-              <i className="kb-bento__grip kb-bento__grip--start" aria-hidden="true" />
-              <i className="kb-bento__grip kb-bento__grip--end" aria-hidden="true" />
+              <i className="kb-who__grip kb-who__grip--start" aria-hidden="true" />
+              <i className="kb-who__grip kb-who__grip--end" aria-hidden="true" />
             </span>
             <br />
             Pode ficar tranquilo, o resto do meu trabalho passa por bem mais do que vibe.
@@ -146,8 +146,8 @@ export default function BentoGrid({ lang }: { lang: Lang }) {
         </p>
       </div>
 
-      <div className="kb-bento__body">
-        <div className="kb-bento__dots" aria-hidden="true">
+      <div className="kb-who__body">
+        <div className="kb-who__dots" aria-hidden="true">
           <i />
           <i />
           <i />
@@ -180,18 +180,18 @@ export default function BentoGrid({ lang }: { lang: Lang }) {
         </p>
       </div>
 
-      <span className="kb-bento__decor kb-bento__pip kb-bento__pip--a" aria-hidden="true" />
-      <span className="kb-bento__decor kb-bento__pip kb-bento__pip--b" aria-hidden="true" />
-      <span className="kb-bento__decor kb-bento__pip kb-bento__pip--c" aria-hidden="true" />
-      <span className="kb-bento__decor kb-bento__pip kb-bento__pip--d" aria-hidden="true" />
-      <span className="kb-bento__decor kb-bento__pip kb-bento__pip--e" aria-hidden="true" />
-      <span className="kb-bento__decor kb-bento__pip kb-bento__pip--f" aria-hidden="true" />
-      <span className="kb-bento__decor kb-bento__pip kb-bento__pip--g" aria-hidden="true" />
-      <Sparkle className="kb-bento__decor kb-bento__spark kb-bento__spark--a" />
-      <Sparkle className="kb-bento__decor kb-bento__spark kb-bento__spark--b" />
-      <Sparkle className="kb-bento__decor kb-bento__spark kb-bento__spark--c" />
+      <span className="kb-who__decor kb-who__pip kb-who__pip--a" aria-hidden="true" />
+      <span className="kb-who__decor kb-who__pip kb-who__pip--b" aria-hidden="true" />
+      <span className="kb-who__decor kb-who__pip kb-who__pip--c" aria-hidden="true" />
+      <span className="kb-who__decor kb-who__pip kb-who__pip--d" aria-hidden="true" />
+      <span className="kb-who__decor kb-who__pip kb-who__pip--e" aria-hidden="true" />
+      <span className="kb-who__decor kb-who__pip kb-who__pip--f" aria-hidden="true" />
+      <span className="kb-who__decor kb-who__pip kb-who__pip--g" aria-hidden="true" />
+      <Sparkle className="kb-who__decor kb-who__spark kb-who__spark--a" />
+      <Sparkle className="kb-who__decor kb-who__spark kb-who__spark--b" />
+      <Sparkle className="kb-who__decor kb-who__spark kb-who__spark--c" />
       <svg
-        className="kb-bento__decor kb-bento__squiggle"
+        className="kb-who__decor kb-who__squiggle"
         viewBox="0 0 120 40"
         fill="none"
         aria-hidden="true"
@@ -203,7 +203,7 @@ export default function BentoGrid({ lang }: { lang: Lang }) {
           strokeLinecap="round"
         />
       </svg>
-      <span className="kb-bento__decor kb-bento__blob" aria-hidden="true" />
+      <span className="kb-who__decor kb-who__blob" aria-hidden="true" />
     </div>
   )
 }
