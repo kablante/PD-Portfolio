@@ -119,9 +119,9 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
    white/cyan/magenta it had, then masked down to a thin bright ring right
    on the card's border — like foil catching light at the edge of a trading
    card. */
-.kb-project-card__glare-ring{position:absolute;inset:0;z-index:3;padding:3px;border-radius:inherit;opacity:0;pointer-events:none;transition:opacity 120ms ease-out;background:radial-gradient(300px 300px at var(--pointer-x,50%) var(--pointer-y,50%),var(--kb-indigo) 0%,#6b2a9e 46%,var(--kb-magenta-deep) 80%,transparent 100%);filter:brightness(1.7);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.kb-project-card__glare-ring{position:absolute;inset:0;z-index:3;padding:3px;border-radius:inherit;opacity:0;pointer-events:none;transition:opacity 120ms ease-out;background:radial-gradient(240px 240px at var(--pointer-x,50%) var(--pointer-y,50%),var(--kb-indigo) 0%,#6b2a9e 46%,var(--kb-magenta-deep) 80%,transparent 100%);filter:brightness(1.7);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
 .kb-project-card:hover .kb-project-card__glare-ring{opacity:.85}
-.kb-project-card__title{position:relative;z-index:1;display:inline-block;font-family:var(--font-body);font-size:25px;line-height:1.05;color:var(--text-strong);background:rgba(41,25,143,.72);border-radius:15px;padding:8px 16px;backdrop-filter:blur(var(--blur-glass));-webkit-backdrop-filter:blur(var(--blur-glass))}
+.kb-project-card__title{position:relative;z-index:1;display:inline-block;font-family:var(--font-body);font-size:var(--text-base);font-weight:var(--weight-semibold);letter-spacing:var(--tracking-wide);line-height:1.05;color:var(--text-strong);background:rgba(41,25,143,.72);border-radius:15px;padding:10px 18px;backdrop-filter:blur(var(--blur-glass));-webkit-backdrop-filter:blur(var(--blur-glass))}
 .kb-project-card__desc{display:none}
 
 /* Five cards get too narrow for their copy to read below ~700px — the
