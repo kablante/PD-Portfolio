@@ -357,6 +357,15 @@ export function useSiteGrain() {
         }
       }
       ctx!.putImageData(img, 0, 0)
+
+      // Hero cards (the home row) run their own tilt/scrim/glare effects and
+      // should stay grain-free — carve their current boxes out of this
+      // sitewide pass so it doesn't wash over them. No-ops on pages without
+      // any (e.g. ProjectPage).
+      document.querySelectorAll<HTMLElement>('.kb-project-card__tilt').forEach((card) => {
+        const rect = card.getBoundingClientRect()
+        ctx!.clearRect(rect.left, rect.top, rect.width, rect.height)
+      })
     }
 
     render()
