@@ -1,13 +1,16 @@
 import { Download } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
-import { Blob, Sparkle4, SmallDiamond } from './bentoDecor'
+import { useEffect, useState } from 'react'
 import { type Lang, downloadCvPlaceholder } from './useHomeEffects'
-import { useScrollParallax } from './useScrollParallax'
 
-/** Home's second section - a bento profile grid, ported from the KPop Carrd
- * Figma export and reskinned onto Katarina's own tokens/fonts/content.
- * Each card is a separate positioned element (not a single flat frame) so
- * the per-card scroll parallax below actually has something to move. */
+/** Home's second section - the profile composition, ported from the Bento
+ * Blob Lab artifact and reskinned onto Katarina's own tokens/fonts.
+ *
+ * It is no longer a grid: each module is placed in percentages on a
+ * fixed-ratio canvas (see .kb-bento in kb-site.css), so the whole
+ * arrangement scales as one picture rather than reflowing column by column.
+ * That also means there is no per-card scroll parallax any more - the
+ * modules are positioned absolutely, so a transform on each one would fight
+ * the composition instead of adding depth. */
 
 const TIMEZONE = 'America/Sao_Paulo'
 
@@ -37,158 +40,170 @@ const SKILLS: Array<{ label: string; hue: 'magenta' | 'violet' | 'cyan' | 'pink'
   { label: 'User Research', hue: 'magenta' },
 ]
 
+/** The four-point sparkle from bentoDecor, inlined here so its size and
+ * position stay with the rest of the decor in CSS rather than as props. */
+function Sparkle({ className }: { className: string }) {
+  return (
+    <svg className={className} viewBox="0 0 28 28" fill="currentColor" aria-hidden="true">
+      <path d="M14 0 L15.8 12.2 L28 14 L15.8 15.8 L14 28 L12.2 15.8 L0 14 L12.2 12.2 Z" />
+    </svg>
+  )
+}
+
 export default function BentoGrid({ lang }: { lang: Lang }) {
-  const photoRef = useRef<HTMLDivElement>(null)
-  const nameRef = useRef<HTMLDivElement>(null)
-  const tzRef = useRef<HTMLDivElement>(null)
-  const introRef = useRef<HTMLDivElement>(null)
-  const btnsRef = useRef<HTMLDivElement>(null)
-  const skillsRef = useRef<HTMLDivElement>(null)
-
-  useScrollParallax(photoRef, 0.06, -1.8)
-  useScrollParallax(nameRef, 0.1, 1)
-  useScrollParallax(tzRef, 0.18, 2.2)
-  useScrollParallax(introRef, 0.05, -0.6)
-  useScrollParallax(btnsRef, 0.2, 1.5)
-  useScrollParallax(skillsRef, 0.15, -1.2)
-
   return (
     <div className="kb-bento">
-      <div className="kb-bento-card kb-bento-card--photo" ref={photoRef} style={{ gridArea: 'photo' }}>
-        <div className="kb-portrait-slot kb-bento-card__slot">
-          <span className="kb-slot-label">
-            <span data-lang="en">PORTRAIT PLACEHOLDER · 3:4</span>
-            <span data-lang="pt">FOTO · PLACEHOLDER · 3:4</span>
+      <figure className="kb-bento__photo">
+        <div className="kb-bento__slot">
+          <span>
+            <span data-lang="en">
+              PORTRAIT
+              <br />
+              PLACEHOLDER · 3:4
+            </span>
+            <span data-lang="pt">
+              RETRATO
+              <br />
+              PLACEHOLDER · 3:4
+            </span>
           </span>
         </div>
-        <div className="kb-bento-card__handle">@katarinablante</div>
-        <Sparkle4
-          size={30}
-          color="var(--kb-blush)"
-          style={{ position: 'absolute', top: -14, right: -14, zIndex: 20, filter: 'drop-shadow(0 0 10px rgba(249,172,204,.7))' }}
-        />
-        <Blob
-          color="rgba(254,106,216,.5)"
-          width={76}
-          height={60}
-          style={{ bottom: -20, left: -16, zIndex: 20, boxShadow: '0 0 24px rgba(254,106,216,.4)' }}
-        />
+        <figcaption className="kb-bento__handle">@katarinablante</figcaption>
+      </figure>
+
+      <div className="kb-bento__clock">
+        <span className="kb-bento__time">
+          <TimezoneClock />
+        </span>
+        <span className="kb-bento__tz">GMT-3</span>
       </div>
 
-      <div className="kb-bento-card kb-bento-card--name" ref={nameRef} style={{ gridArea: 'name' }}>
-        <span className="kb-bento-card__eyebrow">
+      <header className="kb-bento__name">
+        <span className="kb-bento__eyebrow">
           <span data-lang="en">✦ Who?</span>
           <span data-lang="pt">✦ Quem?</span>
         </span>
-        <h1 className="kb-bento-card__name">Katarina Blante</h1>
-        <div className="kb-bento-card__meta">
+        <h2 className="kb-bento__h">Katarina Blante</h2>
+        <div className="kb-bento__meta">
           <span data-lang="en">she / her</span>
           <span data-lang="pt">ela / dela</span>
-          <span className="kb-bento-card__dot" aria-hidden="true" />
+          <span className="kb-bento__dot" aria-hidden="true" />
           <span data-lang="en">Brazilian</span>
           <span data-lang="pt">brasileira</span>
         </div>
-        <div className="kb-bento-card__rule" aria-hidden="true" />
-        <SmallDiamond
-          size={18}
-          color="var(--kb-magenta)"
-          style={{ position: 'absolute', top: 18, right: 24, filter: 'drop-shadow(0 0 8px rgba(254,106,216,.7))' }}
-        />
-      </div>
+      </header>
 
-      <div className="kb-bento-card kb-bento-card--tz" ref={tzRef} style={{ gridArea: 'tz' }}>
-        <span className="kb-bento-card__eyebrow kb-bento-card__eyebrow--cyan">
-          <span data-lang="en">timezone</span>
-          <span data-lang="pt">fuso horário</span>
+      <div className="kb-bento__rail">
+        <span className="kb-bento__rail-label">
+          <span data-lang="en">✦ skills &amp; toolkit</span>
+          <span data-lang="pt">✦ ferramentas</span>
         </span>
-        <div className="kb-bento-card__clock">
-          <TimezoneClock />
-        </div>
-        <span className="kb-bento-card__tz-label">GMT-3</span>
+        {SKILLS.map((skill) => (
+          <span key={skill.label} className={`kb-bento-tag kb-bento-tag--${skill.hue}`}>
+            {skill.label}
+          </span>
+        ))}
       </div>
 
-      <div className="kb-bento-card kb-bento-card--intro" ref={introRef} style={{ gridArea: 'intro' }}>
-        <div className="kb-bento-card__intro-text">
-          <p>
-            <span data-lang="en">
-              <em>(Full disclosure: I vibe-coded this site.)</em> Don't worry, the rest of my work goes through more
-              than vibes.
-            </span>
-            <span data-lang="pt">
-              <em>(Aviso sincero: eu vibe-codei este site.)</em> Pode ficar tranquilo, o resto do meu trabalho passa
-              por bem mais do que vibe.
-            </span>
-          </p>
-          <p>
-            <span data-lang="en">
-              I design <em>(B2B products with complex requirements)</em> and business rules. My most recent project
-              was for a Silicon Valley hardware manufacturer, designed to coordinate data across production lines,
-              builds, and equipment for multiple concurrent user roles. In real projects, there are no easy answers.
-              That's where a designer doesn't lose to AI.
-            </span>
-            <span data-lang="pt">
-              Eu desenho <em>(produtos B2B com requisitos complexos)</em> e regras de negócio. Meu projeto mais
-              recente foi para uma fabricante de hardware do Vale do Silício, pensado para coordenar dados entre
-              linhas de produção, builds e equipamentos, para múltiplos perfis de usuário simultâneos. Em projetos
-              reais, não existem respostas fáceis. É aí que um designer não perde para a IA.
-            </span>
-          </p>
-          <p>
-            <span data-lang="en">
-              I work <em>(close to engineering)</em>: GitHub, dev teams, AI-assisted tools are part of the job, not
-              someone else's. Right now I'm also building product management fundamentals: sharper problem framing,
-              better trade-off calls.
-            </span>
-            <span data-lang="pt">
-              Eu trabalho <em>(perto da engenharia)</em>: GitHub, times de dev, ferramentas com IA fazem parte do
-              trabalho, não são tarefa de outra pessoa. Agora também estou construindo fundamentos de product
-              management: enquadrar problemas com mais precisão, tomar decisões de trade-off melhores.
-            </span>
-          </p>
-        </div>
-        <Sparkle4
-          size={20}
-          color="var(--kb-lavender)"
-          style={{ position: 'absolute', bottom: 20, right: 28, opacity: 0.6 }}
-        />
-      </div>
-
-      <div className="kb-bento-card kb-bento-card--btns" ref={btnsRef} style={{ gridArea: 'btns' }}>
+      <div className="kb-bento__actions">
         <button
           type="button"
           className="kb-bento-btn kb-bento-btn--primary"
           onClick={() => window.open('https://www.linkedin.com/in/katarinablante/', '_blank')}
         >
-          <svg width={20} height={20} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.446-2.136 2.94v5.666H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 1 1 0-4.124 2.062 2.062 0 0 1 0 4.124zM7.114 20.452H3.558V9h3.556v11.452z" />
           </svg>
           LinkedIn
         </button>
         <button type="button" className="kb-bento-btn kb-bento-btn--ghost" onClick={() => downloadCvPlaceholder(lang)}>
-          <Download size={20} aria-hidden="true" />
+          <Download aria-hidden="true" />
           <span data-lang="en">Download CV</span>
-          <span data-lang="pt">Baixar currículo</span>
+          <span data-lang="pt">Baixar CV</span>
         </button>
       </div>
 
-      <div className="kb-bento-card kb-bento-card--skills" ref={skillsRef} style={{ gridArea: 'skills' }}>
-        <span className="kb-bento-card__eyebrow">
-          <span data-lang="en">✦ skills &amp; toolkit</span>
-          <span data-lang="pt">✦ ferramentas</span>
-        </span>
-        <div className="kb-bento-card__tags">
-          {SKILLS.map((skill) => (
-            <span key={skill.label} className={`kb-bento-tag kb-bento-tag--${skill.hue}`}>
-              {skill.label}
+      <div className="kb-bento__aside">
+        <p>
+          <span data-lang="en">
+            <span className="kb-bento__sel">
+              Full disclosure: I vibe-coded this site.
+              <i className="kb-bento__grip kb-bento__grip--start" aria-hidden="true" />
+              <i className="kb-bento__grip kb-bento__grip--end" aria-hidden="true" />
             </span>
-          ))}
-        </div>
-        <SmallDiamond
-          size={16}
-          color="var(--kb-blush)"
-          style={{ position: 'absolute', top: 22, right: 22, filter: 'drop-shadow(0 0 6px rgba(249,172,204,.7))' }}
-        />
+            <br />
+            Don't worry, the rest of my work goes through more than vibes.
+          </span>
+          <span data-lang="pt">
+            <span className="kb-bento__sel">
+              Aviso sincero: eu vibe-codei este site.
+              <i className="kb-bento__grip kb-bento__grip--start" aria-hidden="true" />
+              <i className="kb-bento__grip kb-bento__grip--end" aria-hidden="true" />
+            </span>
+            <br />
+            Pode ficar tranquilo, o resto do meu trabalho passa por bem mais do que vibe.
+          </span>
+        </p>
       </div>
+
+      <div className="kb-bento__body">
+        <div className="kb-bento__dots" aria-hidden="true">
+          <i />
+          <i />
+          <i />
+        </div>
+        <p>
+          <span data-lang="en">
+            I design B2B products with complex requirements and business rules. My most recent project was for a
+            Silicon Valley hardware manufacturer, designed to coordinate data across production lines, builds, and
+            equipment for multiple concurrent user roles. In real projects, there are no easy answers. That's where a
+            designer doesn't lose to AI.
+          </span>
+          <span data-lang="pt">
+            Eu desenho produtos B2B com requisitos complexos e regras de negócio. Meu projeto mais recente foi para
+            uma fabricante de hardware do Vale do Silício, pensado para coordenar dados entre linhas de produção,
+            builds e equipamentos, para múltiplos perfis de usuário simultâneos. Em projetos reais, não existem
+            respostas fáceis. É aí que um designer não perde para a IA.
+          </span>
+        </p>
+        <p>
+          <span data-lang="en">
+            I work close to engineering: GitHub, dev teams, AI-assisted tools are part of the job, not someone else's.
+            Right now I'm also building product management fundamentals: sharper problem framing, better trade-off
+            calls.
+          </span>
+          <span data-lang="pt">
+            Eu trabalho perto da engenharia: GitHub, times de dev, ferramentas com IA fazem parte do trabalho, não são
+            tarefa de outra pessoa. Agora também estou construindo fundamentos de product management: enquadrar
+            problemas com mais precisão, tomar decisões de trade-off melhores.
+          </span>
+        </p>
+      </div>
+
+      <span className="kb-bento__decor kb-bento__pip kb-bento__pip--a" aria-hidden="true" />
+      <span className="kb-bento__decor kb-bento__pip kb-bento__pip--b" aria-hidden="true" />
+      <span className="kb-bento__decor kb-bento__pip kb-bento__pip--c" aria-hidden="true" />
+      <span className="kb-bento__decor kb-bento__pip kb-bento__pip--d" aria-hidden="true" />
+      <span className="kb-bento__decor kb-bento__pip kb-bento__pip--e" aria-hidden="true" />
+      <span className="kb-bento__decor kb-bento__pip kb-bento__pip--f" aria-hidden="true" />
+      <span className="kb-bento__decor kb-bento__pip kb-bento__pip--g" aria-hidden="true" />
+      <Sparkle className="kb-bento__decor kb-bento__spark kb-bento__spark--a" />
+      <Sparkle className="kb-bento__decor kb-bento__spark kb-bento__spark--b" />
+      <Sparkle className="kb-bento__decor kb-bento__spark kb-bento__spark--c" />
+      <svg
+        className="kb-bento__decor kb-bento__squiggle"
+        viewBox="0 0 120 40"
+        fill="none"
+        aria-hidden="true"
+      >
+        <path
+          d="M4 24C14 6 30 6 40 20s26 14 36 0 26-12 36 2"
+          stroke="var(--kb-blush)"
+          strokeWidth="4"
+          strokeLinecap="round"
+        />
+      </svg>
+      <span className="kb-bento__decor kb-bento__blob" aria-hidden="true" />
     </div>
   )
 }
