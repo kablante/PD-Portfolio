@@ -297,9 +297,11 @@ export function useCursorSpotlight() {
 }
 
 /** Sitewide grain: a fixed, full-viewport canvas painted with fresh two-pass
- * noise (fine speckle + coarse stipple) on mount and on resize, layered on
- * top of everything via mix-blend-mode:overlay for a subtle film-grain pass.
- * Replaces nothing — kb-aurora__grain's static CSS texture is untouched. */
+ * noise (fine speckle + coarse stipple) on mount and on resize, layered via
+ * mix-blend-mode:overlay for a subtle film-grain pass. Sits at z-index:9999,
+ * above everything except the hero cards — see .kb-home-cards in kb-site.css
+ * for how they outrank it. Replaces nothing — kb-aurora__grain's static CSS
+ * texture is untouched. */
 export function useSiteGrain() {
   useEffect(() => {
     const canvas = document.createElement('canvas')
@@ -357,15 +359,6 @@ export function useSiteGrain() {
         }
       }
       ctx!.putImageData(img, 0, 0)
-
-      // Hero cards (the home row) run their own tilt/scrim/glare effects and
-      // should stay grain-free — carve their current boxes out of this
-      // sitewide pass so it doesn't wash over them. No-ops on pages without
-      // any (e.g. ProjectPage).
-      document.querySelectorAll<HTMLElement>('.kb-project-card__tilt').forEach((card) => {
-        const rect = card.getBoundingClientRect()
-        ctx!.clearRect(rect.left, rect.top, rect.width, rect.height)
-      })
     }
 
     render()

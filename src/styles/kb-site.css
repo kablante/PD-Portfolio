@@ -61,13 +61,21 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
    future exit transition on this same element from ever starting. The
    100% keyframe already matches the element's own resting style, so
    dropping the fill causes no visible jump once it finishes. */
-.kb-home-main{position:relative;z-index:1;height:calc(100vh - 64px);display:flex;flex-direction:column;overflow:hidden;animation:kb-rise-in 480ms cubic-bezier(.22,.61,.36,1)}
+.kb-home-main{position:relative;height:calc(100vh - 64px);display:flex;flex-direction:column;overflow:hidden;animation:kb-rise-in 480ms cubic-bezier(.22,.61,.36,1)}
 
 /* Cards bleed above the viewport on purpose (cropped by .kb-page--home's
    own clip, not by a tight box here) — the negative margin pulls them up,
    the parent's generous height leaves slack below so the hover lift never
-   gets clipped at the bottom. */
-.kb-home-cards{flex:none;margin-top:-16vh}
+   gets clipped at the bottom.
+
+   position+z-index here (rather than on .kb-home-main) is deliberate: it's
+   what lets the hero cards outrank #kb-site-grain's fixed z-index:9999 (see
+   useSiteGrain) without dragging the rest of .kb-home-main — the wordmark,
+   the Who section, everything else — above the grain with them. Removing
+   .kb-home-main's own z-index (it used to hold this stacking context) was
+   required for that: a positioned descendant can never escape an ancestor's
+   stacking context, only rank within it. */
+.kb-home-cards{position:relative;z-index:10000;flex:none;margin-top:-16vh}
 /* No gap: each card's *slot* is deliberately narrower than the card
    itself (see .kb-project-card), which is what makes them overlap. */
 .kb-home-cards__row{display:flex;justify-content:center;align-items:flex-start;padding:0 clamp(20px,4vw,40px);max-width:1800px;margin:0 auto}
