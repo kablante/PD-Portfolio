@@ -4,7 +4,7 @@ import AuroraBackground from '@/components/shared/AuroraBackground'
 import '@/styles/kb-tokens.css'
 import '@/styles/kb-components.css'
 import '@/styles/kb-site.css'
-import BentoGrid from './BentoGrid'
+import WhoSection from './WhoSection'
 import { homeProjects, projectImageTransitionName } from './projects'
 import { useCardSpreadEffects, useCursorSpotlight, useLang } from './useHomeEffects'
 
@@ -73,8 +73,8 @@ export default function Home() {
           </span>
         </div>
       </div>
-      <div className="kb-home-blank">
-        <BentoGrid lang={lang} />
+      <div className="kb-who-section">
+        <WhoSection lang={lang} />
       </div>
       <div className="kb-lang-dock">
         <div role="group" aria-label="Language" className="kb-lang-switch">
