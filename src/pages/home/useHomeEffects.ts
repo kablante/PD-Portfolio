@@ -296,6 +296,79 @@ export function useCursorSpotlight() {
   }, [])
 }
 
+/** Sitewide grain: a fixed, full-viewport canvas painted with fresh two-pass
+ * noise (fine speckle + coarse stipple) on mount and on resize, layered on
+ * top of everything via mix-blend-mode:overlay for a subtle film-grain pass.
+ * Replaces nothing — kb-aurora__grain's static CSS texture is untouched. */
+export function useSiteGrain() {
+  useEffect(() => {
+    const canvas = document.createElement('canvas')
+    canvas.setAttribute('aria-hidden', 'true')
+    canvas.id = 'kb-site-grain'
+    Object.assign(canvas.style, {
+      position: 'fixed',
+      inset: '0',
+      width: '100%',
+      height: '100%',
+      pointerEvents: 'none',
+      zIndex: '9999',
+      mixBlendMode: 'overlay',
+      opacity: '.4',
+    })
+    document.body.appendChild(canvas)
+
+    const ctx = canvas.getContext('2d')
+    if (!ctx) {
+      canvas.remove()
+      return
+    }
+
+    function render() {
+      const w = window.innerWidth
+      const h = window.innerHeight
+      canvas.width = w
+      canvas.height = h
+      const img = ctx!.createImageData(w, h)
+      const d = img.data
+      for (let i = 0; i < d.length; i += 4) {
+        const rand = Math.random()
+        if (rand > 0.35) {
+          d[i] = 255
+          d[i + 1] = 255
+          d[i + 2] = 255
+          d[i + 3] = Math.floor(rand * 85)
+        }
+      }
+      for (let y = 0; y < h; y += 3) {
+        for (let x = 0; x < w; x += 3) {
+          if (Math.random() > 0.55) {
+            for (let dy = 0; dy < 2; dy++) {
+              for (let dx = 0; dx < 2; dx++) {
+                const idx = ((y + dy) * w + (x + dx)) * 4
+                if (idx < d.length) {
+                  d[idx] = 255
+                  d[idx + 1] = 255
+                  d[idx + 2] = 255
+                  d[idx + 3] = Math.floor(Math.random() * 90 + 30)
+                }
+              }
+            }
+          }
+        }
+      }
+      ctx!.putImageData(img, 0, 0)
+    }
+
+    render()
+    window.addEventListener('resize', render)
+
+    return () => {
+      window.removeEventListener('resize', render)
+      canvas.remove()
+    }
+  }, [])
+}
+
 /** Mouse-driven depth parallax on the fixed aurora background: sets
  * --kb-px/--kb-py (-0.5..0.5) which kb-site.css's mesh/star layers read via
  * `translate`. Skipped on touch and reduced-motion. */

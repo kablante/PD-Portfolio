@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { useAuroraParallax } from '@/pages/home/useHomeEffects'
+import { useAuroraParallax, useSiteGrain } from '@/pages/home/useHomeEffects'
 
 /** Site-wide fixed background - previously a drifting gradient mesh + star
  * field, now a set of soft pulsing glow orbs (ported from the KPop Carrd
@@ -10,6 +10,7 @@ import { useAuroraParallax } from '@/pages/home/useHomeEffects'
 export default function AuroraBackground() {
   const bgRef = useRef<HTMLDivElement>(null)
   useAuroraParallax(bgRef)
+  useSiteGrain()
 
   return (
     <div className="kb-bg" aria-hidden="true" ref={bgRef}>
