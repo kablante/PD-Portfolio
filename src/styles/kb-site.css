@@ -105,7 +105,7 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
    `{type:"spring",bounce:0,duration:.3}`, which CSS/WAAPI can't express
    natively). */
 .kb-project-card{all:unset;box-sizing:border-box;cursor:pointer;display:flex;justify-content:center;position:relative;flex:1 1 0;min-width:0;max-width:clamp(60px,20.5vw,220px);height:min(66vh,560px);transform:rotate(var(--card-rot,0deg));transform-origin:50% 50%}
-.kb-project-card__tilt{position:relative;overflow:hidden;flex:none;width:clamp(90px,31vw,340px);height:100%;border-radius:30px;background:#e9e9e9;box-shadow:0 0 60px 0 rgba(0,0,0,.15);display:flex;flex-direction:column;justify-content:flex-end;padding:22px;transform:perspective(800px);transition:transform 300ms ease-out,box-shadow 300ms ease-out}
+.kb-project-card__tilt{position:relative;overflow:hidden;flex:none;width:clamp(90px,31vw,340px);height:100%;border-radius:30px;background:#e9e9e9;box-shadow:0 0 60px 0 rgba(0,0,0,.3);display:flex;flex-direction:column;justify-content:flex-end;padding:22px;transform:perspective(800px);transition:transform 300ms ease-out,box-shadow 300ms ease-out}
 .kb-project-card__img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;-webkit-user-drag:none;user-select:none}
 .kb-project-card__scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 12%,rgba(0,0,0,0) 100%);z-index:0}
 /* Holographic glare: a soft pink highlight that follows the cursor
@@ -121,7 +121,7 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
    card. */
 .kb-project-card__glare-ring{position:absolute;inset:0;z-index:3;padding:3px;border-radius:inherit;opacity:0;pointer-events:none;transition:opacity 300ms ease-out;background:radial-gradient(160px 160px at var(--pointer-x,50%) var(--pointer-y,50%),var(--kb-indigo) 0%,#6b2a9e 46%,var(--kb-magenta-deep) 80%,transparent 100%);filter:brightness(1.7);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
 .kb-project-card:hover .kb-project-card__glare-ring{opacity:.85}
-.kb-project-card__title{position:relative;z-index:1;display:block;font-family:var(--font-display);font-size:25px;line-height:1.05;color:var(--text-strong)}
+.kb-project-card__title{position:relative;z-index:1;display:inline-block;font-family:var(--font-display);font-size:25px;line-height:1.05;color:var(--text-strong);background:var(--kb-blue);border-radius:15px;padding:8px 16px}
 .kb-project-card__desc{display:none}
 
 /* Five cards get too narrow for their copy to read below ~700px — the
