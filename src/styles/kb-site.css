@@ -108,10 +108,10 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
 .kb-project-card__tilt{position:relative;overflow:hidden;flex:none;width:clamp(90px,31vw,340px);height:100%;border-radius:30px;background:#e9e9e9;box-shadow:0px 6px 30px 10px rgba(0,0,0,.3);display:flex;flex-direction:column;justify-content:flex-end;padding:22px;transform:perspective(800px);transition:transform 300ms ease-out,box-shadow 300ms ease-out}
 .kb-project-card__img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;-webkit-user-drag:none;user-select:none}
 .kb-project-card__scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 12%,rgba(0,0,0,.88) 100%);z-index:0}
-/* Holographic glare: a soft cyan highlight that follows the cursor
+/* Holographic glare: a soft magenta highlight that follows the cursor
    (--pointer-x/--pointer-y, set by initCardTilt in site.js), faded in only
    while hovering — the "brilho de carta física". */
-.kb-project-card__glare{position:absolute;inset:0;z-index:2;opacity:0;pointer-events:none;mix-blend-mode:overlay;transition:opacity 300ms ease-out;background:radial-gradient(circle at var(--pointer-x,50%) var(--pointer-y,50%),var(--kb-butter) 0%,transparent 75%)}
+.kb-project-card__glare{position:absolute;inset:0;z-index:2;opacity:0;pointer-events:none;mix-blend-mode:overlay;transition:opacity 300ms ease-out;background:radial-gradient(circle at var(--pointer-x,50%) var(--pointer-y,50%),var(--kb-magenta) 0%,transparent 75%)}
 .kb-project-card:hover .kb-project-card__glare{opacity:.6}
 /* Holographic edge: same pointer-tracked spotlight as before, recolored to
    --gradient-nebula's own stops (indigo → violet → deep magenta, same
