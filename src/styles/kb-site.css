@@ -61,13 +61,21 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
    future exit transition on this same element from ever starting. The
    100% keyframe already matches the element's own resting style, so
    dropping the fill causes no visible jump once it finishes. */
-.kb-home-main{position:relative;z-index:1;height:calc(100vh - 64px);display:flex;flex-direction:column;overflow:hidden;animation:kb-rise-in 480ms cubic-bezier(.22,.61,.36,1)}
+.kb-home-main{position:relative;height:calc(100vh - 64px);display:flex;flex-direction:column;overflow:hidden;animation:kb-rise-in 480ms cubic-bezier(.22,.61,.36,1)}
 
 /* Cards bleed above the viewport on purpose (cropped by .kb-page--home's
    own clip, not by a tight box here) — the negative margin pulls them up,
    the parent's generous height leaves slack below so the hover lift never
-   gets clipped at the bottom. */
-.kb-home-cards{flex:none;margin-top:-16vh}
+   gets clipped at the bottom.
+
+   position+z-index here (rather than on .kb-home-main) is deliberate: it's
+   what lets the hero cards outrank #kb-site-grain's fixed z-index:9999 (see
+   useSiteGrain) without dragging the rest of .kb-home-main — the wordmark,
+   the Who section, everything else — above the grain with them. Removing
+   .kb-home-main's own z-index (it used to hold this stacking context) was
+   required for that: a positioned descendant can never escape an ancestor's
+   stacking context, only rank within it. */
+.kb-home-cards{position:relative;z-index:10000;flex:none;margin-top:-16vh}
 /* No gap: each card's *slot* is deliberately narrower than the card
    itself (see .kb-project-card), which is what makes them overlap. */
 .kb-home-cards__row{display:flex;justify-content:center;align-items:flex-start;padding:0 clamp(20px,4vw,40px);max-width:1800px;margin:0 auto}
@@ -97,24 +105,24 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
    `{type:"spring",bounce:0,duration:.3}`, which CSS/WAAPI can't express
    natively). */
 .kb-project-card{all:unset;box-sizing:border-box;cursor:pointer;display:flex;justify-content:center;position:relative;flex:1 1 0;min-width:0;max-width:clamp(60px,20.5vw,220px);height:min(66vh,560px);transform:rotate(var(--card-rot,0deg));transform-origin:50% 50%}
-.kb-project-card__tilt{position:relative;overflow:hidden;flex:none;width:clamp(90px,31vw,340px);height:100%;border-radius:30px;background:#e9e9e9;box-shadow:0px 6px 30px 10px rgba(0,0,0,.3);display:flex;flex-direction:column;justify-content:flex-end;padding:22px;transform:perspective(800px);transition:transform 300ms ease-out,box-shadow 300ms ease-out}
+.kb-project-card__tilt{position:relative;overflow:hidden;flex:none;width:clamp(90px,31vw,340px);height:100%;border-radius:30px;background:#e9e9e9;box-shadow:0 0 60px 0 rgba(0,0,0,.3);display:flex;flex-direction:column;justify-content:flex-end;padding:22px;transform:perspective(800px);transition:transform 300ms ease-out,box-shadow 300ms ease-out}
 .kb-project-card__img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;-webkit-user-drag:none;user-select:none}
-.kb-project-card__scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(13,3,66,0) 30%,rgba(13,3,66,.88) 100%);z-index:0}
-/* Holographic glare: a soft cyan highlight that follows the cursor
+.kb-project-card__scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 12%,rgba(0,0,0,0) 100%);z-index:0}
+/* Holographic glare: a soft pink highlight that follows the cursor
    (--pointer-x/--pointer-y, set by initCardTilt in site.js), faded in only
    while hovering — the "brilho de carta física". */
-.kb-project-card__glare{position:absolute;inset:0;z-index:2;opacity:0;pointer-events:none;mix-blend-mode:overlay;transition:opacity 300ms ease-out;background:radial-gradient(circle at var(--pointer-x,50%) var(--pointer-y,50%),var(--kb-butter) 0%,transparent 75%)}
-.kb-project-card:hover .kb-project-card__glare{opacity:.6}
+.kb-project-card__glare{position:absolute;inset:0;z-index:2;opacity:0;pointer-events:none;mix-blend-mode:overlay;transition:opacity 300ms ease-out;background:radial-gradient(circle at var(--pointer-x,50%) var(--pointer-y,50%),var(--kb-blush) 0%,transparent 75%)}
+.kb-project-card:hover .kb-project-card__glare{opacity:1}
 /* Holographic edge: same pointer-tracked spotlight as before, recolored to
    --gradient-nebula's own stops (indigo → violet → deep magenta, same
    progression used on the about/project placeholder slots) instead of the
    white/cyan/magenta it had, then masked down to a thin bright ring right
    on the card's border — like foil catching light at the edge of a trading
    card. */
-.kb-project-card__glare-ring{position:absolute;inset:0;z-index:3;padding:3px;border-radius:inherit;opacity:0;pointer-events:none;transition:opacity 300ms ease-out;background:radial-gradient(160px 160px at var(--pointer-x,50%) var(--pointer-y,50%),var(--kb-indigo) 0%,#6b2a9e 46%,var(--kb-magenta-deep) 80%,transparent 100%);filter:brightness(1.7);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.kb-project-card__glare-ring{position:absolute;inset:0;z-index:3;padding:3px;border-radius:inherit;opacity:0;pointer-events:none;transition:opacity 120ms ease-out;background:radial-gradient(240px 240px at var(--pointer-x,50%) var(--pointer-y,50%),var(--kb-indigo) 0%,#6b2a9e 46%,var(--kb-magenta-deep) 80%,transparent 100%);filter:brightness(1.7);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
 .kb-project-card:hover .kb-project-card__glare-ring{opacity:.85}
-.kb-project-card__title{position:relative;z-index:1;display:block;font-family:var(--font-display);font-size:22px;line-height:1.05;color:var(--text-strong)}
-.kb-project-card__desc{position:relative;z-index:1;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;margin-top:8px;font-size:13px;line-height:1.45;font-weight:300;color:rgba(255,255,255,.82)}
+.kb-project-card__title{position:relative;z-index:1;display:inline-block;font-family:var(--font-body);font-size:var(--text-base);font-weight:var(--weight-semibold);letter-spacing:var(--tracking-wide);line-height:1.05;color:var(--text-strong);background:rgba(41,25,143,.72);border-radius:15px;padding:10px 18px;backdrop-filter:blur(var(--blur-glass));-webkit-backdrop-filter:blur(var(--blur-glass))}
+.kb-project-card__desc{display:none}
 
 /* Five cards get too narrow for their copy to read below ~700px — the
    card shapes still carry the layout, so drop the text instead of

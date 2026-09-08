@@ -1,32 +1,49 @@
-# React + TypeScript + Vite
+# PD-Portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Katarina Blante's portfolio — a bilingual (EN/PT) product-designer site with
+an "ethereal and nocturnal" brand design system. Built with React, TypeScript
+and Vite, deployed to GitHub Pages from `main`.
 
-Currently, two official plugins are available:
+Live at https://kablante.github.io/PD-Portfolio/
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Structure
 
-## React Compiler
+- `src/pages/home/` — home screen: the project card row, the wordmark, the
+  "Who" section, and the effect hooks (card spread/tilt, cursor spotlight,
+  aurora parallax, sitewide grain, EN/PT language state)
+- `src/pages/project/ProjectPage.tsx` — case-study page, shared across all
+  projects
+- `src/components/shared/AuroraBackground.tsx` — the fixed background used by
+  both Home and ProjectPage
+- `src/components/ui/` — small shared UI primitives (button, dynamic frame
+  layout)
+- `src/styles/` — design tokens, component styles and site layout CSS
+- `public/assets/` — logo lockups, licensed fonts (MADE Sunflower, Promised
+  Freedom) and project images
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Running locally
 
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```
+npm install
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## Building
+
+```
+npm run build
+```
+
+Type-checks with `tsc -b` and builds the production bundle to `dist/` via
+Vite. `npm run preview` serves that build locally.
+
+## Deploying
+
+Pushing to `main` triggers `.github/workflows/deploy.yml`, which builds the
+app and publishes `dist/` to GitHub Pages (see that file for why `dist/index.html`
+is also copied to `dist/404.html`).
+
+## Language toggle
+
+Every page ships both English and Portuguese copy; the EN/PT switch swaps the
+visible language and remembers the choice (`localStorage`) across pages.

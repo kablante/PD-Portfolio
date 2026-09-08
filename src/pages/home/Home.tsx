@@ -6,7 +6,7 @@ import '@/styles/kb-components.css'
 import '@/styles/kb-site.css'
 import WhoSection from './WhoSection'
 import { homeProjects, projectImageTransitionName } from './projects'
-import { useCardSpreadEffects, useCursorSpotlight, useLang } from './useHomeEffects'
+import { useCardSpreadEffects, useCursorSpotlight, useLang, useLogoMorph } from './useHomeEffects'
 import { asset } from '@/lib/asset'
 
 export default function Home() {
@@ -15,6 +15,7 @@ export default function Home() {
 
   useCardSpreadEffects(rowRef)
   useCursorSpotlight()
+  useLogoMorph()
 
   return (
     <div className="kb-page kb-page--home">

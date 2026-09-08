@@ -219,7 +219,7 @@ export function useCardSpreadEffects(rowRef: RefObject<HTMLDivElement | null>) {
 
 const SPOTLIGHT_RADIUS = 220
 const SPOTLIGHT_BRIGHTNESS = 0.14
-const SPOTLIGHT_COLOR = '#fff9ad' // --kb-butter (brand yellow)
+const SPOTLIGHT_COLOR = '#fe6ad8' // --kb-magenta
 
 function hexToRgb(hex: string) {
   const n = Number.parseInt(hex.slice(1), 16)
@@ -296,6 +296,81 @@ export function useCursorSpotlight() {
   }, [])
 }
 
+/** Sitewide grain: a fixed, full-viewport canvas painted with fresh two-pass
+ * noise (fine speckle + coarse stipple) on mount and on resize, layered via
+ * mix-blend-mode:overlay for a subtle film-grain pass. Sits at z-index:9999,
+ * above everything except the hero cards — see .kb-home-cards in kb-site.css
+ * for how they outrank it. Replaces nothing — kb-aurora__grain's static CSS
+ * texture is untouched. */
+export function useSiteGrain() {
+  useEffect(() => {
+    const canvas = document.createElement('canvas')
+    canvas.setAttribute('aria-hidden', 'true')
+    canvas.id = 'kb-site-grain'
+    Object.assign(canvas.style, {
+      position: 'fixed',
+      inset: '0',
+      width: '100%',
+      height: '100%',
+      pointerEvents: 'none',
+      zIndex: '9999',
+      mixBlendMode: 'overlay',
+      opacity: '.4',
+    })
+    document.body.appendChild(canvas)
+
+    const ctx = canvas.getContext('2d')
+    if (!ctx) {
+      canvas.remove()
+      return
+    }
+
+    function render() {
+      const w = window.innerWidth
+      const h = window.innerHeight
+      canvas.width = w
+      canvas.height = h
+      const img = ctx!.createImageData(w, h)
+      const d = img.data
+      for (let i = 0; i < d.length; i += 4) {
+        const rand = Math.random()
+        if (rand > 0.35) {
+          d[i] = 255
+          d[i + 1] = 255
+          d[i + 2] = 255
+          d[i + 3] = Math.floor(rand * 85)
+        }
+      }
+      for (let y = 0; y < h; y += 3) {
+        for (let x = 0; x < w; x += 3) {
+          if (Math.random() > 0.55) {
+            for (let dy = 0; dy < 2; dy++) {
+              for (let dx = 0; dx < 2; dx++) {
+                const idx = ((y + dy) * w + (x + dx)) * 4
+                if (idx < d.length) {
+                  d[idx] = 255
+                  d[idx + 1] = 255
+                  d[idx + 2] = 255
+                  d[idx + 3] = Math.floor(Math.random() * 90 + 30)
+                }
+              }
+            }
+          }
+        }
+      }
+      ctx!.putImageData(img, 0, 0)
+    }
+
+    render()
+    window.addEventListener('resize', render)
+
+    return () => {
+      window.removeEventListener('resize', render)
+      canvas.remove()
+    }
+  }, [])
+}
+
 /** Mouse-driven depth parallax on the fixed aurora background: sets
  * --kb-px/--kb-py (-0.5..0.5) which kb-site.css's mesh/star layers read via
  * `translate`. Skipped on touch and reduced-motion. */
@@ -315,4 +390,51 @@ export function useAuroraParallax(bgRef: RefObject<HTMLDivElement | null>) {
     window.addEventListener('mousemove', onMove)
     return () => window.removeEventListener('mousemove', onMove)
   }, [bgRef])
+}
+
+/** Scroll-scrubbed handoff from the hero wordmark to the Who section's
+ * name: as the user scrolls through .kb-home-main (progress 0 -> 1), the
+ * logo fades from opacity 1 to 0 while drifting down and shrinking
+ * slightly, and .kb-who__h fades in from 0 to 1 the same amount — reads as
+ * the logo dissolving into the name rather than two unrelated fades.
+ * Scroll-driven (not a one-shot trigger), so it reverses cleanly on scroll
+ * back up. Skipped entirely under prefers-reduced-motion: both stay at
+ * their normal, fully-visible resting state. */
+export function useLogoMorph() {
+  useEffect(() => {
+    const logo = document.querySelector<HTMLElement>('.kb-hero-lockup')
+    const name = document.querySelector<HTMLElement>('.kb-who__h')
+    const homeMain = document.querySelector<HTMLElement>('.kb-home-main')
+    if (!logo || !name || !homeMain) return
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
+
+    let rafId: number | null = null
+
+    function render() {
+      rafId = null
+      const range = homeMain!.offsetHeight
+      const progress = range > 0 ? Math.min(Math.max(window.scrollY / range, 0), 1) : 0
+      logo!.style.opacity = String(1 - progress)
+      logo!.style.transform = `translateY(${progress * 40}px) scale(${1 - progress * 0.15})`
+      name!.style.opacity = String(progress)
+      name!.style.transform = `translateY(${(1 - progress) * 16}px)`
+    }
+
+    function onScroll() {
+      if (rafId === null) rafId = requestAnimationFrame(render)
+    }
+
+    render()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', render)
+    return () => {
+      if (rafId !== null) cancelAnimationFrame(rafId)
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', render)
+      logo!.style.opacity = ''
+      logo!.style.transform = ''
+      name!.style.opacity = ''
+      name!.style.transform = ''
+    }
+  }, [])
 }
