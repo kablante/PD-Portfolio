@@ -7,6 +7,7 @@ import '@/styles/kb-site.css'
 import WhoSection from './WhoSection'
 import { homeProjects, projectImageTransitionName } from './projects'
 import { useCardSpreadEffects, useCursorSpotlight, useLang } from './useHomeEffects'
+import { asset } from '@/lib/asset'
 
 export default function Home() {
   const rowRef = useRef<HTMLDivElement>(null)
@@ -60,14 +61,14 @@ export default function Home() {
           <span data-lang="en">
             <img
               className="kb-hero-lockup__logo"
-              src="/assets/logo-wordmark.svg"
+              src={asset("/assets/logo-wordmark.svg")}
               alt="Katarina Blante — product designer"
             />
           </span>
           <span data-lang="pt">
             <img
               className="kb-hero-lockup__logo"
-              src="/assets/logo-wordmark-pt.svg"
+              src={asset("/assets/logo-wordmark-pt.svg")}
               alt="Katarina Blante — designer de produto"
             />
           </span>

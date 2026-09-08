@@ -6,6 +6,7 @@ import '@/styles/kb-components.css'
 import '@/styles/kb-site.css'
 import { homeProjects, projectImageTransitionName } from '../home/projects'
 import { downloadCvPlaceholder, useCursorSpotlight, useLang } from '../home/useHomeEffects'
+import { asset } from '@/lib/asset'
 
 /** Project case-study pages aren't built yet - this is deliberately just the
  * site chrome (aurora background, top nav bar, back link) so each card has
@@ -25,7 +26,7 @@ export default function ProjectPage() {
 
       <div className="kb-footerbar kb-footerbar--top">
         <Link to="/" className="kb-footerbar__logo" aria-label="Katarina Blante — home">
-          <img src="/assets/logo-kb-mark.svg" alt="k·B" />
+          <img src={asset("/assets/logo-kb-mark.svg")} alt="k·B" />
         </Link>
 
         <div className="kb-footerbar__actions">

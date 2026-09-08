@@ -1,3 +1,4 @@
+import { asset } from '@/lib/asset'
 export interface HomeProject {
   slug: string
   image: string
@@ -18,7 +19,7 @@ export function projectImageTransitionName(slug: string) {
 export const homeProjects: HomeProject[] = [
   {
     slug: 'aurora-bank',
-    image: '/assets/projects/aurora-bank.png',
+    image: asset('/assets/projects/aurora-bank.png'),
     rotation: '-3.859deg',
     title: 'Venturus',
     descEn:
@@ -28,7 +29,7 @@ export const homeProjects: HomeProject[] = [
   },
   {
     slug: 'petal',
-    image: '/assets/projects/petal.jpg',
+    image: asset('/assets/projects/petal.jpg'),
     rotation: '1.891deg',
     title: 'Venturus',
     descEn:
@@ -38,7 +39,7 @@ export const homeProjects: HomeProject[] = [
   },
   {
     slug: 'cosmos-learn',
-    image: '/assets/projects/cosmos-learn.png',
+    image: asset('/assets/projects/cosmos-learn.png'),
     rotation: '-0.207deg',
     title: 'Boavista',
     descEn:
@@ -48,7 +49,7 @@ export const homeProjects: HomeProject[] = [
   },
   {
     slug: 'verao',
-    image: '/assets/projects/verao.png',
+    image: asset('/assets/projects/verao.png'),
     rotation: '2.596deg',
     title: 'For She',
     descEn:
@@ -58,7 +59,7 @@ export const homeProjects: HomeProject[] = [
   },
   {
     slug: 'nebula-studio',
-    image: '/assets/projects/nebula-studio.png',
+    image: asset('/assets/projects/nebula-studio.png'),
     rotation: '-3.466deg',
     title: 'Fortal City Game',
     descEn:
