@@ -391,3 +391,50 @@ export function useAuroraParallax(bgRef: RefObject<HTMLDivElement | null>) {
     return () => window.removeEventListener('mousemove', onMove)
   }, [bgRef])
 }
+
+/** Scroll-scrubbed handoff from the hero wordmark to the Who section's
+ * name: as the user scrolls through .kb-home-main (progress 0 -> 1), the
+ * logo fades from opacity 1 to 0 while drifting down and shrinking
+ * slightly, and .kb-who__h fades in from 0 to 1 the same amount — reads as
+ * the logo dissolving into the name rather than two unrelated fades.
+ * Scroll-driven (not a one-shot trigger), so it reverses cleanly on scroll
+ * back up. Skipped entirely under prefers-reduced-motion: both stay at
+ * their normal, fully-visible resting state. */
+export function useLogoMorph() {
+  useEffect(() => {
+    const logo = document.querySelector<HTMLElement>('.kb-hero-lockup')
+    const name = document.querySelector<HTMLElement>('.kb-who__h')
+    const homeMain = document.querySelector<HTMLElement>('.kb-home-main')
+    if (!logo || !name || !homeMain) return
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
+
+    let rafId: number | null = null
+
+    function render() {
+      rafId = null
+      const range = homeMain!.offsetHeight
+      const progress = range > 0 ? Math.min(Math.max(window.scrollY / range, 0), 1) : 0
+      logo!.style.opacity = String(1 - progress)
+      logo!.style.transform = `translateY(${progress * 40}px) scale(${1 - progress * 0.15})`
+      name!.style.opacity = String(progress)
+      name!.style.transform = `translateY(${(1 - progress) * 16}px)`
+    }
+
+    function onScroll() {
+      if (rafId === null) rafId = requestAnimationFrame(render)
+    }
+
+    render()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', render)
+    return () => {
+      if (rafId !== null) cancelAnimationFrame(rafId)
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', render)
+      logo!.style.opacity = ''
+      logo!.style.transform = ''
+      name!.style.opacity = ''
+      name!.style.transform = ''
+    }
+  }, [])
+}
