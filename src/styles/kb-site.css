@@ -74,8 +74,15 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
    the Who section, everything else — above the grain with them. Removing
    .kb-home-main's own z-index (it used to hold this stacking context) was
    required for that: a positioned descendant can never escape an ancestor's
-   stacking context, only rank within it. */
-.kb-home-cards{position:relative;z-index:10000;flex:none;margin-top:-16vh}
+   stacking context, only rank within it.
+
+   That z-index:10000 also outranks every *other* fixed UI on the page
+   (.kb-lang-dock, .kb-footerbar are z-index:20) — without pointer-events:none
+   here, this element's own transparent box (it paints nothing) sits above
+   them in hit-testing even though it's invisible, silently swallowing
+   clicks on the language switch. Re-enabled on .kb-project-card itself so
+   the actual cards stay clickable. */
+.kb-home-cards{position:relative;z-index:10000;flex:none;margin-top:-16vh;pointer-events:none}
 /* No gap: each card's *slot* is deliberately narrower than the card
    itself (see .kb-project-card), which is what makes them overlap. */
 .kb-home-cards__row{display:flex;justify-content:center;align-items:flex-start;padding:0 clamp(20px,4vw,40px);max-width:1800px;margin:0 auto}
@@ -104,7 +111,7 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
    frame-by-frame with a spring stepper (Aave uses Motion's
    `{type:"spring",bounce:0,duration:.3}`, which CSS/WAAPI can't express
    natively). */
-.kb-project-card{all:unset;box-sizing:border-box;cursor:pointer;display:flex;justify-content:center;position:relative;flex:1 1 0;min-width:0;max-width:clamp(60px,20.5vw,220px);height:min(66vh,560px);transform:rotate(var(--card-rot,0deg));transform-origin:50% 50%}
+.kb-project-card{all:unset;box-sizing:border-box;cursor:pointer;display:flex;justify-content:center;position:relative;flex:1 1 0;min-width:0;max-width:clamp(60px,20.5vw,220px);height:min(66vh,560px);transform:rotate(var(--card-rot,0deg));transform-origin:50% 50%;pointer-events:auto}
 .kb-project-card__tilt{position:relative;overflow:hidden;flex:none;width:clamp(90px,31vw,340px);height:100%;border-radius:30px;background:#e9e9e9;box-shadow:0 0 60px 0 rgba(0,0,0,.3);display:flex;flex-direction:column;justify-content:flex-end;padding:22px;transform:perspective(800px);transition:transform 300ms ease-out,box-shadow 300ms ease-out}
 .kb-project-card__img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;-webkit-user-drag:none;user-select:none}
 .kb-project-card__scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 12%,rgba(0,0,0,0) 100%);z-index:0}
