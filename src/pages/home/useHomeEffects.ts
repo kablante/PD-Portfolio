@@ -43,8 +43,15 @@ export function downloadCvPlaceholder(lang: Lang) {
 }
 
 const MAX_TILT_DEG = 10
-const RIGHT_SPREAD_PCT = 33.9757 // Aave's flat constant for viewport >=1082px
-const LEFT_SPREAD_PCT = 5
+// The card that sits on top of the resting pile (see .kb-project-card's
+// nth-child z-index in kb-site.css - lowest index = leftmost = highest
+// z-index) needs the bigger push on hover, since it's the one that would
+// otherwise visually bury the hovered card; the back-of-pile side barely
+// needs to move since it's already behind everything. FRONT/BACK name which
+// side of the *pile* each constant belongs to, not left/right - see
+// recomputeTargets for how that maps onto direction.
+const FRONT_SPREAD_PCT = 33.9757 // Aave's flat constant for viewport >=1082px
+const BACK_SPREAD_PCT = 5
 const ROTATE_STEP_DEG = 2.5
 const ACTIVE_SCALE = 1.025
 const SPRING_OMEGA = 5 / 0.3 // duration 0.3s, bounce 0
@@ -134,15 +141,19 @@ export function useCardSpreadEffects(rowRef: RefObject<HTMLDivElement | null>) {
         }
         const distance = Math.abs(delta)
         if (delta < 0) {
+          // Physically left of the active card, and - per the pile's
+          // z-index - in front of it: the side that needs the big push.
+          const wrapCorrection = delta === -(cards.length - 1) ? 0.25 : 1
           targets[i] = {
-            x: -LEFT_SPREAD_PCT / distance,
+            x: (-FRONT_SPREAD_PCT / distance) * wrapCorrection,
             rot: restRotation[i] - ROTATE_STEP_DEG / distance,
             scale: 1,
           }
         } else {
-          const wrapCorrection = delta === cards.length - 1 ? 0.25 : 1
+          // Physically right of the active card, and behind it in the
+          // pile: already covered by nothing, so only a small push.
           targets[i] = {
-            x: (RIGHT_SPREAD_PCT / distance) * wrapCorrection,
+            x: BACK_SPREAD_PCT / distance,
             rot: restRotation[i] + ROTATE_STEP_DEG / distance,
             scale: 1,
           }
