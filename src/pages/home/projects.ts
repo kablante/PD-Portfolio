@@ -2,6 +2,9 @@ import { asset } from '@/lib/asset'
 export interface HomeProject {
   slug: string
   image: string
+  /** Project-page header image, if it differs from the home card's own
+   * (cropped-for-the-card) `image` - falls back to `image` when unset. */
+  headerImage?: string
   rotation: string
   title: string
   descEn: string
@@ -50,6 +53,7 @@ export const homeProjects: HomeProject[] = [
   {
     slug: 'for-she',
     image: asset('/assets/projects/for-she.png'),
+    headerImage: asset('/assets/projects/for-she/for-she.png'),
     rotation: '2.596deg',
     title: 'For She',
     descEn:
