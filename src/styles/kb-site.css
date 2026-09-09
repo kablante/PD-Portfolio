@@ -282,15 +282,18 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
    forwards/both fill would keep this animation overriding transform/
    opacity forever, blocking the .kb-leaving-home exit transition below
    from ever starting. */
-.kb-content{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:calc(64px + clamp(56px,7vw,104px)) clamp(24px,5vw,64px) clamp(72px,9vw,120px);animation:kb-rise-in 480ms cubic-bezier(.22,.61,.36,1)}
-.kb-back-link{all:unset;cursor:pointer;font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--kb-cyan);display:inline-block}
-.kb-back-link:hover{color:var(--kb-butter)}
+/* No back-link row above the header image any more (the footerbar logo
+   already goes home) - just enough top padding to clear the fixed navbar. */
+.kb-content{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:calc(64px + clamp(20px,3vw,36px)) clamp(24px,5vw,64px) clamp(72px,9vw,120px);animation:kb-rise-in 480ms cubic-bezier(.22,.61,.36,1)}
 
 /* Project header image - the shared-element target for the home card's
    container-transform (see projectImageTransitionName / the View
    Transitions API rules at the bottom of this file). */
-.kb-project-header{border-radius:16px;overflow:hidden;height:clamp(240px,34vw,460px);margin-top:clamp(32px,4vw,56px)}
-.kb-project-header__img{width:100%;height:100%;object-fit:cover;display:block}
+/* Full height, not cropped: this is the case study's cover image, not a
+   viewport-height banner, so it shows completely at whatever aspect ratio
+   it was exported at instead of being cover-cropped into a fixed box. */
+.kb-project-header{border-radius:16px;overflow:hidden;margin-top:0}
+.kb-project-header__img{display:block;width:100%;height:auto}
 
 /* About */
 .kb-about-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:clamp(32px,5vw,64px);margin-top:32px;align-items:start}
@@ -315,6 +318,128 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
 .kb-project-stats__value{display:block;font-family:var(--font-display);font-size:44px;line-height:1;color:var(--kb-butter)}
 .kb-project-stats__label{display:block;font-size:14px;color:var(--text-muted);margin-top:8px}
 .kb-project-actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:clamp(40px,5vw,72px)}
+
+/* ---------- Project case study — long-form template ----------
+   Shared by any project page that has real content (currently just For
+   She). Deliberately plain building blocks — a section heading+paragraph,
+   a figure, a figure row, a quote, a list, a carousel, a video embed —
+   rather than a generic "content engine", so the next case study composes
+   them directly in its own TSX file instead of fighting a schema. */
+/* Solid indigo reading panel - a blog article's content column, opaque so
+   long-form text stays legible over the aurora background/grain instead of
+   sitting straight on it. Same solid tone the dialog surface already uses
+   (--kb-void-100), just at case-study scale. */
+.kb-project-body{position:relative;margin-top:clamp(32px,4vw,56px);background:var(--kb-void-100);border-radius:24px;padding:clamp(32px,5vw,72px) clamp(24px,5vw,64px) clamp(56px,7vw,96px);box-shadow:var(--shadow-lg)}
+.kb-project-body > .kb-project-title:first-child{margin-top:0}
+/* Full-bleed on mobile: .kb-content's own side gutter only exists to give
+   the header image breathing room against the aurora background - once
+   this panel is opaque, that same gutter just wastes width showing more of
+   the background at its edges instead of more of the panel's own content. */
+@media (max-width:700px){
+  .kb-project-body{
+    margin-left:calc(-1 * clamp(24px,5vw,64px));
+    margin-right:calc(-1 * clamp(24px,5vw,64px));
+    border-radius:0;
+    padding-left:24px;
+    padding-right:24px;
+  }
+}
+
+/* Meta (Role/Timeline/Team): Role+Timeline share a row, Team gets its own
+   row below (its value - the team roster - reads too long to sit inline
+   next to another field). Each field's label reuses the skills rail's own
+   mono/caps/lavender treatment; the value is body font, not mono, so the
+   actual information reads like prose rather than a data readout. */
+.kb-project-meta-row{display:flex;flex-wrap:wrap;gap:8px 32px;margin-top:14px}
+.kb-project-meta-item{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 10px}
+.kb-project-meta-item__label{font-family:var(--font-mono);font-size:14px;letter-spacing:.16em;text-transform:uppercase;color:var(--kb-lavender);opacity:.9;white-space:nowrap}
+.kb-project-meta-item__value{font-family:var(--font-body);font-size:17px;font-weight:300;color:var(--text-body)}
+.kb-project-meta-item__value a{color:var(--text-link)}
+.kb-project-meta-item__value a:hover{color:var(--text-link-hover)}
+
+/* Highlight: a single reusable "marker" treatment for calling out a phrase
+   inline (distinct from .kb-project-quote's blockquote treatment) - kept as
+   one class so any edit to it applies everywhere it's used across a case
+   study. */
+.kb-project-highlight{background:linear-gradient(rgba(254,106,216,.4),rgba(254,106,216,.4)) no-repeat;background-size:100% 42%;background-position:0 88%;color:var(--text-strong);font-weight:var(--weight-semibold);padding:0 .05em}
+
+/* Skills & toolkit tags - same label + color as the Who section's own rail
+   (see skills.ts), just sized in px instead of cqw since this isn't inside
+   that section's container-query canvas. */
+.kb-project-skills{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:20px}
+.kb-project-skills__label{font-family:var(--font-mono);font-size:14px;letter-spacing:.16em;text-transform:uppercase;color:var(--kb-lavender);opacity:.9;white-space:nowrap}
+.kb-project-skill{padding:8px 18px;border-radius:var(--radius-pill);font-family:var(--font-mono);font-size:15px;letter-spacing:.04em;white-space:nowrap}
+.kb-who-tag--magenta,.kb-project-skill--magenta{background:rgba(254,106,216,.18);border:1.5px solid rgba(254,106,216,.5);color:var(--kb-blush)}
+.kb-who-tag--violet,.kb-project-skill--violet{background:rgba(41,25,143,.55);border:1.5px solid rgba(183,140,245,.52);color:var(--kb-lavender)}
+.kb-who-tag--cyan,.kb-project-skill--cyan{background:rgba(72,247,250,.12);border:1.5px solid rgba(72,247,250,.45);color:var(--kb-cyan)}
+.kb-who-tag--pink,.kb-project-skill--pink{background:rgba(249,172,204,.14);border:1.5px solid rgba(249,172,204,.45);color:var(--kb-blush)}
+
+.kb-project-section{margin-top:clamp(56px,7vw,96px)}
+.kb-project-section h2{font-family:var(--font-display);font-weight:400;font-size:clamp(30px,3.6vw,44px);line-height:1.1;color:var(--text-strong)}
+.kb-project-section__eyebrow{display:block;font-family:var(--font-mono);font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--kb-lavender);margin-bottom:10px}
+.kb-project-section p{font-size:19px;font-weight:300;line-height:1.75;color:var(--text-body);max-width:70ch;margin-top:18px;text-wrap:pretty}
+.kb-project-section p + p{margin-top:16px}
+.kb-project-section h3{font-family:var(--font-body);font-weight:var(--weight-semibold);font-size:20px;color:var(--text-strong);margin-top:clamp(32px,4vw,48px)}
+
+.kb-project-quote{position:relative;margin:clamp(32px,4vw,48px) 0 0;padding-left:clamp(20px,2.4vw,28px);border-left:3px solid var(--kb-cyan);max-width:62ch}
+.kb-project-quote p{margin:0;font-family:var(--font-display);font-weight:400;font-size:clamp(22px,2.6vw,32px);line-height:1.35;color:var(--text-strong);text-wrap:pretty}
+.kb-project-quote cite{display:block;margin-top:12px;font-style:normal;font-family:var(--font-mono);font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted)}
+
+.kb-project-list{list-style:none;margin:20px 0 0;padding:0;display:grid;gap:14px;max-width:60ch}
+.kb-project-list li{position:relative;padding-left:28px;font-size:18px;font-weight:300;line-height:1.65;color:var(--text-body)}
+.kb-project-list li::before{content:"";position:absolute;left:0;top:10px;width:8px;height:8px;border-radius:50%;background:var(--kb-cyan);box-shadow:0 0 10px rgba(72,247,250,.65)}
+
+/* Figures: a soft nebula-gradient mat behind every image, since the source
+   screenshots carry their own (often white) backgrounds — object-fit:contain
+   plus height:auto means the mat's own height follows each image's natural
+   aspect ratio (only its width is standardized, by the column it sits in)
+   instead of forcing every image into one fixed box. Each standalone figure
+   keeps its own border/mat - see the carousel and gallery below for the
+   "one border around the whole block" version of this. */
+.kb-project-figure{margin-top:clamp(28px,3.6vw,40px);border-radius:16px;border:1px solid var(--border-soft);background:var(--gradient-nebula);padding:clamp(12px,2vw,20px);overflow:hidden}
+.kb-project-figure img{display:block;width:100%;height:auto;object-fit:contain;border-radius:8px;margin:0 auto}
+.kb-project-figure figcaption{margin-top:12px;font-family:var(--font-mono);font-size:13px;letter-spacing:.04em;color:rgba(255,255,255,.72);text-align:center}
+.kb-project-figure-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:clamp(16px,2.4vw,24px);margin-top:clamp(28px,3.6vw,40px)}
+.kb-project-figure-row .kb-project-figure{margin-top:0}
+
+/* Every image (besides the page header) opens full-size on click - a plain
+   reset button wrapping the <img> so it stays keyboard-operable. */
+.kb-project-zoom{all:unset;display:block;width:100%;cursor:zoom-in}
+.kb-project-zoom img{display:block}
+
+.kb-lightbox{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:clamp(20px,6vw,72px);background:rgba(8,1,42,.9);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);cursor:zoom-out;animation:kb-fade var(--duration-base) var(--ease-soft)}
+.kb-lightbox__img{display:block;max-width:100%;max-height:100%;border-radius:12px;box-shadow:var(--shadow-lg);cursor:default}
+.kb-lightbox__close{position:fixed;top:24px;right:24px;z-index:1}
+
+/* Persona carousel: manual scroll-snap, no autoplay — nothing to pause,
+   arrow buttons double as the keyboard-reachable controls. One border/mat
+   wraps the whole scrolling track (per the "block, not each image" rule);
+   individual slides carry none of their own. */
+.kb-project-carousel{position:relative;margin-top:clamp(28px,3.6vw,40px)}
+.kb-project-carousel__track{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;border-radius:16px;border:1px solid var(--border-soft);background:var(--gradient-nebula);padding:clamp(12px,2vw,20px)}
+.kb-project-carousel__track::-webkit-scrollbar{display:none}
+.kb-project-carousel__slide{flex:none;width:min(680px,90%);scroll-snap-align:center}
+.kb-project-carousel__slide img{display:block;width:100%;height:auto;object-fit:contain;border-radius:8px;margin:0 auto}
+.kb-project-carousel__nav{display:flex;justify-content:center;gap:12px;margin-top:16px}
+
+/* Gallery: several images of differing aspect ratios (e.g. Prototypes and
+   Wireframes). A CSS multi-column layout packs them tightly by actual
+   height instead of forcing equal grid cells, which is what left empty gaps
+   next to the shorter shots before - each column keeps a standard width,
+   only the height adapts per image. One border/mat for the whole gallery,
+   same "block, not each image" rule as the carousel. */
+.kb-project-gallery{margin-top:clamp(28px,3.6vw,40px);width:100%;border-radius:16px;border:1px solid var(--border-soft);background:var(--gradient-nebula);padding:clamp(12px,2vw,20px);columns:1;column-gap:clamp(12px,2vw,20px)}
+.kb-project-gallery__item{display:block;width:100%;break-inside:avoid;margin-bottom:clamp(12px,2vw,20px)}
+.kb-project-gallery__item img{display:block;width:100%;height:auto;border-radius:8px}
+/* Capped at 2, not 3+: with only a handful of images, one column per image
+   defeats the packing this layout exists for (each column would hold just
+   one image, leaving the shorter one's column visibly short of the taller
+   one instead of two images filling it) - two columns keeps at least one of
+   them holding more than a single image. */
+@media (min-width:640px){.kb-project-gallery{columns:2}}
+
+.kb-project-video{position:relative;margin-top:clamp(28px,3.6vw,40px);border-radius:16px;overflow:hidden;aspect-ratio:16/9;background:var(--kb-void-200)}
+.kb-project-video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 
 /* ---------- Nav/footer bar ----------
    Fixed to the top on about/project pages — the persistent piece of chrome

@@ -6,11 +6,17 @@ import { useAuroraParallax, useSiteGrain } from '@/pages/home/useHomeEffects'
  * Figma bento layout, recolored onto the site's own accent tokens). Keeps
  * the same dark-void base and grain texture, and the same cursor-parallax
  * wiring (--kb-px/--kb-py) as before. Shared by Home and ProjectPage so
- * both stay in sync. */
-export default function AuroraBackground() {
+ * both stay in sync.
+ *
+ * `grainOverlay` (default true) controls the animated full-page grain
+ * canvas from useSiteGrain, on top of everything including page content -
+ * project pages turn it off since it fought the reading content's
+ * legibility, keeping only the static texture baked into .kb-aurora__grain
+ * below (part of the fixed background itself, unaffected by this prop). */
+export default function AuroraBackground({ grainOverlay = true }: { grainOverlay?: boolean } = {}) {
   const bgRef = useRef<HTMLDivElement>(null)
   useAuroraParallax(bgRef)
-  useSiteGrain()
+  useSiteGrain(grainOverlay)
 
   return (
     <div className="kb-bg" aria-hidden="true" ref={bgRef}>

@@ -7,10 +7,16 @@ import '@/styles/kb-site.css'
 import { homeProjects, projectImageTransitionName } from '../home/projects'
 import { downloadCvPlaceholder, useCursorSpotlight, useLang } from '../home/useHomeEffects'
 import { asset } from '@/lib/asset'
+import ForShe from './case-studies/ForShe'
 
-/** Project case-study pages aren't built yet - this is deliberately just the
- * site chrome (aurora background, top nav bar, back link) so each card has
- * somewhere real to land instead of a dead link. */
+/** Registry of the actual case-study content, keyed by slug. Most project
+ * cards don't have a written case study yet - this is deliberately just the
+ * site chrome (aurora background, top nav bar, back link, header image) for
+ * those, so each card has somewhere real to land instead of a dead link. */
+const caseStudies: Partial<Record<string, React.ComponentType>> = {
+  'for-she': ForShe,
+}
+
 export default function ProjectPage() {
   const { slug } = useParams()
   const project = homeProjects.find((p) => p.slug === slug)
@@ -20,9 +26,11 @@ export default function ProjectPage() {
 
   if (!project) return <Navigate to="/" replace />
 
+  const CaseStudy = caseStudies[project.slug]
+
   return (
     <div className="kb-page">
-      <AuroraBackground />
+      <AuroraBackground grainOverlay={false} />
 
       <div className="kb-footerbar kb-footerbar--top">
         <Link to="/" className="kb-footerbar__logo" aria-label="Katarina Blante — home">
@@ -64,11 +72,6 @@ export default function ProjectPage() {
       </div>
 
       <div className="kb-content">
-        <Link to="/" className="kb-back-link" viewTransition>
-          <span data-lang="en">← Back to home</span>
-          <span data-lang="pt">← Voltar ao início</span>
-        </Link>
-
         <div className="kb-project-header">
           <img
             className="kb-project-header__img"
@@ -77,6 +80,11 @@ export default function ProjectPage() {
             style={{ viewTransitionName: projectImageTransitionName(project.slug) }}
           />
         </div>
+
+        <article className="kb-project-body">
+          <h1 className="kb-project-title">{project.title}</h1>
+          {CaseStudy && <CaseStudy />}
+        </article>
       </div>
     </div>
   )

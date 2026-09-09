@@ -1,6 +1,7 @@
 import { Download } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import Sparkle from '@/components/shared/Sparkle'
+import { SKILLS } from './skills'
 import { type Lang, downloadCvPlaceholder } from './useHomeEffects'
 
 /** The Who section - home's second screen, ported from the Bento Blob Lab
@@ -31,15 +32,6 @@ function TimezoneClock() {
     </>
   )
 }
-
-const SKILLS: Array<{ label: string; hue: 'magenta' | 'violet' | 'cyan' | 'pink' }> = [
-  { label: 'AI-Assisted Design Workflows', hue: 'magenta' },
-  { label: 'Enterprise UX Design', hue: 'violet' },
-  { label: 'Cross-functional Collaboration', hue: 'cyan' },
-  { label: 'Figma', hue: 'pink' },
-  { label: 'GitHub', hue: 'violet' },
-  { label: 'User Research', hue: 'magenta' },
-]
 
 export default function WhoSection({ lang }: { lang: Lang }) {
   return (
