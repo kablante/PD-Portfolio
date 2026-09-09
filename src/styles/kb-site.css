@@ -128,18 +128,140 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
    card. */
 .kb-project-card__glare-ring{position:absolute;inset:0;z-index:3;padding:3px;border-radius:inherit;opacity:0;pointer-events:none;transition:opacity 120ms ease-out;background:radial-gradient(240px 240px at var(--pointer-x,50%) var(--pointer-y,50%),var(--kb-indigo) 0%,#6b2a9e 46%,var(--kb-magenta-deep) 80%,transparent 100%);filter:brightness(1.7);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
 .kb-project-card:hover .kb-project-card__glare-ring{opacity:.85}
-.kb-project-card__title{position:relative;z-index:1;display:inline-block;font-family:var(--font-body);font-size:var(--text-base);font-weight:var(--weight-semibold);letter-spacing:var(--tracking-wide);line-height:1.05;color:var(--text-strong);background:rgba(41,25,143,.72);border-radius:15px;padding:10px 18px;backdrop-filter:blur(var(--blur-glass));-webkit-backdrop-filter:blur(var(--blur-glass))}
 .kb-project-card__desc{display:none}
 
-/* Five cards get too narrow for their copy to read below ~700px — the
-   card shapes still carry the layout, so drop the text instead of
-   letting it wrap over itself. */
 @media (max-width:700px){
-  .kb-project-card__title,.kb-project-card__desc{display:none}
+  /* Below this width the overlapping-stack composition (deliberately
+     narrower slots than cards, see the comment above) leaves each card too
+     sliver-thin to read and the gaps between them go dead. Swap it for a
+     one-at-a-time horizontal carousel instead: full-bleed cards, scroll-snap
+     centering, native swipe. useCardCarouselActive marks whichever card is
+     nearest center as `--active`, which is what reveals its title - the
+     touch equivalent of :hover. */
+  .kb-home-cards{margin-top:-16vh}
+  .kb-home-cards__row{
+    justify-content:flex-start;
+    overflow-x:auto;
+    overflow-y:visible;
+    scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    gap:16px;
+    padding:0 8vw;
+    pointer-events:auto;
+  }
+  .kb-home-cards__row::-webkit-scrollbar{display:none}
+  .kb-project-card{
+    flex:none;
+    width:76vw;
+    max-width:300px;
+    height:min(58vh,480px);
+    scroll-snap-align:center;
+    transform:none;
+    opacity:.55;
+    transition:opacity var(--duration-slow) var(--ease-soft);
+  }
+  .kb-project-card--active{opacity:1}
+  /* Same border-gradient foil the desktop card gets on :hover (see
+     .kb-project-card__glare-ring above) - there's no hover on touch, so the
+     active (centered) card gets it permanently instead. */
+  .kb-project-card--active .kb-project-card__glare-ring{opacity:.85}
+  .kb-project-card__tilt{width:100%}
+
+  /* Bare arrow, not a button-shaped icon: a plain glyph reads as "there's
+     more this way" without implying a standalone tappable control the way
+     a circled icon (the design system's usual .kb-icon-btn treatment)
+     would. Advances the carousel for real on tap - a decorative arrow that
+     does nothing would be its own broken affordance.
+
+     Positioned at roughly the midpoint between the language switch (fixed,
+     top:24px) and the bottom of the card, rather than centered on
+     .kb-home-cards itself - that box's negative margin-top bleeds its top
+     off-screen (same treatment as desktop), which pulls a plain 50% down
+     with it into the language switch's corner. */
+  .kb-cards-hint{
+    all:unset;
+    position:absolute;right:2vw;top:68%;transform:translateY(-50%);
+    z-index:6;cursor:pointer;color:var(--kb-cyan);pointer-events:auto;
+    filter:drop-shadow(0 0 0 transparent);
+    transition:filter var(--duration-base) var(--ease-soft);
+  }
+  .kb-cards-hint svg{width:32px;height:32px;display:block}
+  .kb-cards-hint:active{filter:drop-shadow(0 0 10px rgba(72,247,250,.9))}
+  .kb-cards-hint--prev{right:auto;left:2vw}
 }
 
+.kb-cards-hint{display:none}
+
 .kb-hero-lockup{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(12px,3vh,40px);padding:clamp(8px,2vh,32px) clamp(24px,5vw,64px)}
-.kb-hero-lockup__logo{display:block;width:min(70vw,860px);max-height:20vh;height:auto;object-fit:contain}
+
+/* ---------- Hero wordmark (live text, see LogoWordmark.tsx) ----------
+   Rebuilt from logo-wordmark.svg's vectorized letter outlines into real
+   text on the site's own display/hand fonts, so it can scale with clamp()
+   and pick up transitions/animations - neither is realistic on baked SVG
+   paths. The three flourishes (K's dot, the sparkle standing in for the
+   "i"'s dot, the closing sparkle+dot pair) are positioned in em units
+   relative to their own letter, so they track the text's size and line
+   position automatically instead of needing separate breakpoint tuning. */
+.kb-logo{display:flex;flex-direction:column;align-items:center;text-align:center}
+.kb-logo__name{margin:0;font-family:var(--font-display);font-weight:var(--weight-regular);
+  font-size:clamp(40px,9vw,120px);line-height:1;color:var(--kb-magenta);
+  filter:drop-shadow(0 0 26px rgba(254,106,216,.4));white-space:normal}
+/* Measured straight off Logo.svg (getBBox on the actual paths): the
+   tagline's glyphs run ~78% the height of the name's, not the ~25% a
+   typical "eyebrow" caption would be - this is meant to read as a second,
+   only slightly quieter line, not a small label underneath. */
+.kb-logo__tagline{margin:clamp(2px,0.8vh,10px) 0 0;font-family:var(--font-hand);
+  font-size:clamp(28px,7vw,90px);line-height:1.15;color:var(--kb-cyan);
+  filter:drop-shadow(0 0 14px rgba(72,247,250,.35))}
+
+/* Each word is its own no-wrap unit so the line can break between
+   "Katarina" and "Blante" if it must, but never mid-word around the K/i
+   decoration spans (an inline-block, which .kb-logo__k/__i used to be,
+   is itself a valid break opportunity - that silently split "Katarina"
+   into "Katari" + "na" at small widths). */
+.kb-logo__word{white-space:nowrap}
+/* inline-block (safe now that the nowrap word above absorbs any break
+   opportunity it would otherwise introduce) so the dot's percentages below
+   resolve against the K glyph's own box, matching the exact placement
+   measured on Logo.svg's K path + its dot path: dot-center sits at 57%
+   across / 15% down the K's own bounding box. */
+.kb-logo__k{position:relative;display:inline-block}
+.kb-logo__k-dot{position:absolute;left:57%;top:15%;transform:translate(-50%,-50%);
+  width:0.11em;height:0.11em;color:var(--kb-cyan);
+  filter:drop-shadow(0 0 0.4em rgba(72,247,250,.75))}
+
+.kb-logo__i{position:relative;display:inline}
+.kb-logo__i-spark{position:absolute;top:-0.5em;left:50%;transform:translateX(-50%);
+  width:0.4em;height:0.4em;color:var(--kb-cyan);
+  filter:drop-shadow(0 0 0.3em rgba(72,247,250,.8))}
+
+/* Also measured off Logo.svg: the closing sparkle sits almost flush
+   against "e" (no visible gap) with its top at the text's cap-height, and
+   the dot tucks into its bottom-right corner rather than floating beside
+   its middle. */
+.kb-logo__flourish{position:relative;display:inline-flex;align-items:flex-end;
+  margin-left:0.02em;vertical-align:text-top}
+.kb-logo__flourish-spark{width:0.34em;height:0.34em;color:var(--kb-cyan);
+  filter:drop-shadow(0 0 0.28em rgba(72,247,250,.8))}
+.kb-logo__flourish-dot{width:0.09em;height:0.09em;margin-left:0.04em;
+  color:var(--kb-cyan);filter:drop-shadow(0 0 0.3em rgba(72,247,250,.7))}
+
+/* The DS ships this as two deliberate layouts (Logo.svg one-line,
+   "2 lines.svg" two-line) rather than "whatever wraps" - force the break
+   at the same width the rest of the mobile layout switches over, instead
+   of leaving it to however much room the words happen to have. */
+.kb-logo__linebreak{display:none}
+
+@media (max-width:700px){
+  .kb-cards-hint{display:block}
+  .kb-logo__linebreak{display:inline}
+  .kb-logo__name{font-size:clamp(48px,15vw,120px)}
+  /* "2 lines.svg" runs the tagline a bit smaller relative to the name than
+     the one-line version does (~60% of a line's height vs ~78%) - the
+     two-line name already fills more of the block on its own. */
+  .kb-logo__tagline{font-size:clamp(24px,9vw,52px)}
+}
 
 /* ---------- Content page → Home exit transition (reverse) ----------
    The mirror of the transition above: any link back to the home page —
@@ -212,20 +334,25 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
 .kb-footerbar__logo{all:unset;cursor:pointer;flex:none;display:flex;align-items:center;margin-right:8px}
 .kb-footerbar__logo img{display:block;width:auto;height:46px}
 
-.kb-footerbar__actions{flex:none;display:flex;align-items:center;gap:8px;--control-height:36px;--border-hairline:#aeaeae;--surface-card:transparent;color:#e9e9e9}
+.kb-footerbar__actions{flex:none;display:flex;align-items:center;gap:8px;--control-height:36px;--border-hairline:var(--kb-white-64);--surface-card:transparent;color:var(--text-strong)}
 
 /* ---------- Home nav: language switch only, top-right corner ---------- */
-.kb-lang-dock{position:fixed;top:24px;right:24px;z-index:20}
+/* The hero cards sit at z-index:10000 (needed to outrank the site grain -
+   see .kb-home-cards above), which otherwise outranks this too: on any
+   screen narrow enough for the card row to reach this corner - not just
+   phones, plenty of laptop-width windows do too - a card would paint over
+   the switch and swallow its clicks. */
+.kb-lang-dock{position:fixed;top:24px;right:24px;z-index:10001}
 
-.kb-lang-switch{position:relative;width:80px;height:36px;border-radius:30px;box-shadow:inset 0 0 0 1px #aeaeae;flex:none;background:none;border:0;padding:0}
+.kb-lang-switch{position:relative;width:80px;height:36px;border-radius:30px;box-shadow:inset 0 0 0 1px var(--kb-white-64);flex:none;background:none;border:0;padding:0}
 .kb-lang-switch__knob{position:absolute;top:0;left:0;width:43px;height:36px;border-radius:30px;background:var(--kb-blush);transition:transform 240ms cubic-bezier(.22,.61,.36,1),background var(--duration-base) var(--ease-soft),box-shadow var(--duration-base) var(--ease-soft);transform:translateX(0)}
 .kb-lang-switch:hover .kb-lang-switch__knob{background:var(--kb-butter);box-shadow:var(--glow-butter)}
 html[data-active-lang="pt"] .kb-lang-switch__knob{transform:translateX(37px)}
-.kb-lang-switch button{all:unset;cursor:pointer;position:absolute;top:0;width:43px;height:36px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:500;color:#aeaeae}
-.kb-lang-switch button[data-lang-btn="en"]{left:0;color:#0d0342}
+.kb-lang-switch button{all:unset;cursor:pointer;position:absolute;top:0;width:43px;height:36px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:500;color:var(--kb-white-64)}
+.kb-lang-switch button[data-lang-btn="en"]{left:0;color:var(--text-on-accent)}
 .kb-lang-switch button[data-lang-btn="pt"]{right:0}
-html[data-active-lang="pt"] .kb-lang-switch button[data-lang-btn="en"]{color:#aeaeae}
-html[data-active-lang="pt"] .kb-lang-switch button[data-lang-btn="pt"]{color:#0d0342}
+html[data-active-lang="pt"] .kb-lang-switch button[data-lang-btn="en"]{color:var(--kb-white-64)}
+html[data-active-lang="pt"] .kb-lang-switch button[data-lang-btn="pt"]{color:var(--text-on-accent)}
 
 .kb-footerbar__copy{flex:1;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:clamp(11px,0.9vw,14px);color:var(--kb-lavender)}
 
@@ -380,19 +507,42 @@ html[data-active-lang="pt"] .kb-who__body p{font-size:1.85cqw}
     gap:20px;max-width:540px;align-items:stretch}
   .kb-who > *{position:static}
   .kb-who__decor,.kb-who__blob{display:none}
-  .kb-who__photo{width:76%;align-self:flex-start}
+  /* A few flow-appropriate exceptions: the desktop coordinates above are
+     percentages of the fixed-ratio canvas, meaningless once .kb-who is a
+     normal-flow column - each of these gets a fresh position anchored to
+     .kb-who's own (now much taller) box instead of reusing them verbatim,
+     kept to the fairly predictable top of the flow (name + photo) rather
+     than the variable-height text blocks further down. */
+  .kb-who__spark--a,.kb-who__pip--b{display:block;position:absolute}
+  .kb-who__spark--a{top:-6px;right:6%;width:26px;height:auto}
+  .kb-who__pip--b{top:15%;right:1%}
+  /* Name reads as the section's opener, not a caption under the photo -
+     order (not DOM order, so the clock's overlap trick below still lands
+     on whatever is visually above it) puts it first and gives it real
+     room instead of the tight desktop clamp. */
+  .kb-who__name{order:1;margin-bottom:4px}
+  .kb-who__photo{order:2;width:76%;align-self:flex-start}
   .kb-who__slot span{font-size:11px}
   .kb-who__handle{font-size:12px;padding:14px 0 18px}
-  .kb-who__clock{width:120px;align-self:flex-end;margin-top:-78px;gap:2px}
+  .kb-who__clock{order:3;width:120px;align-self:flex-end;margin-top:-78px;gap:2px}
   .kb-who__time{font-size:22px}
   .kb-who__tz{font-size:10px}
+  .kb-who__rail{order:4}
+  .kb-who__actions{order:5}
+  .kb-who__aside{order:6}
+  .kb-who__body{order:7}
   .kb-who__name,.kb-who__rail,.kb-who__actions,.kb-who__aside,.kb-who__body{width:100%}
-  .kb-who__eyebrow{font-size:11px;margin-bottom:8px}
-  .kb-who__h{font-size:clamp(40px,13vw,66px)}
-  .kb-who__meta{font-size:24px;gap:10px;margin-top:12px}
-  .kb-who__aside p{font-size:21px;line-height:1.4}
-  .kb-who__body{padding:22px 24px;border-radius:30px}
-  .kb-who__body p{font-size:15px}
+  .kb-who__eyebrow{font-size:13px;margin-bottom:10px}
+  .kb-who__h{font-size:clamp(48px,16vw,84px)}
+  .kb-who__meta{font-size:26px;gap:10px;margin-top:14px}
+  /* Elongate rather than shrink: more line-height and padding instead of a
+     smaller font keeps the hand-drawn note and the bio paragraphs
+     comfortable to read on a narrow screen. */
+  .kb-who__aside{padding:4px 0;text-align:center}
+  .kb-who__aside p{font-size:26px;line-height:1.55}
+  .kb-who__body{padding:28px 26px;border-radius:30px}
+  .kb-who__body p,html[data-active-lang="pt"] .kb-who__body p{font-size:16px;line-height:1.85}
+  .kb-who__body p + p{margin-top:1.1em}
   .kb-who__rail{border-radius:30px;padding:16px}
   .kb-who__rail-label,.kb-who-tag{font-size:11px}
   .kb-who-tag{padding:7px 14px}

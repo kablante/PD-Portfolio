@@ -1,21 +1,58 @@
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useRef } from 'react'
 import { Link } from 'react-router-dom'
 import AuroraBackground from '@/components/shared/AuroraBackground'
 import '@/styles/kb-tokens.css'
 import '@/styles/kb-components.css'
 import '@/styles/kb-site.css'
+import LogoWordmark from './LogoWordmark'
 import WhoSection from './WhoSection'
 import { homeProjects, projectImageTransitionName } from './projects'
-import { useCardSpreadEffects, useCursorSpotlight, useLang, useLogoMorph } from './useHomeEffects'
-import { asset } from '@/lib/asset'
+import {
+  useCardCarouselActive,
+  useCardSpreadEffects,
+  useCursorSpotlight,
+  useLang,
+  useLogoMorph,
+} from './useHomeEffects'
 
 export default function Home() {
   const rowRef = useRef<HTMLDivElement>(null)
   const { lang, setLang } = useLang()
 
   useCardSpreadEffects(rowRef)
+  useCardCarouselActive(rowRef)
   useCursorSpotlight()
   useLogoMorph()
+
+  function handleShiftCarousel(direction: 1 | -1) {
+    const row = rowRef.current
+    if (!row) return
+    const cards = Array.from(row.querySelectorAll<HTMLElement>('.kb-project-card'))
+    const activeIndex = cards.findIndex((card) => card.classList.contains('kb-project-card--active'))
+    const target = cards[activeIndex + direction]
+    if (!target) return
+    // scrollIntoView fights the row's own scroll-snap (the browser can
+    // "correct" a smooth scrollIntoView back toward the nearest snap point
+    // mid-animation) - scrolling the row itself by the exact distance to
+    // the target card's center doesn't have that problem.
+    const rowRect = row.getBoundingClientRect()
+    const targetRect = target.getBoundingClientRect()
+    const delta = targetRect.left + targetRect.width / 2 - (rowRect.left + rowRect.width / 2)
+    row.scrollBy({ left: delta, behavior: 'smooth' })
+  }
+
+  function handleCardClick(event: React.MouseEvent<HTMLAnchorElement>) {
+    // On the mobile carousel the arrow sits near the card edges, and a tap
+    // meant for it (or for scrubbing past a half-visible neighbor) can land
+    // on a card underneath. Only the centered card is a real navigation
+    // target there - desktop, where every card is fully its own target,
+    // is untouched.
+    if (!window.matchMedia?.('(pointer: coarse)').matches) return
+    if (!event.currentTarget.classList.contains('kb-project-card--active')) {
+      event.preventDefault()
+    }
+  }
 
   return (
     <div className="kb-page kb-page--home">
@@ -23,6 +60,15 @@ export default function Home() {
 
       <div className="kb-home-main">
         <div className="kb-home-cards">
+          <button
+            type="button"
+            className="kb-cards-hint kb-cards-hint--prev"
+            aria-label="Previous project"
+            style={{ display: 'none' }}
+            onClick={() => handleShiftCarousel(-1)}
+          >
+            <ChevronLeft aria-hidden="true" />
+          </button>
           <div className="kb-home-cards__row" ref={rowRef}>
             {homeProjects.map((project) => (
               <Link
@@ -30,6 +76,8 @@ export default function Home() {
                 to={`/projects/${project.slug}`}
                 className="kb-project-card"
                 viewTransition
+                aria-label={project.title}
+                onClick={handleCardClick}
                 style={{ '--card-rot': project.rotation } as React.CSSProperties}
               >
                 <div className="kb-project-card__tilt">
@@ -44,10 +92,6 @@ export default function Home() {
                   <span className="kb-project-card__scrim" aria-hidden="true" />
                   <span className="kb-project-card__glare" aria-hidden="true" />
                   <span className="kb-project-card__glare-ring" aria-hidden="true" />
-                  <span className="kb-project-card__title">
-                    <span data-lang="en">{project.title}</span>
-                    <span data-lang="pt">{project.title}</span>
-                  </span>
                   <p className="kb-project-card__desc">
                     <span data-lang="en">{project.descEn}</span>
                     <span data-lang="pt">{project.descPt}</span>
@@ -56,23 +100,18 @@ export default function Home() {
               </Link>
             ))}
           </div>
+          <button
+            type="button"
+            className="kb-cards-hint kb-cards-hint--next"
+            aria-label="Next project"
+            onClick={() => handleShiftCarousel(1)}
+          >
+            <ChevronRight aria-hidden="true" />
+          </button>
         </div>
 
         <div className="kb-hero-lockup">
-          <span data-lang="en">
-            <img
-              className="kb-hero-lockup__logo"
-              src={asset("/assets/logo-wordmark.svg")}
-              alt="Katarina Blante — product designer"
-            />
-          </span>
-          <span data-lang="pt">
-            <img
-              className="kb-hero-lockup__logo"
-              src={asset("/assets/logo-wordmark-pt.svg")}
-              alt="Katarina Blante — designer de produto"
-            />
-          </span>
+          <LogoWordmark />
         </div>
       </div>
       <div className="kb-who-section">
@@ -81,10 +120,10 @@ export default function Home() {
       <div className="kb-lang-dock">
         <div role="group" aria-label="Language" className="kb-lang-switch">
           <span className="kb-lang-switch__knob" aria-hidden="true" />
-          <button type="button" data-lang-btn="en" onClick={() => setLang('en')}>
+          <button type="button" data-lang-btn="en" aria-pressed={lang === 'en'} onClick={() => setLang('en')}>
             EN
           </button>
-          <button type="button" data-lang-btn="pt" onClick={() => setLang('pt')}>
+          <button type="button" data-lang-btn="pt" aria-pressed={lang === 'pt'} onClick={() => setLang('pt')}>
             PT
           </button>
         </div>

@@ -23,6 +23,7 @@ export function useLang() {
 
   useEffect(() => {
     document.documentElement.setAttribute('data-active-lang', lang)
+    document.documentElement.lang = lang
   }, [lang])
 
   function setLang(next: Lang) {
@@ -217,6 +218,64 @@ export function useCardSpreadEffects(rowRef: RefObject<HTMLDivElement | null>) {
   }, [rowRef])
 }
 
+/** Touch counterpart to useCardSpreadEffects: there's no cursor to hover
+ * with, so instead whichever card sits nearest the row's horizontal center
+ * as the user swipes gets marked `.kb-project-card--active` (see the
+ * @media (max-width:700px) carousel rules in kb-site.css), which is what
+ * reveals its title the same way :hover does on desktop. It also drives the
+ * border-gradient ring's focal point (--pointer-x, the same custom property
+ * the desktop pointer-tilt effect sets from the mouse) from each card's own
+ * scroll position instead, so the glow sweeps across as it passes center,
+ * and shows/hides the prev/next arrows so neither ever points at a card
+ * that isn't there. */
+export function useCardCarouselActive(rowRef: RefObject<HTMLDivElement | null>) {
+  useEffect(() => {
+    if (!window.matchMedia?.('(pointer: coarse)').matches) return
+    const row = rowRef.current
+    if (!row) return
+    const cards = Array.from(row.querySelectorAll<HTMLElement>('.kb-project-card'))
+    if (!cards.length) return
+    const container = row.closest<HTMLElement>('.kb-home-cards')
+    const prevButton = container?.querySelector<HTMLElement>('.kb-cards-hint--prev')
+    const nextButton = container?.querySelector<HTMLElement>('.kb-cards-hint--next')
+
+    let rafId: number | null = null
+
+    function updateActive() {
+      rafId = null
+      const rowRect = row!.getBoundingClientRect()
+      const rowCenter = rowRect.left + rowRect.width / 2
+      let closestIndex = 0
+      let closestDist = Number.POSITIVE_INFINITY
+      cards.forEach((card, i) => {
+        const rect = card.getBoundingClientRect()
+        const cardCenter = rect.left + rect.width / 2
+        const dist = Math.abs(cardCenter - rowCenter)
+        if (dist < closestDist) {
+          closestDist = dist
+          closestIndex = i
+        }
+        const pct = Math.max(0, Math.min(100, 50 + ((cardCenter - rowCenter) / rect.width) * 50))
+        card.style.setProperty('--pointer-x', `${pct.toFixed(1)}%`)
+      })
+      cards.forEach((card, i) => card.classList.toggle('kb-project-card--active', i === closestIndex))
+      if (prevButton) prevButton.style.display = closestIndex === 0 ? 'none' : ''
+      if (nextButton) nextButton.style.display = closestIndex === cards.length - 1 ? 'none' : ''
+    }
+
+    function onScroll() {
+      if (rafId === null) rafId = requestAnimationFrame(updateActive)
+    }
+
+    updateActive()
+    row.addEventListener('scroll', onScroll, { passive: true })
+    return () => {
+      if (rafId !== null) cancelAnimationFrame(rafId)
+      row.removeEventListener('scroll', onScroll)
+    }
+  }, [rowRef])
+}
+
 const SPOTLIGHT_RADIUS = 220
 const SPOTLIGHT_BRIGHTNESS = 0.14
 const SPOTLIGHT_COLOR = '#fe6ad8' // --kb-magenta
@@ -253,44 +312,57 @@ export function useCursorSpotlight() {
 
     let mouseX = -1000
     let mouseY = -1000
-    let rafId: number
+    let rafId: number | null = null
     const rgb = hexToRgb(SPOTLIGHT_COLOR)
 
     function resize() {
       canvas.width = window.innerWidth
       canvas.height = window.innerHeight
+      schedule()
     }
     function draw() {
+      rafId = null
       ctx!.clearRect(0, 0, canvas.width, canvas.height)
-      if (mouseX !== -1000) {
+      if (mouseX !== -1000 && document.visibilityState === 'visible') {
         const gradient = ctx!.createRadialGradient(mouseX, mouseY, 0, mouseX, mouseY, SPOTLIGHT_RADIUS)
         gradient.addColorStop(0, `rgba(${rgb},${SPOTLIGHT_BRIGHTNESS})`)
         gradient.addColorStop(1, 'rgba(0,0,0,0)')
         ctx!.fillStyle = gradient
         ctx!.fillRect(0, 0, canvas.width, canvas.height)
       }
-      rafId = requestAnimationFrame(draw)
+    }
+    // Redraws only when the mouse actually moves (still coalesced through
+    // rAF so fast mousemove bursts collapse into one paint per frame),
+    // instead of an infinite 60fps loop that keeps painting a static image.
+    function schedule() {
+      if (rafId === null) rafId = requestAnimationFrame(draw)
     }
     function onMove(e: MouseEvent) {
       mouseX = e.clientX
       mouseY = e.clientY
+      schedule()
     }
     function onLeave() {
       mouseX = -1000
       mouseY = -1000
+      schedule()
+    }
+    function onVisibilityChange() {
+      if (document.visibilityState === 'visible') schedule()
     }
 
     resize()
     window.addEventListener('resize', resize)
     window.addEventListener('mousemove', onMove)
     window.addEventListener('mouseleave', onLeave)
-    rafId = requestAnimationFrame(draw)
+    document.addEventListener('visibilitychange', onVisibilityChange)
 
     return () => {
-      cancelAnimationFrame(rafId)
+      if (rafId !== null) cancelAnimationFrame(rafId)
       window.removeEventListener('resize', resize)
       window.removeEventListener('mousemove', onMove)
       window.removeEventListener('mouseleave', onLeave)
+      document.removeEventListener('visibilitychange', onVisibilityChange)
       canvas.remove()
     }
   }, [])
