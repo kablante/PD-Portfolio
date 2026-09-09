@@ -75,7 +75,7 @@ export default function ProjectPage() {
         <div className="kb-project-header">
           <img
             className="kb-project-header__img"
-            src={project.image}
+            src={project.headerImage ?? project.image}
             alt=""
             style={{ viewTransitionName: projectImageTransitionName(project.slug) }}
           />
