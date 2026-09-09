@@ -112,6 +112,21 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
    `{type:"spring",bounce:0,duration:.3}`, which CSS/WAAPI can't express
    natively). */
 .kb-project-card{all:unset;box-sizing:border-box;cursor:pointer;display:flex;justify-content:center;position:relative;flex:1 1 0;min-width:0;max-width:clamp(60px,20.5vw,220px);height:min(66vh,560px);transform:rotate(var(--card-rot,0deg));transform-origin:50% 50%;pointer-events:auto}
+/* Overrides the default "later DOM = higher stacking" rule above for the
+   resting pile itself: the FIRST/leftmost card must sit on top and the
+   last/rightmost card at the bottom. initCardSpread's spread-distance sides
+   are swapped in useHomeEffects.ts to match this front/back order (whichever
+   side is "on top" needs the bigger push to clear the hovered card) - the
+   two must stay in sync, or the hover "swallow" effect buries the wrong
+   card. Scoped past the mobile carousel breakpoint: cards don't overlap
+   there, so no stacking order is needed. */
+@media (min-width:701px){
+  .kb-project-card:nth-child(1){z-index:5}
+  .kb-project-card:nth-child(2){z-index:4}
+  .kb-project-card:nth-child(3){z-index:3}
+  .kb-project-card:nth-child(4){z-index:2}
+  .kb-project-card:nth-child(5){z-index:1}
+}
 .kb-project-card__tilt{position:relative;overflow:hidden;flex:none;width:clamp(90px,31vw,340px);height:100%;border-radius:30px;background:#e9e9e9;box-shadow:0 0 60px 0 rgba(0,0,0,.3);display:flex;flex-direction:column;justify-content:flex-end;padding:22px;transform:perspective(800px);transition:transform 300ms ease-out,box-shadow 300ms ease-out}
 .kb-project-card__img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;-webkit-user-drag:none;user-select:none}
 .kb-project-card__scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 12%,rgba(0,0,0,0) 100%);z-index:0}
@@ -195,72 +210,52 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
 
 .kb-hero-lockup{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(12px,3vh,40px);padding:clamp(8px,2vh,32px) clamp(24px,5vw,64px)}
 
-/* ---------- Hero wordmark (live text, see LogoWordmark.tsx) ----------
-   Rebuilt from logo-wordmark.svg's vectorized letter outlines into real
-   text on the site's own display/hand fonts, so it can scale with clamp()
-   and pick up transitions/animations - neither is realistic on baked SVG
-   paths. The three flourishes (K's dot, the sparkle standing in for the
-   "i"'s dot, the closing sparkle+dot pair) are positioned in em units
-   relative to their own letter, so they track the text's size and line
-   position automatically instead of needing separate breakpoint tuning. */
 .kb-logo{display:flex;flex-direction:column;align-items:center;text-align:center}
-.kb-logo__name{margin:0;font-family:var(--font-display);font-weight:var(--weight-regular);
-  font-size:clamp(40px,9vw,120px);line-height:1;color:var(--kb-magenta);
-  filter:drop-shadow(0 0 26px rgba(254,106,216,.4));white-space:normal}
-/* Measured straight off Logo.svg (getBBox on the actual paths): the
-   tagline's glyphs run ~78% the height of the name's, not the ~25% a
-   typical "eyebrow" caption would be - this is meant to read as a second,
-   only slightly quieter line, not a small label underneath. */
-.kb-logo__tagline{margin:clamp(2px,0.8vh,10px) 0 0;font-family:var(--font-hand);
-  font-size:clamp(28px,7vw,90px);line-height:1.15;color:var(--kb-cyan);
-  filter:drop-shadow(0 0 14px rgba(72,247,250,.35))}
 
-/* Each word is its own no-wrap unit so the line can break between
-   "Katarina" and "Blante" if it must, but never mid-word around the K/i
-   decoration spans (an inline-block, which .kb-logo__k/__i used to be,
-   is itself a valid break opportunity - that silently split "Katarina"
-   into "Katari" + "na" at small widths). */
-.kb-logo__word{white-space:nowrap}
-/* inline-block (safe now that the nowrap word above absorbs any break
-   opportunity it would otherwise introduce) so the dot's percentages below
-   resolve against the K glyph's own box, matching the exact placement
-   measured on Logo.svg's K path + its dot path: dot-center sits at 57%
-   across / 15% down the K's own bounding box. */
-.kb-logo__k{position:relative;display:inline-block}
-.kb-logo__k-dot{position:absolute;left:57%;top:15%;transform:translate(-50%,-50%);
-  width:0.11em;height:0.11em;color:var(--kb-cyan);
-  filter:drop-shadow(0 0 0.4em rgba(72,247,250,.75))}
+/* ---------- Hero wordmark (vector art, see LogoArtEn/LogoArtPt and
+   LogoArtKatarinaLine/LogoArtBlanteLine/LogoArtTaglineEn/LogoArtTaglinePt)
+   ----------
+   The design system's own traced paths, not text in a font - no installed
+   font reproduces the K's swash, the sparkle shapes or the dot placements
+   closely enough (see LogoArtEn.tsx's comment). kb-logo-art--desktop is
+   the one-line "Katarina Blante" + tagline lockup (shown >=701px);
+   kb-logo-art--mobile reflows the same artwork as three stacked pieces -
+   "Katarina", "Blante", tagline - each its own tightly-cropped SVG,
+   reproducing the two-line layout the live-text build used to get from a
+   real line-break (shown <=700px, in the site's existing mobile media
+   query). Exactly one is ever visible; both are aria-hidden, since
+   .kb-logo__sr-text below carries the actual accessible/SEO text. */
+.kb-logo-art{display:none}
+.kb-logo-art--desktop{width:clamp(320px,44vw,600px)}
+.kb-logo-art__svg{display:block;width:100%;height:auto}
 
-.kb-logo__i{position:relative;display:inline}
-.kb-logo__i-spark{position:absolute;top:-0.5em;left:50%;transform:translateX(-50%);
-  width:0.4em;height:0.4em;color:var(--kb-cyan);
-  filter:drop-shadow(0 0 0.3em rgba(72,247,250,.8))}
+.kb-logo-art--mobile{flex-direction:column;align-items:center;gap:clamp(4px,1.2vh,12px)}
+.kb-logo-art__line{display:block;width:auto}
+.kb-logo-art__line--katarina,.kb-logo-art__line--blante{height:clamp(48px,15vw,120px)}
+/* "2 lines.svg" - the design system's own two-line export, not part of the
+   asset set this was built from - runs its tagline smaller relative to
+   each name line than the one-line lockup does (~60% of a line's height
+   vs ~78% - see LogoArtTaglineEn.tsx). This reproduces that ratio by
+   height rather than by the tagline's own (unrelated) vector proportions. */
+.kb-logo-art__line--tagline{height:clamp(24px,9vw,52px);margin-top:clamp(2px,0.8vh,6px)}
 
-/* Also measured off Logo.svg: the closing sparkle sits almost flush
-   against "e" (no visible gap) with its top at the text's cap-height, and
-   the dot tucks into its bottom-right corner rather than floating beside
-   its middle. */
-.kb-logo__flourish{position:relative;display:inline-flex;align-items:flex-end;
-  margin-left:0.02em;vertical-align:text-top}
-.kb-logo__flourish-spark{width:0.34em;height:0.34em;color:var(--kb-cyan);
-  filter:drop-shadow(0 0 0.28em rgba(72,247,250,.8))}
-.kb-logo__flourish-dot{width:0.09em;height:0.09em;margin-left:0.04em;
-  color:var(--kb-cyan);filter:drop-shadow(0 0 0.3em rgba(72,247,250,.7))}
-
-/* The DS ships this as two deliberate layouts (Logo.svg one-line,
-   "2 lines.svg" two-line) rather than "whatever wraps" - force the break
-   at the same width the rest of the mobile layout switches over, instead
-   of leaving it to however much room the words happen to have. */
-.kb-logo__linebreak{display:none}
+/* Real, always-present text for assistive tech and search engines - the
+   vector art above is decorative (aria-hidden) and can't carry semantics
+   of its own. Visually hidden (not display:none, which would also remove
+   it from the accessibility tree) rather than shown on any breakpoint,
+   now that vector art covers both. */
+.kb-logo__sr-text{
+  position:absolute;width:1px;height:1px;margin:-1px;padding:0;
+  overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0;
+}
 
 @media (max-width:700px){
   .kb-cards-hint{display:block}
-  .kb-logo__linebreak{display:inline}
-  .kb-logo__name{font-size:clamp(48px,15vw,120px)}
-  /* "2 lines.svg" runs the tagline a bit smaller relative to the name than
-     the one-line version does (~60% of a line's height vs ~78%) - the
-     two-line name already fills more of the block on its own. */
-  .kb-logo__tagline{font-size:clamp(24px,9vw,52px)}
+  .kb-logo-art--mobile{display:flex}
+}
+
+@media (min-width:701px){
+  .kb-logo-art--desktop{display:block}
 }
 
 /* ---------- Content page → Home exit transition (reverse) ----------
