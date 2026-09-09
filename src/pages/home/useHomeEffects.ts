@@ -384,9 +384,15 @@ export function useCursorSpotlight() {
  * mix-blend-mode:overlay for a subtle film-grain pass. Sits at z-index:9999,
  * above everything except the hero cards — see .kb-home-cards in kb-site.css
  * for how they outrank it. Replaces nothing — kb-aurora__grain's static CSS
- * texture is untouched. */
-export function useSiteGrain() {
+ * texture is untouched.
+ *
+ * `enabled` (default true) lets a page opt out of this full-page overlay
+ * while keeping the static texture on the fixed background — project pages
+ * do this, since grain sitting on top of long-form reading content hurt
+ * legibility more than it added atmosphere. */
+export function useSiteGrain(enabled = true) {
   useEffect(() => {
+    if (!enabled) return
     const canvas = document.createElement('canvas')
     canvas.setAttribute('aria-hidden', 'true')
     canvas.id = 'kb-site-grain'
@@ -411,6 +417,7 @@ export function useSiteGrain() {
     function render() {
       const w = window.innerWidth
       const h = window.innerHeight
+      if (!w || !h) return
       canvas.width = w
       canvas.height = h
       const img = ctx!.createImageData(w, h)
@@ -451,7 +458,7 @@ export function useSiteGrain() {
       window.removeEventListener('resize', render)
       canvas.remove()
     }
-  }, [])
+  }, [enabled])
 }
 
 /** Mouse-driven depth parallax on the fixed aurora background: sets

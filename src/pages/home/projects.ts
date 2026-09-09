@@ -48,8 +48,8 @@ export const homeProjects: HomeProject[] = [
       'A landing page da Boavista não estava convertendo. O marketing tinha três dias e nenhum orçamento para refazer. Propus uma mesmo assim, e ela dobrou a taxa de conversão.',
   },
   {
-    slug: 'verao',
-    image: asset('/assets/projects/verao.png'),
+    slug: 'for-she',
+    image: asset('/assets/projects/for-she.png'),
     rotation: '2.596deg',
     title: 'For She',
     descEn:
