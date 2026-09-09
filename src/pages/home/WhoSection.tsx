@@ -1,5 +1,6 @@
 import { Download } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import Sparkle from '@/components/shared/Sparkle'
 import { type Lang, downloadCvPlaceholder } from './useHomeEffects'
 
 /** The Who section - home's second screen, ported from the Bento Blob Lab
@@ -39,16 +40,6 @@ const SKILLS: Array<{ label: string; hue: 'magenta' | 'violet' | 'cyan' | 'pink'
   { label: 'GitHub', hue: 'violet' },
   { label: 'User Research', hue: 'magenta' },
 ]
-
-/** Four-point sparkle, sized and positioned from CSS with the rest of the
- * decor rather than through props. */
-function Sparkle({ className }: { className: string }) {
-  return (
-    <svg className={className} viewBox="0 0 28 28" fill="currentColor" aria-hidden="true">
-      <path d="M14 0 L15.8 12.2 L28 14 L15.8 15.8 L14 28 L12.2 15.8 L0 14 L12.2 12.2 Z" />
-    </svg>
-  )
-}
 
 export default function WhoSection({ lang }: { lang: Lang }) {
   return (
@@ -118,8 +109,8 @@ export default function WhoSection({ lang }: { lang: Lang }) {
         </button>
         <button type="button" className="kb-who-btn kb-who-btn--ghost" onClick={() => downloadCvPlaceholder(lang)}>
           <Download aria-hidden="true" />
-          <span data-lang="en">Download CV</span>
-          <span data-lang="pt">Baixar CV</span>
+          <span data-lang="en">Download Resume</span>
+          <span data-lang="pt">Baixar Currículo</span>
         </button>
       </div>
 
@@ -127,21 +118,21 @@ export default function WhoSection({ lang }: { lang: Lang }) {
         <p>
           <span data-lang="en">
             <span className="kb-who__sel">
-              Full disclosure: I vibe-coded this site.
+               Full disclosure: I vibe-coded this site 
               <i className="kb-who__grip kb-who__grip--start" aria-hidden="true" />
               <i className="kb-who__grip kb-who__grip--end" aria-hidden="true" />
             </span>
             <br />
-            Don't worry, the rest of my work goes through more than vibes.
+            Don't worry, the rest of my work goes through more than vibes!
           </span>
           <span data-lang="pt">
             <span className="kb-who__sel">
-              Aviso sincero: eu vibe-codei este site.
+               Aviso: eu vibe-codei este site 
               <i className="kb-who__grip kb-who__grip--start" aria-hidden="true" />
               <i className="kb-who__grip kb-who__grip--end" aria-hidden="true" />
             </span>
             <br />
-            Pode ficar tranquilo, o resto do meu trabalho passa por bem mais do que vibe.
+            Mas fica tranquilo, meu trabalho é mais do que seguir uma vibe!
           </span>
         </p>
       </div>
@@ -160,22 +151,15 @@ export default function WhoSection({ lang }: { lang: Lang }) {
             designer doesn't lose to AI.
           </span>
           <span data-lang="pt">
-            Eu desenho produtos B2B com requisitos complexos e regras de negócio. Meu projeto mais recente foi para
-            uma fabricante de hardware do Vale do Silício, pensado para coordenar dados entre linhas de produção,
-            builds e equipamentos, para múltiplos perfis de usuário simultâneos. Em projetos reais, não existem
-            respostas fáceis. É aí que um designer não perde para a IA.
+            Desenho produtos B2B com regras de negócio e requisitos complexos. Meu projeto mais recente foi para uma fabricante de hardware do Vale do Silício, projetado para coordenar dados entre linhas de produção, builds e equipamentos, com múltiplos perfis de usuário simultâneos. Em projetos reais, não existem respostas fáceis. É aí que um designer não perde para a IA.
           </span>
         </p>
         <p>
           <span data-lang="en">
-            I work close to engineering: GitHub, dev teams, AI-assisted tools are part of the job, not someone else's.
-            Right now I'm also building product management fundamentals: sharper problem framing, better trade-off
-            calls.
+            I work closely with engineering: GitHub and AI-assisted tools are part of my day-to-day work. I don’t leave that to someone else. I’m also building a foundation in Product Management to frame problems more precisely and make better trade-off calls.
           </span>
           <span data-lang="pt">
-            Eu trabalho perto da engenharia: GitHub, times de dev, ferramentas com IA fazem parte do trabalho, não são
-            tarefa de outra pessoa. Agora também estou construindo fundamentos de product management: enquadrar
-            problemas com mais precisão, tomar decisões de trade-off melhores.
+            Trabalho junto com a engenharia: GitHub e ferramentas de IA fazem parte do meu dia a dia. Não deixo isso para outra pessoa. Agora também estou construindo uma base em Product Management para enquadrar problemas com mais precisão e tomar decisões melhores quando há trade-offs.
           </span>
         </p>
       </div>

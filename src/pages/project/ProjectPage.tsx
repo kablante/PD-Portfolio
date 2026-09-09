@@ -52,10 +52,10 @@ export default function ProjectPage() {
 
         <div role="group" aria-label="Language" className="kb-lang-switch">
           <span className="kb-lang-switch__knob" aria-hidden="true" />
-          <button type="button" data-lang-btn="en" onClick={() => setLang('en')}>
+          <button type="button" data-lang-btn="en" aria-pressed={lang === 'en'} onClick={() => setLang('en')}>
             EN
           </button>
-          <button type="button" data-lang-btn="pt" onClick={() => setLang('pt')}>
+          <button type="button" data-lang-btn="pt" aria-pressed={lang === 'pt'} onClick={() => setLang('pt')}>
             PT
           </button>
         </div>
