@@ -7,8 +7,8 @@ export interface HomeProject {
   headerImage?: string
   rotation: string
   title: string
-  descEn: string
-  descPt: string
+  descEn?: string
+  descPt?: string
 }
 
 /** Shared `view-transition-name` so the card image on Home and the header
