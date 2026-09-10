@@ -23,22 +23,16 @@ export const homeProjects: HomeProject[] = [
   {
     slug: 'VNT-Station-branch',
     image: asset('/assets/projects/VNT-Station-branch.jpg'),
+    headerImage: asset('/assets/projects/VNT/VNT-Station-branch'),
     rotation: '-3.859deg',
     title: 'Venturus',
-    descEn:
-      '-',
-    descPt:
-      '-',
   },
   {
     slug: 'VNT-Help.jpg',
     image: asset('/assets/projects/VNT-Help.jpg'),
+    headerImage: asset('/assets/projects/VNT/VNT-Help'),
     rotation: '1.891deg',
     title: 'Venturus',
-    descEn:
-      '-',
-    descPt:
-      '-',
   },
   {
     slug: 'boavista',
@@ -46,10 +40,6 @@ export const homeProjects: HomeProject[] = [
     headerImage: asset('/assets/projects/boavista/Boavista_LP_-_Cover.png'),
     rotation: '-0.207deg',
     title: 'Boavista',
-    descEn:
-      "Boavista's landing page wasn't converting. Marketing had three days and no budget for a redo. I proposed one anyway, and it doubled the conversion rate.",
-    descPt:
-      'A landing page da Boavista não estava convertendo. O marketing tinha três dias e nenhum orçamento para refazer. Propus uma mesmo assim, e ela dobrou a taxa de conversão.',
   },
   {
     slug: 'for-she',
@@ -57,10 +47,6 @@ export const homeProjects: HomeProject[] = [
     headerImage: asset('/assets/projects/for-she/for-she.png'),
     rotation: '2.596deg',
     title: 'For She',
-    descEn:
-      'Hackathon das Manas gave us a weekend to design a platform for women entering tech. We placed 1st, with an honorable mention for global impact.',
-    descPt:
-      'O Hackathon das Manas nos deu um fim de semana para desenhar uma plataforma para mulheres entrando em tech. Ficamos em 1º lugar, com menção honrosa por impacto global.',
   },
   {
     slug: 'side-projects',
@@ -68,9 +54,5 @@ export const homeProjects: HomeProject[] = [
     headerImage: asset('/assets/projects/side-projects/side-projects-header.jpg'),
     rotation: '-3.466deg',
     title: 'Side Projects',
-    descEn:
-      '-',
-    descPt:
-      '-',
   },
 ]
