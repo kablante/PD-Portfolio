@@ -21,28 +21,29 @@ export function projectImageTransitionName(slug: string) {
 
 export const homeProjects: HomeProject[] = [
   {
-    slug: 'aurora-bank',
-    image: asset('/assets/projects/aurora-bank.png'),
+    slug: 'VNT-Station-branch',
+    image: asset('/assets/projects/VNT-Station-branch.jpg'),
     rotation: '-3.859deg',
     title: 'Venturus',
     descEn:
-      'Aurora asked for a faster signup. What people actually needed was to know where they were in the process, and what would happen next.',
+      '-',
     descPt:
-      'A Aurora pediu um cadastro mais rápido. O que as pessoas precisavam, na verdade, era saber onde estavam no processo e o que viria depois.',
+      '-',
   },
   {
-    slug: 'petal',
-    image: asset('/assets/projects/petal.jpg'),
+    slug: 'VNT-Help.jpg',
+    image: asset('/assets/projects/VNT-Help.jpg'),
     rotation: '1.891deg',
     title: 'Venturus',
     descEn:
-      'Every plant app I found sent guilt. Petal reframes care as a weekly rhythm you can miss without failing.',
+      '-',
     descPt:
-      'Todo app de plantas que encontrei mandava culpa. O Petal transforma o cuidado num ritmo semanal que você pode furar sem fracassar.',
+      '-',
   },
   {
-    slug: 'cosmos-learn',
-    image: asset('/assets/projects/cosmos-learn.png'),
+    slug: 'boavista',
+    image: asset('/assets/projects/boavista.png'),
+    headerImage: asset('/assets/projects/boavista/Boavista_LP_-_Cover.png'),
     rotation: '-0.207deg',
     title: 'Boavista',
     descEn:
@@ -62,13 +63,14 @@ export const homeProjects: HomeProject[] = [
       'O Hackathon das Manas nos deu um fim de semana para desenhar uma plataforma para mulheres entrando em tech. Ficamos em 1º lugar, com menção honrosa por impacto global.',
   },
   {
-    slug: 'nebula-studio',
-    image: asset('/assets/projects/nebula-studio.png'),
+    slug: 'side-projects',
+    image: asset('/assets/projects/side-projects.png'),
+    headerImage: asset('/assets/projects/side-projects/side-projects-header.jpg'),
     rotation: '-3.466deg',
-    title: 'Fortal City Game',
+    title: 'Side Projects',
     descEn:
-      'A mobile advergame for local Fortaleza businesses, built in three days for the Sebrae Dev Program. Sunny-beach-city tourism, minus the beach cliché.',
+      '-',
     descPt:
-      'Um advergame mobile para negócios locais de Fortaleza, construído em três dias para o Sebrae Dev Program. Turismo de cidade praiana e ensolarada, sem o clichê de praia.',
+      '-',
   },
 ]
