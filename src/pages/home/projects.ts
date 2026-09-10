@@ -20,15 +20,15 @@ export function projectImageTransitionName(slug: string) {
 export const homeProjects: HomeProject[] = [
   {
     slug: 'VNT-Station-branch',
-    image: asset('/assets/projects/VNT-Station-branch.jpg'),
-    headerImage: asset('/assets/projects/VNT/VNT-Station-branch'),
+    image: asset('/assets/projects/VNT-Station-branch.png'),
+    headerImage: asset('/assets/projects/VNT/VNT-Station-branch.png'),
     rotation: '-3.859deg',
     title: 'Venturus',
   },
   {
     slug: 'VNT-Help.jpg',
-    image: asset('/assets/projects/VNT-Help.jpg'),
-    headerImage: asset('/assets/projects/VNT/VNT-Help'),
+    image: asset('/assets/projects/VNT-Help.png'),
+    headerImage: asset('/assets/projects/VNT/VNT-Help.png'),
     rotation: '1.891deg',
     title: 'Venturus',
   },
@@ -49,7 +49,7 @@ export const homeProjects: HomeProject[] = [
   {
     slug: 'side-projects',
     image: asset('/assets/projects/side-projects.png'),
-    headerImage: asset('/assets/projects/side-projects/side-projects-header.jpg'),
+    headerImage: asset('/assets/projects/side-projects/side-projects-header.png'),
     rotation: '-3.466deg',
     title: 'Side Projects',
   },
