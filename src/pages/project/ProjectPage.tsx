@@ -15,6 +15,7 @@ import ForShe from './case-studies/ForShe'
  * those, so each card has somewhere real to land instead of a dead link. */
 const caseStudies: Partial<Record<string, React.ComponentType>> = {
   'for-she': ForShe,
+  'boavista': Boavista,
 }
 
 export default function ProjectPage() {
