@@ -1,5 +1,4 @@
-import { type ReactNode, useRef, useState } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useState } from 'react'
 import ImageLightbox from '@/components/shared/ImageLightbox'
 import { asset } from '@/lib/asset'
 import { skillHue } from '../../home/skills'
@@ -34,10 +33,6 @@ function ZoomableImage({ src, alt, onZoom }: ZoomableProps) {
     </button>
   )
 }
-
-function shiftCarousel(track: HTMLDivElement, direction: 1 | -1) {
-  const slides = Array.from(track.querySelectorAll<HTMLElement>('.kb-project-carousel__slide'))
-  if (!slides.length) return
 
   const trackRect = track.getBoundingClientRect()
   const center = trackRect.left + trackRect.width / 2
