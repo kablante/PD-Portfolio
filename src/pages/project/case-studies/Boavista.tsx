@@ -10,6 +10,32 @@ const PROJECT_SKILLS = [
   'User Research',
 ]
 
+/** Every image on the page, in the order it appears - so the lightbox can
+ * step through all of them (figures, gallery, and any future carousel)
+ * regardless of which section or layout an image sits in. */
+const ALL_IMAGES = [
+  { src: asset('/assets/projects/boavista/Boavista_LP_-_Drafts.png'), alt: 'Boavista landing page redesign drafts' },
+  {
+    src: asset('/assets/projects/boavista/Boavista_LP_-_Old_Version.png'),
+    alt: 'Previous version of the Boavista e-Extrato Card landing page',
+  },
+  { src: asset('/assets/projects/boavista/Benchmark_Equals.png'), alt: 'Benchmark of Equals landing page' },
+  {
+    src: asset('/assets/projects/boavista/Benchmark_NexxeraHubly.png'),
+    alt: 'Benchmark of Nexxera Hubly landing page',
+  },
+  { src: asset('/assets/projects/boavista/Benchmark_Even.png'), alt: 'Benchmark of Even landing page' },
+  {
+    src: asset('/assets/projects/boavista/Boavista_LP_-_Photoshop_Wireframe.png'),
+    alt: 'Photoshop wireframe for the Boavista landing page',
+  },
+  {
+    src: asset('/assets/projects/boavista/Boavista_LP_-_Final_Design.png'),
+    alt: 'Final Boavista e-Extrato Card landing page design',
+  },
+  { src: asset('/assets/projects/boavista/Boavista_LP_-_Results.png'), alt: 'Boavista landing page results' },
+]
+
 interface ZoomableProps {
   src: string
   alt: string
@@ -36,7 +62,9 @@ function ZoomableImage({ src, alt, onZoom }: ZoomableProps) {
 
 /** Boavista Tecnologia — e-Extrato Card landing-page redesign case study. */
 export default function Boavista() {
-  const [lightbox, setLightbox] = useState<{ src: string; alt: string } | null>(null)
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
+  const openLightbox = ({ src }: { src: string; alt: string }) =>
+    setLightboxIndex(ALL_IMAGES.findIndex((image) => image.src === src))
 
   return (
     <>
@@ -125,7 +153,7 @@ export default function Boavista() {
         <Figure
           src={asset('/assets/projects/boavista/Boavista_LP_-_Drafts.png')}
           alt="Boavista landing page redesign drafts"
-          onZoom={setLightbox}
+          onZoom={openLightbox}
         />
       </section>
 
@@ -138,7 +166,7 @@ export default function Boavista() {
           <Figure
             src={asset('/assets/projects/boavista/Boavista_LP_-_Old_Version.png')}
             alt="Previous version of the Boavista e-Extrato Card landing page"
-            onZoom={setLightbox}
+            onZoom={openLightbox}
           />
 
           <div>
@@ -187,7 +215,7 @@ export default function Boavista() {
                 '/assets/projects/boavista/Benchmark_Equals.png',
               )}
               alt="Benchmark of Equals landing page"
-              onZoom={setLightbox}
+              onZoom={openLightbox}
             />
           </div>
 
@@ -197,7 +225,7 @@ export default function Boavista() {
                 '/assets/projects/boavista/Benchmark_NexxeraHubly.png',
               )}
               alt="Benchmark of Nexxera Hubly landing page"
-              onZoom={setLightbox}
+              onZoom={openLightbox}
             />
           </div>
 
@@ -207,7 +235,7 @@ export default function Boavista() {
                 '/assets/projects/boavista/Benchmark_Even.png',
               )}
               alt="Benchmark of Even landing page"
-              onZoom={setLightbox}
+              onZoom={openLightbox}
             />
           </div>
         </div>
@@ -270,7 +298,7 @@ export default function Boavista() {
             '/assets/projects/boavista/Boavista_LP_-_Photoshop_Wireframe.png',
           )}
           alt="Photoshop wireframe for the Boavista landing page"
-          onZoom={setLightbox}
+          onZoom={openLightbox}
         />
 
         <p>
@@ -288,7 +316,7 @@ export default function Boavista() {
               '/assets/projects/boavista/Boavista_LP_-_Final_Design.png',
             )}
             alt="Final Boavista e-Extrato Card landing page design"
-            onZoom={setLightbox}
+            onZoom={openLightbox}
           />
 
           <ul className="kb-project-list">
@@ -328,11 +356,16 @@ export default function Boavista() {
           Product Successes
         </span>
 
-        <Figure
-          src={asset('/assets/projects/boavista/Boavista_LP_-_Results.png')}
-          alt="Boavista landing page results"
-          onZoom={setLightbox}
-        />
+        <div className="kb-project-stats">
+          <div>
+            <span className="kb-project-stats__value">2x</span>
+            <span className="kb-project-stats__label">Conversion rate, from 3% to 6%</span>
+          </div>
+          <div>
+            <span className="kb-project-stats__value">6%</span>
+            <span className="kb-project-stats__label">Organic-only conversion, held since launch</span>
+          </div>
+        </div>
 
         <p>
           The page has held at{' '}
@@ -341,13 +374,20 @@ export default function Boavista() {
           </span>
           .
         </p>
+
+        <Figure
+          src={asset('/assets/projects/boavista/Boavista_LP_-_Results.png')}
+          alt="Boavista landing page results"
+          onZoom={openLightbox}
+        />
       </section>
 
-      {lightbox && (
+      {lightboxIndex !== null && (
         <ImageLightbox
-          src={lightbox.src}
-          alt={lightbox.alt}
-          onClose={() => setLightbox(null)}
+          images={ALL_IMAGES}
+          index={lightboxIndex}
+          onNavigate={setLightboxIndex}
+          onClose={() => setLightboxIndex(null)}
         />
       )}
     </>

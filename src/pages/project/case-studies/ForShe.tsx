@@ -9,6 +9,45 @@ import { skillHue } from '../../home/skills'
  * both places always renders in the same color. */
 const PROJECT_SKILLS = ['Figma', 'User Research', 'Cross-functional Collaboration']
 
+/** Every image on the page, in the order it appears - so the lightbox can
+ * step through all of them (figures, carousels, and gallery) regardless of
+ * which section or layout an image sits in. */
+const ALL_IMAGES = [
+  { src: asset('/assets/projects/for-she/solution.png'), alt: 'For She platform concept overview' },
+  { src: asset('/assets/projects/for-she/trello.png'), alt: 'Trello board used to manage the sprint' },
+  {
+    src: asset('/assets/projects/for-she/survey-numbers.png'),
+    alt: 'Survey results: 56% cite unequal pay and lack of diversity, 72% prefer women-only platforms, 75% face gender-related challenges entering the job market',
+  },
+  {
+    src: asset('/assets/projects/for-she/product-vision.png'),
+    alt: 'Product vision board outlining the first feature set',
+  },
+  {
+    src: asset('/assets/projects/for-she/persona-monica.png'),
+    alt: 'Persona: Mônica Duarte, 32, psychologist switching careers into tech',
+  },
+  {
+    src: asset('/assets/projects/for-she/persona-ana.png'),
+    alt: 'Persona: Ana Maria Dias, 19, just graduated high school, builds PCs with her dad',
+  },
+  {
+    src: asset('/assets/projects/for-she/happy-ending.png'),
+    alt: 'Ana and Mônica meet on For She and exchange mentorship for PC-building help',
+  },
+  { src: asset('/assets/projects/for-she/lean-canvas.png'), alt: 'Lean Canvas mapping the For She business model' },
+  { src: asset('/assets/projects/for-she/benchmark.png'), alt: 'Benchmark against Catho and InfoJobs' },
+  { src: asset('/assets/projects/for-she/sitemap.png'), alt: 'Whiteboard site map of the For She platform' },
+  { src: asset('/assets/projects/for-she/visual-id.png'), alt: 'For She logo lockups and color palette' },
+  { src: asset('/assets/projects/for-she/wireframe-flows.png'), alt: 'Core flow wireframes' },
+  { src: asset('/assets/projects/for-she/wireframe-dashboard.png'), alt: 'Dashboard wireframe' },
+  { src: asset('/assets/projects/for-she/wireframe-home.png'), alt: 'Home screen wireframe' },
+  {
+    src: asset('/assets/projects/for-she/award.png'),
+    alt: 'Hackathon das Manas 1st place award graphic for Team Marias Bonitas',
+  },
+]
+
 interface ZoomableProps {
   src: string
   alt: string
@@ -95,7 +134,9 @@ function Carousel({ children, prevLabel, nextLabel }: { children: ReactNode; pre
  * (kb-project-section/figure/figure-row/gallery/quote/list/carousel/video,
  * in kb-site.css) are the reusable template for every case study after it. */
 export default function ForShe() {
-  const [lightbox, setLightbox] = useState<{ src: string; alt: string } | null>(null)
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
+  const openLightbox = ({ src }: { src: string; alt: string }) =>
+    setLightboxIndex(ALL_IMAGES.findIndex((image) => image.src === src))
 
   return (
     <>
@@ -180,7 +221,7 @@ export default function ForShe() {
           internships, specialization programs, and mentoring, built specifically for women entering tech. The goal
           was to pair skill-building with an actual support system, so it doesn't stop once someone lands a role.
         </p>
-        <Figure src={asset('/assets/projects/for-she/solution.png')} alt="For She platform concept overview" onZoom={setLightbox} />
+        <Figure src={asset('/assets/projects/for-she/solution.png')} alt="For She platform concept overview" onZoom={openLightbox} />
       </section>
 
       <section className="kb-project-section">
@@ -195,7 +236,7 @@ export default function ForShe() {
           I ran project management for the sprint, using Trello for tasks and deadlines so a four-person team could
           move fast without losing track of scope.
         </p>
-        <Figure src={asset('/assets/projects/for-she/trello.png')} alt="Trello board used to manage the sprint" onZoom={setLightbox} />
+        <Figure src={asset('/assets/projects/for-she/trello.png')} alt="Trello board used to manage the sprint" onZoom={openLightbox} />
         <p>
           To test the idea, <span className="kb-project-highlight">we surveyed 40 women</span>. Most said they'd feel more comfortable applying to roles marked
           specifically for women, and preferred women as leaders or mentors.
@@ -203,7 +244,7 @@ export default function ForShe() {
         <Figure
           src={asset('/assets/projects/for-she/survey-numbers.png')}
           alt="Survey results: 56% cite unequal pay and lack of diversity, 72% prefer women-only platforms, 75% face gender-related challenges entering the job market"
-          onZoom={setLightbox}
+          onZoom={openLightbox}
         />
       </section>
 
@@ -225,7 +266,7 @@ export default function ForShe() {
         <Figure
           src={asset('/assets/projects/for-she/product-vision.png')}
           alt="Product vision board outlining the first feature set"
-          onZoom={setLightbox}
+          onZoom={openLightbox}
         />
       </section>
 
@@ -240,21 +281,21 @@ export default function ForShe() {
             <ZoomableImage
               src={asset('/assets/projects/for-she/persona-monica.png')}
               alt="Persona: Mônica Duarte, 32, psychologist switching careers into tech"
-              onZoom={setLightbox}
+              onZoom={openLightbox}
             />
           </div>
           <div className="kb-project-carousel__slide">
             <ZoomableImage
               src={asset('/assets/projects/for-she/persona-ana.png')}
               alt="Persona: Ana Maria Dias, 19, just graduated high school, builds PCs with her dad"
-              onZoom={setLightbox}
+              onZoom={openLightbox}
             />
           </div>
           <div className="kb-project-carousel__slide">
             <ZoomableImage
               src={asset('/assets/projects/for-she/happy-ending.png')}
               alt="Ana and Mônica meet on For She and exchange mentorship for PC-building help"
-              onZoom={setLightbox}
+              onZoom={openLightbox}
             />
           </div>
         </Carousel>
@@ -272,14 +313,14 @@ export default function ForShe() {
             <ZoomableImage
               src={asset('/assets/projects/for-she/lean-canvas.png')}
               alt="Lean Canvas mapping the For She business model"
-              onZoom={setLightbox}
+              onZoom={openLightbox}
             />
           </div>
           <div className="kb-project-carousel__slide">
             <ZoomableImage
               src={asset('/assets/projects/for-she/benchmark.png')}
               alt="Benchmark against Catho and InfoJobs"
-              onZoom={setLightbox}
+              onZoom={openLightbox}
             />
           </div>
         </Carousel>
@@ -287,13 +328,13 @@ export default function ForShe() {
 
       <section className="kb-project-section">
         <h2>Site Map</h2>
-        <Figure src={asset('/assets/projects/for-she/sitemap.png')} alt="Whiteboard site map of the For She platform" onZoom={setLightbox} />
+        <Figure src={asset('/assets/projects/for-she/sitemap.png')} alt="Whiteboard site map of the For She platform" onZoom={openLightbox} />
       </section>
 
       <section className="kb-project-section">
         <span className="kb-project-section__eyebrow">Final Design</span>
         <h2>Visual ID & Logo</h2>
-        <Figure src={asset('/assets/projects/for-she/visual-id.png')} alt="For She logo lockups and color palette" onZoom={setLightbox} />
+        <Figure src={asset('/assets/projects/for-she/visual-id.png')} alt="For She logo lockups and color palette" onZoom={openLightbox} />
         <p>
           Navy blue, aqua, and purple were deliberate: navy for trust and professionalism, aqua for energy, purple
           for creativity. I made the call to skip pure pink, and the team agreed: a softer purple-magenta keeps a
@@ -306,13 +347,13 @@ export default function ForShe() {
         <p>Wireframes came first, to lock structure before the visual identity went on.</p>
         <div className="kb-project-gallery">
           <div className="kb-project-gallery__item">
-            <ZoomableImage src={asset('/assets/projects/for-she/wireframe-flows.png')} alt="Core flow wireframes" onZoom={setLightbox} />
+            <ZoomableImage src={asset('/assets/projects/for-she/wireframe-flows.png')} alt="Core flow wireframes" onZoom={openLightbox} />
           </div>
           <div className="kb-project-gallery__item">
-            <ZoomableImage src={asset('/assets/projects/for-she/wireframe-dashboard.png')} alt="Dashboard wireframe" onZoom={setLightbox} />
+            <ZoomableImage src={asset('/assets/projects/for-she/wireframe-dashboard.png')} alt="Dashboard wireframe" onZoom={openLightbox} />
           </div>
           <div className="kb-project-gallery__item">
-            <ZoomableImage src={asset('/assets/projects/for-she/wireframe-home.png')} alt="Home screen wireframe" onZoom={setLightbox} />
+            <ZoomableImage src={asset('/assets/projects/for-she/wireframe-home.png')} alt="Home screen wireframe" onZoom={openLightbox} />
           </div>
         </div>
       </section>
@@ -364,11 +405,18 @@ export default function ForShe() {
         <Figure
           src={asset('/assets/projects/for-she/award.png')}
           alt="Hackathon das Manas 1st place award graphic for Team Marias Bonitas"
-          onZoom={setLightbox}
+          onZoom={openLightbox}
         />
       </section>
 
-      {lightbox && <ImageLightbox src={lightbox.src} alt={lightbox.alt} onClose={() => setLightbox(null)} />}
+      {lightboxIndex !== null && (
+        <ImageLightbox
+          images={ALL_IMAGES}
+          index={lightboxIndex}
+          onNavigate={setLightboxIndex}
+          onClose={() => setLightboxIndex(null)}
+        />
+      )}
     </>
   )
 }

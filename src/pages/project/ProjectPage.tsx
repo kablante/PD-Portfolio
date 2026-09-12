@@ -9,6 +9,7 @@ import { downloadCvPlaceholder, useCursorSpotlight, useLang } from '../home/useH
 import { asset } from '@/lib/asset'
 import ForShe from './case-studies/ForShe'
 import Boavista from './case-studies/Boavista'
+import SideProjects from './case-studies/SideProjects'
 
 /** Registry of the actual case-study content, keyed by slug. Most project
  * cards don't have a written case study yet - this is deliberately just the
@@ -17,6 +18,7 @@ import Boavista from './case-studies/Boavista'
 const caseStudies: Partial<Record<string, React.ComponentType>> = {
   'for-she': ForShe,
   'boavista': Boavista,
+  'side-projects': SideProjects,
 }
 
 export default function ProjectPage() {
@@ -74,14 +76,16 @@ export default function ProjectPage() {
       </div>
 
       <div className="kb-content">
-        <div className="kb-project-header">
-          <img
-            className="kb-project-header__img"
-            src={project.headerImage ?? project.image}
-            alt=""
-            style={{ viewTransitionName: projectImageTransitionName(project.slug) }}
-          />
-        </div>
+        {!project.hideHeaderImage && (
+          <div className="kb-project-header">
+            <img
+              className="kb-project-header__img"
+              src={project.headerImage ?? project.image}
+              alt=""
+              style={{ viewTransitionName: projectImageTransitionName(project.slug) }}
+            />
+          </div>
+        )}
 
         <article className="kb-project-body">
           <h1 className="kb-project-title">{project.title}</h1>

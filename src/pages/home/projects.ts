@@ -5,6 +5,10 @@ export interface HomeProject {
   /** Project-page header image, if it differs from the home card's own
    * (cropped-for-the-card) `image` - falls back to `image` when unset. */
   headerImage?: string
+  /** Skips the header image on the project page entirely - for case studies
+   * (like Side Projects) that open straight into their own content instead
+   * of a single hero shot. */
+  hideHeaderImage?: boolean
   rotation: string
   title: string
   descEn?: string
@@ -51,7 +55,7 @@ export const homeProjects: HomeProject[] = [
   {
     slug: 'side-projects',
     image: asset('/assets/projects/side-projects.png'),
-    headerImage: asset('/assets/projects/side-projects/side-projects-header.png'),
+    hideHeaderImage: true,
     rotation: '-3.466deg',
     title: 'Side Projects',
   },
