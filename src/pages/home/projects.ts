@@ -28,7 +28,7 @@ export const homeProjects: HomeProject[] = [
     title: 'Venturus',
   },
   {
-    slug: 'VNT-Help.jpg',
+    slug: 'VNT-Help',
     image: asset('/assets/projects/VNT-Help.png'),
     headerImage: asset('/assets/projects/VNT/VNT-Help.png'),
     rotation: '1.891deg',
