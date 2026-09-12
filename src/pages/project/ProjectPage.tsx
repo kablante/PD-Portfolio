@@ -8,6 +8,7 @@ import { homeProjects, projectImageTransitionName } from '../home/projects'
 import { downloadCvPlaceholder, useCursorSpotlight, useLang } from '../home/useHomeEffects'
 import { asset } from '@/lib/asset'
 import ForShe from './case-studies/ForShe'
+import Boavista from './case-studies/Boavista'
 
 /** Registry of the actual case-study content, keyed by slug. Most project
  * cards don't have a written case study yet - this is deliberately just the
@@ -15,6 +16,7 @@ import ForShe from './case-studies/ForShe'
  * those, so each card has somewhere real to land instead of a dead link. */
 const caseStudies: Partial<Record<string, React.ComponentType>> = {
   'for-she': ForShe,
+  'boavista': Boavista,
 }
 
 export default function ProjectPage() {

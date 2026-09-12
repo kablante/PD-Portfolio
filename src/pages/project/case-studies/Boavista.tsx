@@ -84,12 +84,6 @@ export default function Boavista() {
       <section className="kb-project-section">
         <span className="kb-project-section__eyebrow">Overview</span>
 
-        <Figure
-          src={asset('/assets/projects/boavista/Boavista_LP_-_Cover.png')}
-          alt="Boavista Tecnologia e-Extrato Card landing page cover"
-          onZoom={setLightbox}
-        />
-
         <p>
           Boavista Tecnologia&apos;s e-Extrato Card is a card-sales reconciliation
           product for retailers running multiple stores. During the company&apos;s
@@ -190,7 +184,7 @@ export default function Boavista() {
           <div className="kb-project-gallery__item">
             <ZoomableImage
               src={asset(
-                '/assets/projects/boavista/Boavista_LP_-_Benchmark_Equals.png',
+                '/assets/projects/boavista/Benchmark_Equals.png',
               )}
               alt="Benchmark of Equals landing page"
               onZoom={setLightbox}
@@ -200,7 +194,7 @@ export default function Boavista() {
           <div className="kb-project-gallery__item">
             <ZoomableImage
               src={asset(
-                '/assets/projects/boavista/Boavista_LP_-_Benchmark_NexxeraHubly.png',
+                '/assets/projects/boavista/Benchmark_NexxeraHubly.png',
               )}
               alt="Benchmark of Nexxera Hubly landing page"
               onZoom={setLightbox}
@@ -210,7 +204,7 @@ export default function Boavista() {
           <div className="kb-project-gallery__item">
             <ZoomableImage
               src={asset(
-                '/assets/projects/boavista/Boavista_LP_-_Benchmark_Even.png',
+                '/assets/projects/boavista/Benchmark_Even.png',
               )}
               alt="Benchmark of Even landing page"
               onZoom={setLightbox}
@@ -347,23 +341,6 @@ export default function Boavista() {
           </span>
           .
         </p>
-
-        <p>Next steps:</p>
-
-        <ul className="kb-project-list">
-          <li>
-            Run a sales survey to understand how well leads understand the
-            product before the conversation.
-          </li>
-          <li>Run a user survey.</li>
-          <li>
-            Return to Hotjar to identify current drop-off points.
-          </li>
-          <li>
-            Longer term, reduce text-heavy sections and move sections 2–6 toward
-            motion graphics, mainly to make the page work properly on mobile.
-          </li>
-        </ul>
       </section>
 
       {lightbox && (
