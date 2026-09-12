@@ -112,7 +112,7 @@ export default function ProjectPage() {
       <div className="kb-project-layout">
         <ProjectSidebar project={project} lang={lang} setLang={setLang} contentRef={articleRef} />
 
-        <div className="kb-content">
+        <div className={`kb-content${project.hideHeaderImage ? ' kb-content--no-header' : ''}`}>
           {!project.hideHeaderImage && (
             <div className="kb-project-header">
               <img
