@@ -1,8 +1,8 @@
 import { Download } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import Sparkle from '@/components/shared/Sparkle'
+import { asset } from '@/lib/asset'
 import { SKILLS } from './skills'
-import { type Lang, downloadCvPlaceholder } from './useHomeEffects'
 
 /** The Who section - home's second screen, ported from the Bento Blob Lab
  * artifact and reskinned onto Katarina's own tokens/fonts.
@@ -33,7 +33,7 @@ function TimezoneClock() {
   )
 }
 
-export default function WhoSection({ lang }: { lang: Lang }) {
+export default function WhoSection() {
   return (
     <div className="kb-who">
       <figure className="kb-who__photo">
@@ -99,11 +99,15 @@ export default function WhoSection({ lang }: { lang: Lang }) {
           </svg>
           LinkedIn
         </button>
-        <button type="button" className="kb-who-btn kb-who-btn--ghost" onClick={() => downloadCvPlaceholder(lang)}>
+        <a
+          className="kb-who-btn kb-who-btn--ghost"
+          href={asset('/assets/Katarina-Blante_Resume.pdf')}
+          download="Katarina-Blante_Resume.pdf"
+        >
           <Download aria-hidden="true" />
           <span data-lang="en">Download Resume</span>
           <span data-lang="pt">Baixar Currículo</span>
-        </button>
+        </a>
       </div>
 
       <div className="kb-who__aside">

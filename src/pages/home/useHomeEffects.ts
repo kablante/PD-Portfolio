@@ -38,10 +38,6 @@ export function useLang() {
   return { lang, setLang }
 }
 
-export function downloadCvPlaceholder(lang: Lang) {
-  window.alert(lang === 'pt' ? 'Currículo (PDF) — placeholder' : 'CV (PDF) — placeholder')
-}
-
 const MAX_TILT_DEG = 10
 // The card that sits on top of the resting pile (see .kb-project-card's
 // nth-child z-index in kb-site.css - lowest index = leftmost = highest

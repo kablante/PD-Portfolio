@@ -277,14 +277,83 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
 }
 
 /* ---------- About / Project shared content column ---------- */
-/* +64px reserves room for the fixed top nav bar on these pages */
 /* fill-mode intentionally omitted — see the note on .kb-home-main: a
    forwards/both fill would keep this animation overriding transform/
    opacity forever, blocking the .kb-leaving-home exit transition below
    from ever starting. */
-/* No back-link row above the header image any more (the footerbar logo
-   already goes home) - just enough top padding to clear the fixed navbar. */
-.kb-content{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:calc(64px + clamp(20px,3vw,36px)) clamp(24px,5vw,64px) clamp(72px,9vw,120px);animation:kb-rise-in 480ms cubic-bezier(.22,.61,.36,1)}
+/* Project pages have no fixed top navbar any more (see .kb-sidebar below),
+   so this only needs its own breathing room, not extra space to clear one. */
+.kb-content{position:relative;z-index:1;flex:1 1 auto;min-width:0;max-width:1200px;margin:0 auto;padding:clamp(32px,5vw,56px) clamp(24px,5vw,64px) clamp(72px,9vw,120px);animation:kb-rise-in 480ms cubic-bezier(.22,.61,.36,1)}
+
+/* ---------- Project page sidebar ----------
+   Replaces the old fixed top navbar on project pages: back-to-home, the
+   language switch, an auto-generated outline of the current case study's
+   own headings, links to every other project, and the same LinkedIn/résumé
+   actions as Home's Who section (see ProjectSidebar.tsx). A sticky column
+   on desktop; collapses into a slide-in drawer under 960px. */
+.kb-project-layout{display:flex;align-items:flex-start}
+
+.kb-sidebar{position:sticky;top:0;z-index:5;flex:none;width:272px;height:100vh;overflow-y:auto;display:flex;flex-direction:column;gap:28px;padding:32px 24px;background:rgba(26,12,92,.275);backdrop-filter:blur(var(--blur-glass));-webkit-backdrop-filter:blur(var(--blur-glass));border-right:1px solid var(--border-soft)}
+
+/* Sits at the bottom, right above the .kb-sidebar__actions divider - full
+   width, matching the LinkedIn/résumé buttons below it, instead of the
+   small pill used everywhere else the switch appears. */
+.kb-sidebar__lang{align-self:stretch;width:auto;height:40px;margin-top:auto}
+.kb-sidebar__lang .kb-lang-switch__knob{width:50%}
+html[data-active-lang="pt"] .kb-sidebar__lang .kb-lang-switch__knob{transform:translateX(100%)}
+.kb-sidebar__lang button{width:50%}
+
+/* A standalone item with its own icon and no children (Back to home) -
+   styled like a section header (see below) since the reference sidebar
+   draws every top-level row, grouped or not, the same way. Colored like
+   the site's own links (not the default text-strong of a section header)
+   since unlike those, it's actually a link to somewhere. */
+.kb-sidebar__item{display:flex;align-items:center;gap:8px;text-decoration:none;font-size:13px;font-weight:var(--weight-semibold);color:var(--text-link);transition:color var(--duration-base) var(--ease-soft)}
+.kb-sidebar__item svg{flex:none;color:var(--text-link);transition:color var(--duration-base) var(--ease-soft)}
+.kb-sidebar__item:hover{color:var(--text-link-hover)}
+.kb-sidebar__item:hover svg{color:var(--text-link-hover)}
+
+/* A grouped nav block ("This project" / "Other projects"): icon + label
+   header, then its links in a column with a vertical rule running the
+   length of the group - same shape as the reference's Documentation/
+   Projects groups. */
+.kb-sidebar__section{display:flex;flex-direction:column;gap:8px}
+.kb-sidebar__section-header{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:var(--weight-semibold);color:var(--text-strong)}
+.kb-sidebar__section-header svg{flex:none;color:var(--kb-lavender)}
+.kb-sidebar__section-body{list-style:none;margin:0 0 0 8px;padding:2px 0 2px 12px;border-left:1px solid var(--border-hairline);display:flex;flex-direction:column;gap:2px}
+.kb-sidebar__section-body a{display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:var(--text-muted);text-decoration:none;transition:background var(--duration-base) var(--ease-soft),color var(--duration-base) var(--ease-soft)}
+.kb-sidebar__section-body a:hover{color:var(--text-strong);background:rgba(255,255,255,.06)}
+.kb-sidebar__section-body a.is-active{color:var(--kb-cyan);background:rgba(72,247,250,.12);font-weight:var(--weight-semibold)}
+.kb-sidebar__nav-item--level-2 a{padding-left:20px}
+.kb-sidebar__nav-item--level-3 a{padding-left:32px;font-size:13px}
+
+.kb-sidebar__actions{display:flex;flex-direction:column;gap:10px;padding-top:20px;border-top:1px solid var(--border-hairline)}
+.kb-sidebar-btn{all:unset;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:40px;border-radius:999px;font-size:14px;font-weight:var(--weight-semibold);cursor:pointer;transition:transform var(--duration-fast) var(--ease-soft),background var(--duration-base) var(--ease-soft),border-color var(--duration-base) var(--ease-soft),color var(--duration-base) var(--ease-soft)}
+.kb-sidebar-btn svg{flex:none}
+.kb-sidebar-btn--primary{border:var(--border-width) solid transparent;color:var(--kb-white);
+  background:linear-gradient(130deg,rgba(254,106,216,.85),rgba(183,140,245,.85));
+  box-shadow:0 0 24px rgba(254,106,216,.4)}
+.kb-sidebar-btn--primary:hover{transform:translateY(-2px);background:var(--kb-butter);color:var(--kb-void);box-shadow:var(--glow-butter)}
+.kb-sidebar-btn--ghost{border:var(--border-width) solid rgba(183,140,245,.5);color:var(--kb-lavender)}
+.kb-sidebar-btn--ghost:hover{transform:translateY(-2px);border-color:var(--kb-cyan);color:var(--kb-cyan)}
+
+.kb-sidebar-toggle{display:none;position:fixed;top:16px;left:16px;z-index:30;width:44px;height:44px;align-items:center;justify-content:center;border-radius:999px;border:1px solid var(--border-hairline);background:rgba(26,12,92,.6);backdrop-filter:blur(var(--blur-glass));-webkit-backdrop-filter:blur(var(--blur-glass));color:var(--text-strong);cursor:pointer}
+.kb-sidebar-backdrop{display:none}
+
+/* Lets scrollIntoView (from the "on this page" outline) stop with some
+   breathing room instead of a heading landing flush against the viewport
+   edge - also clears the fixed hamburger toggle on mobile. */
+.kb-project-body :is(h1,h2,h3){scroll-margin-top:88px}
+
+@media (max-width:959px){
+  .kb-sidebar-toggle{display:flex}
+  /* Extra top padding so the fixed hamburger/close toggle (top:16px,
+     44px tall) never overlaps the drawer's own first row. */
+  .kb-sidebar{position:fixed;inset:0 auto 0 0;padding-top:76px;transform:translateX(-100%);transition:transform 280ms var(--ease-soft);box-shadow:var(--shadow-lg);z-index:29;width:min(320px,86vw)}
+  .kb-sidebar--open{transform:translateX(0)}
+  .kb-sidebar-backdrop{display:block;position:fixed;inset:0;z-index:28;background:rgba(8,1,42,.6);backdrop-filter:blur(4px)}
+  .kb-content{padding-top:clamp(88px,14vw,104px)}
+}
 
 /* Project header image - the shared-element target for the home card's
    container-transform (see projectImageTransitionName / the View

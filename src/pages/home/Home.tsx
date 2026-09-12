@@ -115,7 +115,7 @@ export default function Home() {
         </div>
       </div>
       <div className="kb-who-section">
-        <WhoSection lang={lang} />
+        <WhoSection />
       </div>
       <div className="kb-lang-dock">
         <div role="group" aria-label="Language" className="kb-lang-switch">
