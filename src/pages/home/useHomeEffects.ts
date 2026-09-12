@@ -74,6 +74,14 @@ interface Target {
  * re-renders, so it stays imperative behind a ref. */
 export function useCardSpreadEffects(rowRef: RefObject<HTMLDivElement | null>) {
   useEffect(() => {
+    // Touch devices get the one-at-a-time carousel instead (see
+    // useCardCarouselActive) - a tap can still synthesize mouseenter/
+    // mousemove/mouseleave on many mobile browsers, which would set an
+    // inline `transform` here that outranks the carousel's own
+    // `transform:none` (see the max-width:700px rules in kb-site.css),
+    // bringing back the desktop rotation/tilt/spread on a screen that's
+    // meant to show flat, non-rotated cards.
+    if (window.matchMedia?.('(pointer: coarse)').matches) return
     const row = rowRef.current
     if (!row) return
     const cards = Array.from(row.querySelectorAll<HTMLAnchorElement>('.kb-project-card'))
