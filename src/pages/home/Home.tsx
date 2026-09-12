@@ -5,6 +5,7 @@ import AuroraBackground from '@/components/shared/AuroraBackground'
 import '@/styles/kb-tokens.css'
 import '@/styles/kb-components.css'
 import '@/styles/kb-site.css'
+import GallerySection from './GallerySection'
 import LogoWordmark from './LogoWordmark'
 import WhoSection from './WhoSection'
 import { homeProjects, projectImageTransitionName } from './projects'
@@ -117,6 +118,7 @@ export default function Home() {
       <div className="kb-who-section">
         <WhoSection />
       </div>
+      <GallerySection />
       <div className="kb-lang-dock">
         <div role="group" aria-label="Language" className="kb-lang-switch">
           <span className="kb-lang-switch__knob" aria-hidden="true" />
