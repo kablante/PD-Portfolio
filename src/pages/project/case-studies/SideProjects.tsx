@@ -9,12 +9,15 @@ interface SideProjectImage {
 }
 
 interface SideProjectEntry {
+  /** Stable id, also the English project name used for aria-labels. */
   name: string
+  /** Bilingual heading content shown as the section's <h2>. */
+  title: ReactNode
   images: SideProjectImage[]
   /** One to three sentences: what it is, who it was with, and the outcome, if there is one. */
   description: ReactNode
   tools: string
-  timeline: string
+  timeline: ReactNode
 }
 
 /** Each small project gets a name, a gallery, a short description, and a
@@ -23,6 +26,12 @@ interface SideProjectEntry {
 const PROJECTS: SideProjectEntry[] = [
   {
     name: 'Fortal City',
+    title: (
+      <>
+        <span data-lang="en">Fortal City: Mobile Advergame</span>
+        <span data-lang="pt">Fortal City: Advergame Mobile</span>
+      </>
+    ),
     images: [
       {
         src: asset('/assets/projects/side-projects/Fortal_City_-_Screen_1.png'),
@@ -47,20 +56,44 @@ const PROJECTS: SideProjectEntry[] = [
     ],
     description: (
       <>
-        A <span className="kb-project-highlight">mobile advergame</span> prototype that rewards players with real discount coupons at local stores, built with{' '}
-        <a href="https://www.linkedin.com/in/adelaide-brito/" target="_blank" rel="noopener noreferrer">
-          Adelaide Brito
-        </a>{' '}
-        for Sebrae's game development program in Ceará. The game highlighted Fortaleza's tourist attractions beyond
-        its beaches. It drew interest from several companies, but partnership deals never closed, so the project is
-        on hold.
+        <span data-lang="en">
+          A <span className="kb-project-highlight">mobile advergame</span> prototype that rewards players with real
+          discount coupons at local stores, built with{' '}
+          <a href="https://www.linkedin.com/in/adelaide-brito/" target="_blank" rel="noopener noreferrer">
+            Adelaide Brito
+          </a>{' '}
+          for Sebrae's game development program in Ceará. The game highlighted Fortaleza's tourist attractions
+          beyond its beaches. It drew interest from several companies, but partnership deals never closed, so the
+          project is on hold.
+        </span>
+        <span data-lang="pt">
+          Um protótipo de <span className="kb-project-highlight">advergame mobile</span> que recompensa jogadores
+          com cupons de desconto reais em lojas locais, feito com a{' '}
+          <a href="https://www.linkedin.com/in/adelaide-brito/" target="_blank" rel="noopener noreferrer">
+            Adelaide Brito
+          </a>{' '}
+          para o programa de desenvolvimento de jogos do Sebrae no Ceará. O jogo destacava os pontos turísticos de
+          Fortaleza além das praias. Ele despertou interesse de várias empresas, mas as parcerias nunca se fecharam,
+          então o projeto está pausado.
+        </span>
       </>
     ),
     tools: 'Adobe Photoshop',
-    timeline: 'December 2020',
+    timeline: (
+      <>
+        <span data-lang="en">December 2020</span>
+        <span data-lang="pt">Dezembro de 2020</span>
+      </>
+    ),
   },
   {
     name: 'Mobills',
+    title: (
+      <>
+        <span data-lang="en">Mobills: Investment Tracking App</span>
+        <span data-lang="pt">Mobills: App de Acompanhamento de Investimentos</span>
+      </>
+    ),
     images: [
       {
         src: asset('/assets/projects/side-projects/Mobills_Study_-Selling_1.png'),
@@ -79,10 +112,25 @@ const PROJECTS: SideProjectEntry[] = [
         alt: 'Mobills app screens showing total assets, projections, and goals',
       },
     ],
-    description:
-      'A design challenge for the fintech Mobills: a mobile app to track and forecast investments across multiple institutions in one place, built for millennial investors.',
+    description: (
+      <>
+        <span data-lang="en">
+          A design challenge for the fintech Mobills: a mobile app to track and forecast investments across
+          multiple institutions in one place, built for millennial investors.
+        </span>
+        <span data-lang="pt">
+          Um desafio de design para a fintech Mobills: um aplicativo mobile para acompanhar e projetar
+          investimentos de várias instituições em um só lugar, feito para investidores da geração millennial.
+        </span>
+      </>
+    ),
     tools: 'Adobe XD',
-    timeline: 'October 2021',
+    timeline: (
+      <>
+        <span data-lang="en">October 2021</span>
+        <span data-lang="pt">Outubro de 2021</span>
+      </>
+    ),
   },
 ]
 
@@ -158,7 +206,7 @@ export default function SideProjects() {
     <>
       {PROJECTS.map((project) => (
         <section key={project.name} className="kb-project-section">
-          <h2>{project.name}</h2>
+          <h2>{project.title}</h2>
 
           <Carousel prevLabel={`Previous ${project.name} image`} nextLabel={`Next ${project.name} image`}>
             {project.images.map((image) => (

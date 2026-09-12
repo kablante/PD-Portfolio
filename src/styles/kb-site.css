@@ -309,6 +309,18 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
 /* Project */
 .kb-project-meta{display:block;font-family:var(--font-mono);font-size:12px;letter-spacing:.16em;color:var(--kb-lavender);margin-top:32px}
 .kb-project-title{font-family:var(--font-display);font-size:clamp(40px,6.4vw,84px);line-height:1;color:var(--text-strong);margin:16px 0 0;max-width:20ch;text-wrap:pretty}
+/* "Name: Subtitle" titles break after the colon instead of wherever the
+   browser happens to wrap - the name stays the big headline, and the
+   subtitle runs as its own full-width single line underneath. Its font-size
+   is set inline by FittedProjectTitle (ProjectPage.tsx), computed so the
+   line spans the same width as the name, capped at the name's own font
+   size - these rules just supply the shared look (font, color, spacing)
+   and keep it from ever wrapping. */
+.kb-project-subtitle{font-family:var(--font-display);line-height:1.05;color:var(--text-strong);margin:10px 0 0;max-width:none;white-space:nowrap;overflow:hidden}
+/* Off-screen clone used only to measure how wide the subtitle text would
+   render at the name's font size - same font stack as the visible subtitle
+   so the measurement matches; never painted. */
+.kb-project-subtitle-measure{position:absolute;visibility:hidden;white-space:nowrap;top:-9999px;left:-9999px;font-family:var(--font-display);pointer-events:none}
 .kb-project-lede{font-size:20px;line-height:1.55;font-weight:300;color:var(--text-body);max-width:64ch;margin:24px 0 0;text-wrap:pretty}
 .kb-project-shot{border-radius:16px;border:1px solid var(--border-hairline);background:var(--gradient-nebula);height:clamp(240px,34vw,460px);margin-top:clamp(32px,4vw,56px);display:flex;align-items:flex-end;padding:20px}
 .kb-project-blocks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:clamp(24px,4vw,48px);margin-top:clamp(40px,5vw,72px)}
@@ -388,6 +400,17 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
 .kb-project-list{list-style:none;margin:20px 0 0;padding:0;display:grid;gap:14px;max-width:60ch}
 .kb-project-list li{position:relative;padding-left:28px;font-size:18px;font-weight:300;line-height:1.65;color:var(--text-body)}
 .kb-project-list li::before{content:"";position:absolute;left:0;top:10px;width:8px;height:8px;border-radius:50%;background:var(--kb-cyan);box-shadow:0 0 10px rgba(72,247,250,.65)}
+
+/* Marks content withheld pending a client's disclosure/NDA clearance - a
+   block version for where a screenshot or figure would go, and an inline
+   version for a metric missing mid-sentence. Dashed border keeps it reading
+   as "not yet here" rather than a finished part of the page. */
+.kb-project-pending{display:flex;align-items:flex-start;gap:14px;margin-top:clamp(28px,3.6vw,40px);padding:clamp(18px,2.4vw,24px);border:1px dashed var(--border-hairline);border-radius:16px;background:var(--surface-card);max-width:70ch}
+.kb-project-pending svg{flex-shrink:0;margin-top:2px;color:var(--kb-lavender)}
+.kb-project-pending p{margin:0;font-size:15px;font-weight:300;line-height:1.6;color:var(--text-muted)}
+.kb-project-pending strong{color:var(--text-body);font-weight:var(--weight-semibold)}
+.kb-project-pending-inline{display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border:1px dashed var(--border-hairline);border-radius:999px;font-family:var(--font-mono);font-size:13px;color:var(--kb-lavender);white-space:nowrap}
+.kb-project-pending-inline svg{flex-shrink:0}
 
 /* Figures: a soft nebula-gradient mat behind every image, since the source
    screenshots carry their own (often white) backgrounds — object-fit:contain

@@ -11,6 +11,8 @@ export interface HomeProject {
   hideHeaderImage?: boolean
   rotation: string
   title: string
+  /** Portuguese version of `title` - falls back to `title` when unset. */
+  titlePt?: string
   descEn?: string
   descPt?: string
 }
@@ -27,30 +29,35 @@ export const homeProjects: HomeProject[] = [
   {
     slug: 'VNT-Station-branch',
     image: asset('/assets/projects/VNT-Station-branch.png'),
-    headerImage: asset('/assets/projects/VNT/VNT-Station-branch.png'),
+    // Placeholder header - Venturus's own screenshots are pending disclosure/NDA clearance.
+    headerImage: asset('/assets/projects/VNT/VNT.jpg'),
     rotation: '-3.859deg',
     title: 'Venturus',
   },
   {
     slug: 'VNT-Help',
     image: asset('/assets/projects/VNT-Help.png'),
-    headerImage: asset('/assets/projects/VNT/VNT-Help.png'),
+    // Placeholder header - Venturus's own screenshots are pending disclosure/NDA clearance.
+    headerImage: asset('/assets/projects/VNT/VNT.jpg'),
     rotation: '1.891deg',
-    title: 'Venturus',
+    title: 'Venturus: Help Page Redesign & AI Chatbot',
+    titlePt: 'Venturus: Redesign da Página de Help e Chatbot de IA',
   },
   {
     slug: 'boavista',
     image: asset('/assets/projects/boavista.png'),
     headerImage: asset('/assets/projects/boavista/Boavista_LP_-_Cover.png'),
     rotation: '-0.207deg',
-    title: 'Boavista',
+    title: 'Boavista: Landing Page Redesign',
+    titlePt: 'Boavista: Redesign da Landing Page',
   },
   {
     slug: 'for-she',
     image: asset('/assets/projects/for-she.png'),
     headerImage: asset('/assets/projects/for-she/for-she.png'),
     rotation: '2.596deg',
-    title: 'For She',
+    title: 'For She: Recruiting & Training Platform',
+    titlePt: 'For She: Plataforma de Recrutamento e Capacitação',
   },
   {
     slug: 'side-projects',
@@ -58,5 +65,6 @@ export const homeProjects: HomeProject[] = [
     hideHeaderImage: true,
     rotation: '-3.466deg',
     title: 'Side Projects',
+    titlePt: 'Projetos Paralelos',
   },
 ]
