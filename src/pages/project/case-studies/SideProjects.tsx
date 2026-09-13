@@ -11,6 +11,10 @@ interface SideProjectImage {
 interface SideProjectEntry {
   /** Stable id, also the English project name used for aria-labels. */
   name: string
+  /** Anchor id for this project's <section> - stable across languages,
+   * unlike ProjectSidebar's auto-generated (and language-dependent) heading
+   * ids, so the Home gallery can link straight to e.g. #fortal-city. */
+  slug: string
   /** Bilingual heading content shown as the section's <h2>. */
   title: ReactNode
   images: SideProjectImage[]
@@ -26,6 +30,7 @@ interface SideProjectEntry {
 const PROJECTS: SideProjectEntry[] = [
   {
     name: 'Fortal City',
+    slug: 'fortal-city',
     title: (
       <>
         <span data-lang="en">Fortal City: Mobile Advergame</span>
@@ -88,6 +93,7 @@ const PROJECTS: SideProjectEntry[] = [
   },
   {
     name: 'Mobills',
+    slug: 'mobills',
     title: (
       <>
         <span data-lang="en">Mobills: Investment Tracking App</span>
@@ -205,7 +211,7 @@ export default function SideProjects() {
   return (
     <>
       {PROJECTS.map((project) => (
-        <section key={project.name} className="kb-project-section">
+        <section key={project.name} id={project.slug} className="kb-project-section">
           <h2>{project.title}</h2>
 
           <Carousel prevLabel={`Previous ${project.name} image`} nextLabel={`Next ${project.name} image`}>

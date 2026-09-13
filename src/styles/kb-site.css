@@ -14,6 +14,43 @@ body{overflow-x:hidden}
    over the fixed background. Used to be an empty scroll spacer. */
 .kb-who-section{position:relative;z-index:1;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:clamp(24px,5vw,64px)}
 
+/* Third section: a plain grid of every project's own cover shot (see
+   GallerySection.tsx) - no scroll-driven scatter, just a responsive grid
+   with a pointer-tracked hover glow on each card. */
+.kb-gallery-section{position:relative;z-index:1;padding:0 clamp(24px,5vw,64px) clamp(48px,8vw,96px)}
+/* Heading lockup, imitating a design export built from the site's own
+   fonts (--font-hand "Promised Freedom" for the small cyan line,
+   --font-display "MADE Sunflower" for the big lavender one below it) at
+   the exact colors/proportions of that export - a shrink-to-fit block
+   (not text-align:center) so the two lines stay left-aligned to each
+   other, same as the export, while the block itself centers in the
+   section. Sized in vw off the same ~1140px reference .kb-who uses, capped
+   so "portfolio" renders a bit narrower than .kb-who__body's own max width
+   (74% of 1140px = ~844px) rather than matching or exceeding it. */
+.kb-gallery-heading{width:fit-content;margin:0 auto clamp(28px,5vw,56px);
+  display:flex;flex-direction:column;align-items:flex-start}
+.kb-gallery-heading__eyebrow{font-family:var(--font-hand);color:var(--kb-cyan);
+  font-size:clamp(14px,4.4vw,50px);line-height:1.2;margin-bottom:-0.85em}
+.kb-gallery-heading__title{font-family:var(--font-display);font-weight:400;color:var(--kb-lavender);
+  font-size:clamp(36px,13vw,148px);line-height:0.98}
+.kb-gallery-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:clamp(16px,2vw,28px);max-width:1100px;margin:0 auto}
+.kb-gallery-card{position:relative;display:block;overflow:hidden;border-radius:20px;aspect-ratio:16/9}
+.kb-gallery-card__img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 400ms ease}
+.kb-gallery-card:hover .kb-gallery-card__img{transform:scale(1.05)}
+
+@media (max-width:560px){
+  .kb-gallery-grid{grid-template-columns:1fr}
+  .kb-gallery-card{border-radius:16px}
+  /* Mobile only: sized to match the (now full-width) card below it - each
+     card's own width is ~100vw minus the section's own left+right padding
+     (clamp(24px,5vw,64px) each side), so "portfolio" is targeted at that
+     same ~90vw using the font's own width-per-font-size ratio (measured at
+     ~4.22x for MADE Sunflower) rather than the desktop clamp above, which
+     was deliberately capped well below the viewport width. */
+  .kb-gallery-heading__eyebrow{font-size:7vw}
+  .kb-gallery-heading__title{font-size:20.65vw}
+}
+
 /* ---------- Fixed aurora background ---------- */
 .kb-bg{position:fixed;inset:0;z-index:0;pointer-events:none}
 /* Flat scrim over the whole field, on top of the mesh/stars but below
@@ -26,9 +63,10 @@ body{overflow-x:hidden}
    the site's own accent tokens - keeps --kb-void as the base tone, per
    the brief, instead of adopting the file's own near-black. Depth
    parallax: each orb drifts opposite the pointer via the standalone
-   `translate` property, same --kb-px/--kb-py set on .kb-bg by
-   initAuroraParallax as the old mesh/stars used, so it composes with the
-   orb's own bloom-pulse `transform` animation instead of fighting it. */
+   `translate` property, reading the same root-level --kb-px/--kb-py
+   useAuroraParallax sets for every page's confetti too (see .kb-confetti
+   below), so it composes with the orb's own bloom-pulse `transform`
+   animation instead of fighting it. */
 .kb-aurora__orb{position:absolute;border-radius:50%;pointer-events:none;animation:kb-orb-drift 4s ease-in-out infinite;translate:calc(var(--kb-px,0) * -14px) calc(var(--kb-py,0) * -14px);transition:translate 400ms ease-out}
 .kb-aurora__orb--1{left:5%;top:-5%;width:560px;height:560px;background:radial-gradient(circle,var(--kb-magenta),transparent 70%);filter:blur(90px);opacity:.85;animation-duration:4s}
 .kb-aurora__orb--2{left:50%;top:10%;width:650px;height:650px;background:radial-gradient(circle,var(--kb-lavender),transparent 70%);filter:blur(110px);opacity:.75;animation-duration:4.7s;animation-delay:.4s}
@@ -41,6 +79,47 @@ body{overflow-x:hidden}
 @keyframes kb-bloom-pulse{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:1;transform:scale(1.12)}}
 @keyframes kb-rise-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 @media (prefers-reduced-motion:reduce){.kb-aurora__orb{animation:none}}
+
+/* ---------- Confetti (shared decorative dots/sparks/blobs) ----------
+   The Who section's own hand-placed pieces (.kb-who__pip/-spark/-blob
+   above) carry .kb-confetti directly in WhoSection.tsx for this drift;
+   Confetti.tsx (used by the Hero and Gallery sections) renders its own
+   .kb-confetti--pip/-spark/-blob with the same look, inside an inset:0
+   .kb-confetti-layer so each item's left/top percentages land relative to
+   the section, not to Confetti's own (otherwise auto-sized) wrapper.
+   Every piece reads the root-level --kb-px/--kb-py useAuroraParallax sets,
+   same as the aurora background's orbs, each at its own --confetti-depth
+   (px of travel at the pointer's full range, defaulted per type in
+   Confetti.tsx / set alongside .kb-who__pip etc. above). The caller's own
+   element needs `position:relative` for the layer's inset:0 to track it. */
+.kb-confetti{translate:calc(var(--kb-px,0) * var(--confetti-depth,16px)) calc(var(--kb-py,0) * var(--confetti-depth,16px));transition:translate 400ms ease-out}
+.kb-confetti-layer{position:absolute;inset:0;z-index:8;pointer-events:none}
+.kb-confetti-layer > *{position:absolute}
+.kb-confetti--pip{border-radius:50%;background:var(--kb-lavender);opacity:.55}
+.kb-confetti--blob{border-radius:62% 38% 46% 54%/60% 44% 56% 40%;aspect-ratio:5/4;
+  background:rgba(254,106,216,.5);box-shadow:0 0 26px rgba(254,106,216,.45)}
+
+/* Twinkle: a slow, continuous animate__heartBeat-style pulse (scale, same
+   0/14/28/42/70% beats as the original) combined with a fade through the
+   same beats, so every sparkle reads as glinting rather than mechanically
+   growing and shrinking. Brightness is read from --confetti-opacity (each
+   spark's own resting opacity - see Confetti.tsx and .kb-who__spark--b/-c
+   below) rather than animating the `opacity` property against a fixed
+   value, since a running animation always wins over a plain `opacity`
+   declaration (inline included) for as long as it's running - animating
+   toward a shared constant would flatten every spark to the same
+   brightness instead of preserving each one's own. */
+@keyframes kb-sparkle{
+  0%,100%{scale:1;opacity:calc(var(--confetti-opacity,1) * .5)}
+  14%{scale:1.3;opacity:var(--confetti-opacity,1)}
+  28%{scale:1;opacity:calc(var(--confetti-opacity,1) * .5)}
+  42%{scale:1.3;opacity:var(--confetti-opacity,1)}
+  70%{scale:1;opacity:calc(var(--confetti-opacity,1) * .5)}
+}
+.kb-confetti--spark{filter:drop-shadow(0 0 10px rgba(249,172,204,.7));color:var(--kb-blush);
+  transform-box:fill-box;transform-origin:center;
+  opacity:var(--confetti-opacity,1);animation:kb-sparkle 3.6s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.kb-confetti--spark{animation:none}}
 
 /* ---------- Language toggle (bilingual content) ----------
    Every bilingual pair is two bare `<span data-lang="…">` text runs with no
@@ -145,6 +224,17 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
 .kb-project-card:hover .kb-project-card__glare-ring{opacity:.85}
 .kb-project-card__desc{display:none}
 
+/* ---------- Gallery section card hover ----------
+   Same pointer-tracked glare + border-glow as .kb-project-card__glare/-ring
+   above (see GallerySection.tsx), reused under its own class instead of
+   .kb-project-card itself - that class also carries Hero-specific layout
+   (flex sizing, max-width, the --card-rot transform) the gallery grid
+   doesn't want. */
+.kb-gallery-card__glare{position:absolute;inset:0;z-index:2;opacity:0;pointer-events:none;mix-blend-mode:overlay;transition:opacity 300ms ease-out;background:radial-gradient(circle at var(--pointer-x,50%) var(--pointer-y,50%),var(--kb-blush) 0%,transparent 75%)}
+.kb-gallery-card:hover .kb-gallery-card__glare{opacity:1}
+.kb-gallery-card__glare-ring{position:absolute;inset:0;z-index:3;padding:3px;border-radius:inherit;opacity:0;pointer-events:none;transition:opacity 120ms ease-out;background:radial-gradient(240px 240px at var(--pointer-x,50%) var(--pointer-y,50%),var(--kb-indigo) 0%,#6b2a9e 46%,var(--kb-magenta-deep) 80%,transparent 100%);filter:brightness(1.7);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.kb-gallery-card:hover .kb-gallery-card__glare-ring{opacity:.85}
+
 @media (max-width:700px){
   /* Below this width the overlapping-stack composition (deliberately
      narrower slots than cards, see the comment above) leaves each card too
@@ -226,18 +316,22 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
    query). Exactly one is ever visible; both are aria-hidden, since
    .kb-logo__sr-text below carries the actual accessible/SEO text. */
 .kb-logo-art{display:none}
-.kb-logo-art--desktop{width:clamp(320px,44vw,600px)}
+/* Sized 20% above the design system's own export dimensions (clamp(320px,
+   44vw,600px) / clamp(48px,15vw,120px) / clamp(24px,9vw,52px) originally),
+   a fixed static bump - not related to any of the scroll/entrance work
+   elsewhere on this page. */
+.kb-logo-art--desktop{width:clamp(384px,52.8vw,720px)}
 .kb-logo-art__svg{display:block;width:100%;height:auto}
 
 .kb-logo-art--mobile{flex-direction:column;align-items:center;gap:clamp(4px,1.2vh,12px)}
 .kb-logo-art__line{display:block;width:auto}
-.kb-logo-art__line--katarina,.kb-logo-art__line--blante{height:clamp(48px,15vw,120px)}
+.kb-logo-art__line--katarina,.kb-logo-art__line--blante{height:clamp(57.6px,18vw,144px)}
 /* "2 lines.svg" - the design system's own two-line export, not part of the
    asset set this was built from - runs its tagline smaller relative to
    each name line than the one-line lockup does (~60% of a line's height
    vs ~78% - see LogoArtTaglineEn.tsx). This reproduces that ratio by
    height rather than by the tagline's own (unrelated) vector proportions. */
-.kb-logo-art__line--tagline{height:clamp(24px,9vw,52px);margin-top:clamp(2px,0.8vh,6px)}
+.kb-logo-art__line--tagline{height:clamp(28.8px,10.8vw,62.4px);margin-top:clamp(2px,0.8vh,6px)}
 
 /* Real, always-present text for assistive tech and search engines - the
    vector art above is decorative (aria-hidden) and can't carry semantics
@@ -284,6 +378,28 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
 /* Project pages have no fixed top navbar any more (see .kb-sidebar below),
    so this only needs its own breathing room, not extra space to clear one. */
 .kb-content{position:relative;z-index:1;flex:1 1 auto;min-width:0;max-width:1200px;margin:0 auto;padding:clamp(32px,5vw,56px) clamp(24px,5vw,64px) clamp(72px,9vw,120px);animation:kb-rise-in 480ms cubic-bezier(.22,.61,.36,1)}
+
+/* No header image (Side Projects, hideHeaderImage:true) - without one,
+   this top padding plus .kb-project-body's own margin-top just left a gap
+   of bare aurora background above the panel instead of leading straight
+   into it. Squaring the panel's top corners too, since with no gap left
+   above it there's nothing for a rounded corner to visually separate from
+   any more. Applies at every width - the outer page-level gap is what
+   goes, not the panel itself, which stays solid all the way to the top
+   either way. */
+.kb-content.kb-content--no-header{padding-top:0}
+.kb-content--no-header .kb-project-body{margin-top:0;border-top-left-radius:0;border-top-right-radius:0}
+
+/* Under 960px the fixed hamburger toggle (.kb-sidebar-toggle) sits on top
+   of the content column - normally .kb-content's own mobile padding-top
+   (further down) keeps the title clear of it, but that's exactly what the
+   rule above just zeroed out for this case. Pushing the clearance onto the
+   panel's own top padding instead keeps it inside the solid background
+   (so the panel still visually reaches the very top, unlike page-level
+   padding, which would expose bare aurora above it again). */
+@media (max-width:959px){
+  .kb-content--no-header .kb-project-body{padding-top:clamp(88px,14vw,104px)}
+}
 
 /* ---------- Project page sidebar ----------
    Replaces the old fixed top navbar on project pages: back-to-home, the
@@ -449,7 +565,14 @@ html[data-active-lang="pt"] .kb-sidebar__lang .kb-lang-switch__knob{transform:tr
    that section's container-query canvas. */
 .kb-project-skills{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:20px}
 .kb-project-skills__label{font-family:var(--font-mono);font-size:14px;letter-spacing:.16em;text-transform:uppercase;color:var(--kb-lavender);opacity:.9;white-space:nowrap}
-.kb-project-skill{padding:8px 18px;border-radius:var(--radius-pill);font-family:var(--font-mono);font-size:15px;letter-spacing:.04em;white-space:nowrap}
+/* font-size is a vw-based clamp, not a flat 15px: a long label like
+   "Conversion Rate Optimization (CRO)" is wider than the whole skills row
+   on a narrow phone, and nowrap would let it overflow past the viewport
+   edge there - shrinking the type (same idea as the PT-specific reduction
+   on .kb-who__body p below) keeps every chip a single line at any width
+   instead. The clamp only bites under ~420px; at any width past that it
+   sits at the same 15px as before. */
+.kb-project-skill{padding:8px 18px;border-radius:var(--radius-pill);font-family:var(--font-mono);font-size:clamp(12px,3.6vw,15px);letter-spacing:.04em;white-space:nowrap}
 .kb-who-tag--magenta,.kb-project-skill--magenta{background:rgba(254,106,216,.18);border:1.5px solid rgba(254,106,216,.5);color:var(--kb-blush)}
 .kb-who-tag--violet,.kb-project-skill--violet{background:rgba(41,25,143,.55);border:1.5px solid rgba(183,140,245,.52);color:var(--kb-lavender)}
 .kb-who-tag--cyan,.kb-project-skill--cyan{background:rgba(72,247,250,.12);border:1.5px solid rgba(72,247,250,.45);color:var(--kb-cyan)}
@@ -501,7 +624,12 @@ html[data-active-lang="pt"] .kb-sidebar__lang .kb-lang-switch__knob{transform:tr
 
 .kb-lightbox{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:clamp(20px,6vw,72px);background:rgba(8,1,42,.9);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);cursor:zoom-out;animation:kb-fade var(--duration-base) var(--ease-soft)}
 .kb-lightbox__img{display:block;max-width:100%;max-height:100%;border-radius:12px;box-shadow:var(--shadow-lg);cursor:default}
-.kb-lightbox__close{position:fixed;top:24px;right:24px;z-index:1}
+/* top:16px, not the "usual" 24px corner offset elsewhere on the page -
+   matches .kb-sidebar-toggle's own fixed top:16px exactly (both are 44px,
+   .kb-icon-btn's default --control-height), so on a phone with an image
+   open full-screen the close (x) and the hamburger behind it sit on the
+   same line instead of one being a few pixels off from the other. */
+.kb-lightbox__close{position:fixed;top:16px;right:24px;z-index:1}
 .kb-lightbox__nav{position:fixed;top:50%;transform:translateY(-50%);z-index:1;cursor:pointer}
 .kb-lightbox__nav--prev{left:24px}
 .kb-lightbox__nav--next{right:24px}
@@ -586,8 +714,18 @@ html[data-active-lang="pt"] .kb-lang-switch button[data-lang-btn="pt"]{color:var
 .kb-who{position:relative;z-index:1;width:min(1140px,100%);aspect-ratio:1140/1340;container-type:size}
 .kb-who > *{position:absolute}
 
-/* --- Portrait: the one module that reads as a physical object. --- */
-.kb-who__photo{left:11%;top:4.6%;width:26%;margin:0;transform:rotate(-4.2deg);
+/* --- Portrait: the one module that reads as a physical object. ---
+   Same frame as before, unchanged, plus the Hero project cards' pointer-
+   tilt + holo glare (see .kb-project-card__tilt/-glare/-glare-ring and
+   usePhotoTilt in WhoSection.tsx) added on top of it: the tilt transform
+   and the glare overlays both live on .kb-who__photo itself rather than a
+   separate inner wrapper, so hovering only ever adds to the existing look
+   instead of changing how it renders at rest. */
+/* transform (base tilt, hover tilt, and the rotateInDownLeft entrance) is
+   fully owned by motion now - see usePhotoTilt/WhoSection.tsx - so it's
+   deliberately not set here and not in this transition list. */
+.kb-who__photo{position:relative;left:11%;top:4.6%;width:26%;margin:0;
+  transition:box-shadow 300ms ease-out;
   background:rgba(254,106,216,.16);border:2px solid rgba(254,106,216,.5);
   border-radius:30px;padding:10px 10px 0;
   box-shadow:0 18px 50px rgba(8,1,42,.5),0 0 60px rgba(254,106,216,.2)}
@@ -596,6 +734,16 @@ html[data-active-lang="pt"] .kb-lang-switch button[data-lang-btn="pt"]{color:var
   display:flex;align-items:flex-start;justify-content:center;padding-top:9%}
 .kb-who__slot span{font-family:var(--font-mono);font-size:1.85cqw;letter-spacing:.14em;
   color:rgba(255,255,255,.44);text-align:center;line-height:1.7}
+.kb-who__photo-glare{position:absolute;inset:0;z-index:2;opacity:0;pointer-events:none;
+  mix-blend-mode:overlay;transition:opacity 300ms ease-out;border-radius:inherit;
+  background:radial-gradient(circle at var(--pointer-x,50%) var(--pointer-y,50%),var(--kb-blush) 0%,transparent 75%)}
+.kb-who__photo:hover .kb-who__photo-glare{opacity:1}
+.kb-who__photo-glare-ring{position:absolute;inset:0;z-index:3;padding:3px;border-radius:inherit;
+  opacity:0;pointer-events:none;transition:opacity 120ms ease-out;
+  background:radial-gradient(240px 240px at var(--pointer-x,50%) var(--pointer-y,50%),var(--kb-indigo) 0%,#6b2a9e 46%,var(--kb-magenta-deep) 80%,transparent 100%);
+  filter:brightness(1.7);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude}
+.kb-who__photo:hover .kb-who__photo-glare-ring{opacity:.85}
 .kb-who__handle{font-family:var(--font-mono);font-size:1.45cqw;letter-spacing:.1em;
   color:var(--kb-blush);text-align:center;padding:3.6% 0 4.8%}
 
@@ -672,16 +820,21 @@ html[data-active-lang="pt"] .kb-lang-switch button[data-lang-btn="pt"]{color:var
 .kb-who__aside{left:13%;top:47.1%;width:67%;padding:0;z-index:5;text-align:left}
 .kb-who__aside p{margin:0;font-family:var(--font-hand);font-size:3.1cqw;line-height:1.35;
   color:var(--text-strong)}
-.kb-who__sel{position:relative;background:rgba(254,106,216,.45);
-  padding:.06em .05em;border-radius:2px;
+.kb-who__sel{position:relative;padding:.06em .05em;border-radius:2px;
   box-decoration-break:clone;-webkit-box-decoration-break:clone}
+/* The highlight bar itself, split from .kb-who__sel so it can sweep in via
+   scaleX (see VibeCodedHighlight in WhoSection.tsx) without touching the
+   text or the grips - same color/inset the bar always had, just animated
+   instead of a static background. */
+.kb-who__sel-marker{position:absolute;inset:0;background:rgba(254,106,216,.45);
+  border-radius:inherit;transform-origin:left center}
+.kb-who__sel-text{position:relative}
 .kb-who__grip{position:absolute;top:-.02em;bottom:-.02em;width:2.5px;
   background:var(--kb-magenta);border-radius:1px}
 .kb-who__grip::after{content:"";position:absolute;left:50%;width:.44em;height:.44em;
   border-radius:50%;background:var(--kb-magenta);transform:translateX(-50%)}
 .kb-who__grip--start{left:-1px}
 .kb-who__grip--start::after{bottom:100%}
-.kb-who__grip--end{right:-1px}
 .kb-who__grip--end::after{top:100%}
 
 /* --- Body copy: the longest run, so it gets the widest block. --- */
@@ -697,9 +850,12 @@ html[data-active-lang="pt"] .kb-lang-switch button[data-lang-btn="pt"]{color:var
 html[data-active-lang="pt"] .kb-who__body p{font-size:1.85cqw}
 
 /* --- Decor: loose confetti placed only in the gaps the modules leave.
-   Without it the negative space reads as a hole rather than as air. --- */
+   Without it the negative space reads as a hole rather than as air.
+   Each piece also carries .kb-confetti (see the shared Confetti rules
+   below) for the cursor-parallax drift - --confetti-depth here just sets
+   how far *this type* of piece travels. --- */
 .kb-who__decor{z-index:8;pointer-events:none}
-.kb-who__pip{border-radius:50%;background:var(--kb-lavender);opacity:.55}
+.kb-who__pip{border-radius:50%;background:var(--kb-lavender);opacity:.55;--confetti-depth:20px}
 .kb-who__pip--a{left:38.5%;top:2.5%;width:9px;height:9px}
 .kb-who__pip--b{left:97.5%;top:12%;width:11px;height:11px;background:var(--kb-blush);opacity:.5}
 .kb-who__pip--c{left:87%;top:19.5%;width:9px;height:9px;background:var(--kb-cyan);opacity:.5}
@@ -707,12 +863,20 @@ html[data-active-lang="pt"] .kb-who__body p{font-size:1.85cqw}
 .kb-who__pip--e{left:96%;top:58%;width:9px;height:9px;opacity:.5}
 .kb-who__pip--f{left:4%;top:2%;width:7px;height:7px;background:var(--kb-cyan);opacity:.5}
 .kb-who__pip--g{left:91%;top:94%;width:10px;height:10px;background:var(--kb-blush);opacity:.45}
-.kb-who__spark{filter:drop-shadow(0 0 10px rgba(249,172,204,.7))}
-.kb-who__spark--a{left:92%;top:36%;width:3.2%;height:auto;color:var(--kb-blush)}
-.kb-who__spark--b{left:88.5%;top:72%;width:2.6%;height:auto;opacity:.75;color:var(--kb-lavender)}
-.kb-who__spark--c{left:3%;top:62%;width:2.6%;height:auto;opacity:.6;color:var(--kb-cyan)}
-.kb-who__squiggle{left:87%;top:84%;width:9%;height:auto;opacity:.75}
-.kb-who__blob{left:88%;top:50%;width:6.2%;height:auto;aspect-ratio:5/4;z-index:7;
+/* Same kb-sparkle twinkle as .kb-confetti--spark above - resting brightness
+   goes through --confetti-opacity (not `opacity` directly) for the same
+   reason: the animation would otherwise flatten every one of these to
+   whatever fixed value the keyframe names, instead of a/b/c keeping their
+   own designed intensity. animation-delay is staggered per letter so the
+   three don't pulse in exact unison. */
+.kb-who__spark{filter:drop-shadow(0 0 10px rgba(249,172,204,.7));--confetti-depth:26px;
+  transform-box:fill-box;transform-origin:center;
+  opacity:var(--confetti-opacity,1);animation:kb-sparkle 3.6s ease-in-out infinite}
+.kb-who__spark--a{left:92%;top:36%;width:3.2%;height:auto;color:var(--kb-blush);animation-delay:0s}
+.kb-who__spark--b{left:88.5%;top:72%;width:2.6%;height:auto;--confetti-opacity:.75;color:var(--kb-lavender);animation-delay:1.2s}
+.kb-who__spark--c{left:3%;top:62%;width:2.6%;height:auto;--confetti-opacity:.6;color:var(--kb-cyan);animation-delay:2.4s}
+@media (prefers-reduced-motion:reduce){.kb-who__spark{animation:none}}
+.kb-who__blob{left:88%;top:50%;width:6.2%;height:auto;aspect-ratio:5/4;z-index:7;--confetti-depth:10px;
   border-radius:62% 38% 46% 54%/60% 44% 56% 40%;background:rgba(254,106,216,.5);
   box-shadow:0 0 26px rgba(254,106,216,.45)}
 
@@ -764,6 +928,27 @@ html[data-active-lang="pt"] .kb-who__body p{font-size:1.85cqw}
   .kb-who-tag{padding:7px 14px}
   .kb-who__actions{padding:20px;border-radius:30px;gap:12px}
   .kb-who-btn{font-size:var(--text-sm);height:var(--control-height);padding:0 var(--space-5)}
+}
+
+/* Full-bleed on phones, same trick .kb-project-body uses: cancel out
+   .kb-who-section's own side gutter with a matching negative margin so this
+   panel's solid background reaches the viewport edges instead of leaving
+   the gutter as bare background on both sides. Narrower cutoff than the
+   880px flow breakpoint above - .kb-who caps at max-width:540px, so past
+   roughly 590px wide the gutter math here no longer lines up with where
+   .kb-who itself actually sits. */
+@media (max-width:600px){
+  .kb-who__body{
+    /* The 880px breakpoint above pins this to width:100% of its flex
+       parent, so (unlike a block element, which auto-grows to fill
+       whatever negative margins free up) it needs its width computed
+       explicitly too - otherwise the negative margins just shift a
+       still-327px-wide box instead of widening it to match. */
+    width:calc(100% + 2 * clamp(24px,5vw,64px));
+    margin-left:calc(-1 * clamp(24px,5vw,64px));
+    margin-right:calc(-1 * clamp(24px,5vw,64px));
+    border-radius:0;
+  }
 }
 
 /* ---------- Hero card -> project header container transform ----------
