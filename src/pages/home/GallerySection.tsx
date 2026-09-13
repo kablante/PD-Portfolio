@@ -83,7 +83,7 @@ export default function GallerySection() {
   // heading drops in from above and fades in lockstep with scroll position,
   // reversing cleanly if the reader scrolls back up.
   const headingRef = useRef<HTMLDivElement>(null)
-  const { scrollYProgress: headingProgress } = useScroll({ target: headingRef, offset: SCROLL_RANGE })
+  const { scrollYProgress: headingProgress } = useScroll({ target: headingRef, offset: [...SCROLL_RANGE] })
   const headingY = useTransform(headingProgress, [0, 1], ['-100%', '0%'])
   const headingOpacity = useTransform(headingProgress, [0, 1], [0, 1])
 
