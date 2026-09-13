@@ -55,7 +55,7 @@ function usePhotoTilt() {
  * `{x:'100%', y:'100%'}`); the visible state is always the element's own
  * natural position, untouched. */
 function useScrollEntrance(ref: RefObject<HTMLElement | null>, from: { x: string; y: string }) {
-  const { scrollYProgress } = useScroll({ target: ref, offset: SCROLL_RANGE })
+  const { scrollYProgress } = useScroll({ target: ref, offset: [...SCROLL_RANGE] })
   const x = useTransform(scrollYProgress, [0, 1], [from.x, '0%'])
   const y = useTransform(scrollYProgress, [0, 1], [from.y, '0%'])
   const opacity = useTransform(scrollYProgress, [0, 1], [0, 1])
@@ -74,7 +74,7 @@ function useScrollEntrance(ref: RefObject<HTMLElement | null>, from: { x: string
  * already-placed handles. */
 function VibeCodedHighlight({ children }: { children: ReactNode }) {
   const ref = useRef<HTMLSpanElement>(null)
-  const { scrollYProgress } = useScroll({ target: ref, offset: SCROLL_RANGE })
+  const { scrollYProgress } = useScroll({ target: ref, offset: [...SCROLL_RANGE] })
   const scaleX = useTransform(scrollYProgress, [0, 1], [0, 1])
   const gripStartOpacity = useTransform(scrollYProgress, [0, 0.2], [0, 1])
   const gripEndLeft = useTransform(scrollYProgress, [0, 1], ['0%', '100%'])
@@ -131,7 +131,7 @@ export default function WhoSection() {
   const { rotateX, rotateY, onMove, onLeave } = usePhotoTilt()
 
   const photoRef = useRef<HTMLElement>(null)
-  const { scrollYProgress: photoProgress } = useScroll({ target: photoRef, offset: SCROLL_RANGE })
+  const { scrollYProgress: photoProgress } = useScroll({ target: photoRef, offset: [...SCROLL_RANGE] })
   const photoRotate = useTransform(photoProgress, [0, 1], [PHOTO_ENTRANCE_ROTATE, PHOTO_REST_ROTATE])
   const photoOpacity = useTransform(photoProgress, [0, 1], [0, 1])
 

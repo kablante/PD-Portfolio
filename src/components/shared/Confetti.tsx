@@ -70,13 +70,15 @@ export default function Confetti({ items, className }: { items: ConfettiItem[]; 
             <Sparkle
               key={i}
               className="kb-confetti kb-confetti--spark"
-              style={{
-                ...rest,
-                width: item.size,
-                color: item.color,
-                '--confetti-opacity': opacity ?? 1,
-                animationDelay: `${(sparkIndex++ * 0.9).toFixed(1)}s`,
-              }}
+              style={
+                {
+                  ...rest,
+                  width: item.size,
+                  color: item.color,
+                  '--confetti-opacity': opacity ?? 1,
+                  animationDelay: `${(sparkIndex++ * 0.9).toFixed(1)}s`,
+                } as CSSProperties
+              }
             />
           )
         }
