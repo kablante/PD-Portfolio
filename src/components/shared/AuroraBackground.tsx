@@ -1,4 +1,3 @@
-import { useRef } from 'react'
 import { useAuroraParallax, useSiteGrain } from '@/pages/home/useHomeEffects'
 
 /** Site-wide fixed background - previously a drifting gradient mesh + star
@@ -14,12 +13,11 @@ import { useAuroraParallax, useSiteGrain } from '@/pages/home/useHomeEffects'
  * legibility, keeping only the static texture baked into .kb-aurora__grain
  * below (part of the fixed background itself, unaffected by this prop). */
 export default function AuroraBackground({ grainOverlay = true }: { grainOverlay?: boolean } = {}) {
-  const bgRef = useRef<HTMLDivElement>(null)
-  useAuroraParallax(bgRef)
+  useAuroraParallax()
   useSiteGrain(grainOverlay)
 
   return (
-    <div className="kb-bg" aria-hidden="true" ref={bgRef}>
+    <div className="kb-bg" aria-hidden="true">
       <div className="kb-aurora">
         <span className="kb-aurora__orb kb-aurora__orb--1" />
         <span className="kb-aurora__orb kb-aurora__orb--2" />

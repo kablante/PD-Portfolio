@@ -1,5 +1,5 @@
-import { Navigate, useParams } from 'react-router-dom'
-import { useLayoutEffect, useRef, useState } from 'react'
+import { Navigate, useLocation, useParams } from 'react-router-dom'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import AuroraBackground from '@/components/shared/AuroraBackground'
 import '@/styles/kb-tokens.css'
 import '@/styles/kb-components.css'
@@ -91,11 +91,24 @@ function FittedProjectTitle({ name, subtitle }: { name: string; subtitle: string
 
 export default function ProjectPage() {
   const { slug } = useParams()
+  const location = useLocation()
   const project = homeProjects.find((p) => p.slug === slug)
   const { lang, setLang } = useLang()
   const articleRef = useRef<HTMLElement>(null)
 
   useCursorSpotlight()
+
+  // React Router doesn't reset scroll on navigation (see ProjectSidebar's
+  // goHome) - landing on a project page should default to its very top,
+  // except when the link points at one of its own sections (Side Projects'
+  // gallery cards on Home, e.g. #fortal-city) where the hash should win.
+  useEffect(() => {
+    if (location.hash) {
+      document.getElementById(location.hash.slice(1))?.scrollIntoView({ behavior: 'auto', block: 'start' })
+    } else {
+      window.scrollTo({ top: 0, left: 0 })
+    }
+  }, [location.pathname, location.hash])
 
   if (!project) return <Navigate to="/" replace />
 

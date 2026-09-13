@@ -1,5 +1,20 @@
 import { type RefObject, useEffect, useState } from 'react'
 
+// The scroll window every scroll-scrubbed entrance on the Home page (Who
+// section's photo/clock/rail/actions/body/highlight, the Gallery heading)
+// maps to progress 0->1: 0 when the element's top edge is still 85% of the
+// way down the viewport (just barely below the fold), 1 once it's scrolled
+// up to 60% from the top - same shape as useLogoMorph's hero/name
+// crossfade below, just expressed as a per-element scroll range (via
+// motion's useScroll) instead of one global scrollY/homeMain-height ratio,
+// since these modules don't all share a single fixed-height scroll track.
+// Being tied directly to scroll position (not a duration/spring) means
+// scrolling back up reverses these exactly, and scrolling past either end
+// just clamps - there's nothing to "replay", it's live the whole time.
+// One shared constant (rather than one per element/section) is what keeps
+// all of them moving at the same speed.
+export const SCROLL_RANGE = ['start 0.85', 'start 0.6'] as const
+
 const LANG_STORAGE_KEY = 'kb-lang'
 
 export type Lang = 'en' | 'pt'
@@ -465,25 +480,28 @@ export function useSiteGrain(enabled = true) {
   }, [enabled])
 }
 
-/** Mouse-driven depth parallax on the fixed aurora background: sets
- * --kb-px/--kb-py (-0.5..0.5) which kb-site.css's mesh/star layers read via
- * `translate`. Skipped on touch and reduced-motion. */
-export function useAuroraParallax(bgRef: RefObject<HTMLDivElement | null>) {
+/** Mouse-driven depth parallax, site-wide: sets --kb-px/--kb-py (-0.5..0.5)
+ * on the root element, so any descendant can read them via inherited CSS
+ * custom properties - the fixed aurora background's mesh/star layers
+ * (`.kb-aurora__orb`, set on .kb-bg before this lived on root) and every
+ * page's own decorative confetti (`.kb-confetti`, see Confetti.tsx) alike.
+ * One shared listener for the whole page instead of one per consumer.
+ * Skipped on touch and reduced-motion. */
+export function useAuroraParallax() {
   useEffect(() => {
-    const bg = bgRef.current
-    if (!bg) return
     if (window.matchMedia?.('(pointer: coarse)').matches) return
     if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
 
+    const root = document.documentElement
     function onMove(e: MouseEvent) {
       const px = e.clientX / window.innerWidth - 0.5
       const py = e.clientY / window.innerHeight - 0.5
-      bg!.style.setProperty('--kb-px', px.toFixed(3))
-      bg!.style.setProperty('--kb-py', py.toFixed(3))
+      root.style.setProperty('--kb-px', px.toFixed(3))
+      root.style.setProperty('--kb-py', py.toFixed(3))
     }
     window.addEventListener('mousemove', onMove)
     return () => window.removeEventListener('mousemove', onMove)
-  }, [bgRef])
+  }, [])
 }
 
 /** Scroll-scrubbed handoff from the hero wordmark to the Who section's

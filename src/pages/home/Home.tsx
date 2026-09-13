@@ -2,6 +2,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useRef } from 'react'
 import { Link } from 'react-router-dom'
 import AuroraBackground from '@/components/shared/AuroraBackground'
+import Confetti, { type ConfettiItem } from '@/components/shared/Confetti'
 import '@/styles/kb-tokens.css'
 import '@/styles/kb-components.css'
 import '@/styles/kb-site.css'
@@ -16,6 +17,17 @@ import {
   useLang,
   useLogoMorph,
 } from './useHomeEffects'
+
+/** Same confetti as the Who section (see Confetti.tsx), placed in the
+ * corners the card carousel and wordmark leave empty. */
+const HERO_CONFETTI: ConfettiItem[] = [
+  { type: 'pip', left: '6%', top: '10%', size: 9, color: 'var(--kb-lavender)', opacity: 0.55 },
+  { type: 'pip', left: '93%', top: '16%', size: 11, color: 'var(--kb-blush)', opacity: 0.5 },
+  { type: 'pip', left: '5%', top: '86%', size: 8, color: 'var(--kb-cyan)', opacity: 0.5 },
+  { type: 'pip', left: '92%', top: '88%', size: 10, color: 'var(--kb-magenta)', opacity: 0.42 },
+  { type: 'spark', left: '4%', top: '46%', size: '2.4vw', color: 'var(--kb-blush)' },
+  { type: 'spark', left: '95%', top: '58%', size: '2vw', color: 'var(--kb-cyan)', opacity: 0.75 },
+]
 
 export default function Home() {
   const rowRef = useRef<HTMLDivElement>(null)
@@ -60,6 +72,7 @@ export default function Home() {
       <AuroraBackground />
 
       <div className="kb-home-main">
+        <Confetti items={HERO_CONFETTI} />
         <div className="kb-home-cards">
           <button
             type="button"

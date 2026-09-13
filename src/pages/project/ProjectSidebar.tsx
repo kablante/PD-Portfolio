@@ -1,6 +1,7 @@
-import { BookOpen, Download, Home, LayoutGrid, Menu, X } from 'lucide-react'
+import { BookOpen, Download, Home, LayoutGrid } from 'lucide-react'
 import { type RefObject, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { MenuToggle } from '@/components/ui/menu-toggle'
 import { asset } from '@/lib/asset'
 import { homeProjects, type HomeProject } from '../home/projects'
 import type { Lang } from '../home/useHomeEffects'
@@ -93,14 +94,15 @@ interface ProjectSidebarProps {
 
 /** Replaces the old fixed top navbar on project pages: back-to-home, the
  * language switch, an auto-generated "on this page" outline (every
- * h1/h2/h3 the current case study renders), links to every other project,
- * and the same LinkedIn/résumé actions as the Home page's Who section.
- * Collapses into a slide-in drawer under 960px - see .kb-sidebar in
- * kb-site.css. */
+ * h1/h2/h3 the current case study renders), a "Projects" list of every
+ * project - same order as the Hero section's own cards (homeProjects
+ * itself), current one marked `is-active` the same way "This project"
+ * marks whichever section is scrolled to - and the same LinkedIn/résumé
+ * actions as the Home page's Who section. Collapses into a slide-in drawer
+ * under 960px - see .kb-sidebar in kb-site.css. */
 export default function ProjectSidebar({ project, lang, setLang, contentRef }: ProjectSidebarProps) {
   const [open, setOpen] = useState(false)
   const { sections, activeId } = useSectionNav(contentRef, lang, project.slug)
-  const otherProjects = homeProjects.filter((p) => p.slug !== project.slug)
 
   useEffect(() => {
     setOpen(false)
@@ -122,15 +124,14 @@ export default function ProjectSidebar({ project, lang, setLang, contentRef }: P
 
   return (
     <>
-      <button
-        type="button"
-        className="kb-sidebar-toggle"
-        aria-label={lang === 'pt' ? 'Abrir menu' : 'Open menu'}
-        aria-expanded={open}
-        onClick={() => setOpen((o) => !o)}
-      >
-        {open ? <X size={20} aria-hidden="true" /> : <Menu size={20} aria-hidden="true" />}
-      </button>
+      <div className="kb-sidebar-toggle">
+        <MenuToggle
+          open={open}
+          onOpenChange={setOpen}
+          label={lang === 'pt' ? 'Abrir menu' : 'Open menu'}
+          className="size-5"
+        />
+      </div>
 
       {open && <div className="kb-sidebar-backdrop" onClick={() => setOpen(false)} aria-hidden="true" />}
 
@@ -167,18 +168,24 @@ export default function ProjectSidebar({ project, lang, setLang, contentRef }: P
           </nav>
         )}
 
-        <nav className="kb-sidebar__section" aria-label={lang === 'pt' ? 'Outros projetos' : 'Other projects'}>
+        <nav className="kb-sidebar__section" aria-label={lang === 'pt' ? 'Projetos' : 'Projects'}>
           <span className="kb-sidebar__section-header">
             <LayoutGrid size={16} aria-hidden="true" />
-            <span data-lang="en">Other projects</span>
-            <span data-lang="pt">Outros projetos</span>
+            <span data-lang="en">Projects</span>
+            <span data-lang="pt">Projetos</span>
           </span>
           <ul className="kb-sidebar__section-body">
-            {otherProjects.map((p) => {
+            {homeProjects.map((p) => {
               const t = lang === 'pt' && p.titlePt ? p.titlePt : p.title
+              const isActive = p.slug === project.slug
               return (
                 <li key={p.slug}>
-                  <Link to={`/projects/${p.slug}`} onClick={() => setOpen(false)}>
+                  <Link
+                    to={`/projects/${p.slug}`}
+                    className={isActive ? 'is-active' : undefined}
+                    aria-current={isActive ? 'page' : undefined}
+                    onClick={() => setOpen(false)}
+                  >
                     {t}
                   </Link>
                 </li>
@@ -211,7 +218,8 @@ export default function ProjectSidebar({ project, lang, setLang, contentRef }: P
           <a
             className="kb-sidebar-btn kb-sidebar-btn--ghost"
             href={asset('/assets/Katarina-Blante_Resume.pdf')}
-            download="Katarina-Blante_Resume.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
           >
             <Download size={16} aria-hidden="true" />
             <span data-lang="en">Download Resume</span>
