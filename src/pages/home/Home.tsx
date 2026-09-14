@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useRef } from 'react'
 import { Link } from 'react-router-dom'
 import AuroraBackground from '@/components/shared/AuroraBackground'
@@ -106,6 +106,12 @@ export default function Home() {
                   <span className="kb-project-card__scrim" aria-hidden="true" />
                   <span className="kb-project-card__glare" aria-hidden="true" />
                   <span className="kb-project-card__glare-ring" aria-hidden="true" />
+                  {project.comingSoon && (
+                    <span className="kb-badge kb-badge--warning kb-card-badge">
+                      <span data-lang="en">Coming soon</span>
+                      <span data-lang="pt">Em breve</span>
+                    </span>
+                  )}
                   <p className="kb-project-card__desc">
                     <span data-lang="en">{project.descEn}</span>
                     <span data-lang="pt">{project.descPt}</span>
@@ -127,6 +133,8 @@ export default function Home() {
         <div className="kb-hero-lockup">
           <LogoWordmark />
         </div>
+
+        <ChevronDown className="kb-hero-scrollcue" aria-hidden="true" />
       </div>
       <div className="kb-who-section">
         <WhoSection />

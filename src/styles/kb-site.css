@@ -3,16 +3,30 @@
 html,body{height:100%}
 body{overflow-x:hidden}
 
-.kb-page{position:relative;min-height:100vh;font-family:var(--font-body);color:var(--text-body)}
+/* svh (smallest viewport height - the size WITH the mobile browser's
+   address bar showing), not dvh: dvh tracks the address bar live as it
+   hides/shows mid-scroll, which shifts these elements' layout height by
+   that exact amount independent of the reader's own scroll input. Every
+   scroll-linked effect on Home (useLogoMorph's crossfade here, and every
+   scroll-scrubbed entrance in WhoSection/GallerySection via motion's own
+   useScroll, which measures element position relative to the viewport)
+   reads that shift as bogus scroll movement, so the animation visibly
+   jumps/reverses with the page never having actually scrolled - confirmed
+   by forcing .kb-home-main taller with scrollY held fixed and watching
+   useLogoMorph's opacity move on its own. svh is pinned to the
+   address-bar-visible size and never changes mid-scroll, so it fixes the
+   same "effects fire at the wrong time" mobile complaint dvh was chosen
+   for, without the instability dvh itself turned out to cause. */
+.kb-page{position:relative;min-height:100vh;min-height:100svh;font-family:var(--font-body);color:var(--text-body)}
 
 /* Home's first viewport keeps its old exact-height composition; the page
    itself is free to grow past 100vh (.kb-who-section below is what it grows
    into) so the page scrolls instead of being clipped. */
-.kb-page--home{min-height:100vh}
+.kb-page--home{min-height:100vh;min-height:100svh}
 
 /* Second section: the bento profile grid (see WhoSection.tsx), centered
    over the fixed background. Used to be an empty scroll spacer. */
-.kb-who-section{position:relative;z-index:1;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:clamp(24px,5vw,64px)}
+.kb-who-section{position:relative;z-index:1;min-height:100vh;min-height:100svh;display:flex;align-items:center;justify-content:center;padding:clamp(24px,5vw,64px)}
 
 /* Third section: a plain grid of every project's own cover shot (see
    GallerySection.tsx) - no scroll-driven scatter, just a responsive grid
@@ -27,7 +41,7 @@ body{overflow-x:hidden}
    section. Sized in vw off the same ~1140px reference .kb-who uses, capped
    so "portfolio" renders a bit narrower than .kb-who__body's own max width
    (74% of 1140px = ~844px) rather than matching or exceeding it. */
-.kb-gallery-heading{width:fit-content;margin:0 auto clamp(28px,5vw,56px);
+.kb-gallery-heading{width:fit-content;margin:0 auto clamp(56px,10vw,112px);
   display:flex;flex-direction:column;align-items:flex-start}
 .kb-gallery-heading__eyebrow{font-family:var(--font-hand);color:var(--kb-cyan);
   font-size:clamp(14px,4.4vw,50px);line-height:1.2;margin-bottom:-0.85em}
@@ -37,6 +51,19 @@ body{overflow-x:hidden}
 .kb-gallery-card{position:relative;display:block;overflow:hidden;border-radius:20px;aspect-ratio:16/9}
 .kb-gallery-card__img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 400ms ease}
 .kb-gallery-card:hover .kb-gallery-card__img{transform:scale(1.05)}
+/* Dark gradient scrim + project title, revealed on hover/focus - same
+   affordance as the Hero project cards' own title reveal, so the gallery
+   grid reads as "these are the same projects" rather than a plain photo
+   wall. */
+.kb-gallery-card__scrim{position:absolute;inset:0;z-index:4;display:flex;align-items:flex-end;padding:clamp(14px,3vw,24px);background:linear-gradient(180deg,rgba(8,1,42,0) 45%,rgba(8,1,42,.88) 100%);opacity:0;transition:opacity 300ms ease;pointer-events:none}
+.kb-gallery-card:hover .kb-gallery-card__scrim,.kb-gallery-card:focus-visible .kb-gallery-card__scrim{opacity:1}
+/* Mobile/tablet (any device that can't hover - touch, not a width
+   breakpoint, since a touch tablet can be wide and a mouse+trackpad laptop
+   can be narrow) never gets a hover frame to read the title in before a tap
+   activates the link, so the scrim/title stay on permanently there instead
+   of depending on :hover/:focus-visible. */
+@media (hover:none){.kb-gallery-card__scrim{opacity:1}}
+.kb-gallery-card__title{font-family:var(--font-display);font-weight:400;color:var(--kb-white);font-size:clamp(15px,2.2vw,22px);line-height:1.15}
 
 @media (max-width:560px){
   .kb-gallery-grid{grid-template-columns:1fr}
@@ -61,13 +88,8 @@ body{overflow-x:hidden}
 /* Glow orbs, ported from the KPop Carrd Figma bento layout's background
    (5 blurred pulsing radial blobs over a solid void) and recolored onto
    the site's own accent tokens - keeps --kb-void as the base tone, per
-   the brief, instead of adopting the file's own near-black. Depth
-   parallax: each orb drifts opposite the pointer via the standalone
-   `translate` property, reading the same root-level --kb-px/--kb-py
-   useAuroraParallax sets for every page's confetti too (see .kb-confetti
-   below), so it composes with the orb's own bloom-pulse `transform`
-   animation instead of fighting it. */
-.kb-aurora__orb{position:absolute;border-radius:50%;pointer-events:none;animation:kb-orb-drift 4s ease-in-out infinite;translate:calc(var(--kb-px,0) * -14px) calc(var(--kb-py,0) * -14px);transition:translate 400ms ease-out}
+   the brief, instead of adopting the file's own near-black. */
+.kb-aurora__orb{position:absolute;border-radius:50%;pointer-events:none;animation:kb-orb-drift 4s ease-in-out infinite}
 .kb-aurora__orb--1{left:5%;top:-5%;width:560px;height:560px;background:radial-gradient(circle,var(--kb-magenta),transparent 70%);filter:blur(90px);opacity:.85;animation-duration:4s}
 .kb-aurora__orb--2{left:50%;top:10%;width:650px;height:650px;background:radial-gradient(circle,var(--kb-lavender),transparent 70%);filter:blur(110px);opacity:.75;animation-duration:4.7s;animation-delay:.4s}
 .kb-aurora__orb--3{left:75%;top:55%;width:420px;height:420px;background:radial-gradient(circle,var(--kb-cyan),transparent 70%);filter:blur(80px);opacity:.65;animation-duration:5.4s;animation-delay:.8s}
@@ -86,13 +108,9 @@ body{overflow-x:hidden}
    Confetti.tsx (used by the Hero and Gallery sections) renders its own
    .kb-confetti--pip/-spark/-blob with the same look, inside an inset:0
    .kb-confetti-layer so each item's left/top percentages land relative to
-   the section, not to Confetti's own (otherwise auto-sized) wrapper.
-   Every piece reads the root-level --kb-px/--kb-py useAuroraParallax sets,
-   same as the aurora background's orbs, each at its own --confetti-depth
-   (px of travel at the pointer's full range, defaulted per type in
-   Confetti.tsx / set alongside .kb-who__pip etc. above). The caller's own
-   element needs `position:relative` for the layer's inset:0 to track it. */
-.kb-confetti{translate:calc(var(--kb-px,0) * var(--confetti-depth,16px)) calc(var(--kb-py,0) * var(--confetti-depth,16px));transition:translate 400ms ease-out}
+   the section, not to Confetti's own (otherwise auto-sized) wrapper. The
+   caller's own element needs `position:relative` for the layer's inset:0
+   to track it. */
 .kb-confetti-layer{position:absolute;inset:0;z-index:8;pointer-events:none}
 .kb-confetti-layer > *{position:absolute}
 .kb-confetti--pip{border-radius:50%;background:var(--kb-lavender);opacity:.55}
@@ -140,7 +158,19 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
    future exit transition on this same element from ever starting. The
    100% keyframe already matches the element's own resting style, so
    dropping the fill causes no visible jump once it finishes. */
-.kb-home-main{position:relative;height:calc(100vh - 64px);display:flex;flex-direction:column;overflow:hidden;animation:kb-rise-in 480ms cubic-bezier(.22,.61,.36,1)}
+.kb-home-main{position:relative;height:calc(100vh - 64px);height:calc(100svh - 64px);display:flex;flex-direction:column;animation:kb-rise-in 480ms cubic-bezier(.22,.61,.36,1)}
+
+/* Scroll-down cue - the first screen is otherwise just name + tagline +
+   cards with no hint that the page continues, so nothing signals there's a
+   Who section (and everything past it) below the fold. Purely a visual
+   hint, not a control: a bare, non-interactive arrow (no button, no click
+   handler, no label) sitting right at the section's own bottom edge - the
+   reader's own scroll is still what moves the page. The bounce is
+   decorative, so it's turned off under prefers-reduced-motion rather than
+   offering a reduced variant. */
+.kb-hero-scrollcue{position:absolute;left:50%;bottom:clamp(8px,1.5vh,16px);transform:translateX(-50%);z-index:2;width:26px;height:26px;color:var(--kb-white-64);animation:kb-scrollcue-bounce 1.6s ease-in-out infinite;pointer-events:none}
+@keyframes kb-scrollcue-bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+@media (prefers-reduced-motion:reduce){.kb-hero-scrollcue svg{animation:none}}
 
 /* Cards bleed above the viewport on purpose (cropped by .kb-page--home's
    own clip, not by a tight box here) — the negative margin pulls them up,
@@ -223,6 +253,27 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
 .kb-project-card__glare-ring{position:absolute;inset:0;z-index:3;padding:3px;border-radius:inherit;opacity:0;pointer-events:none;transition:opacity 120ms ease-out;background:radial-gradient(240px 240px at var(--pointer-x,50%) var(--pointer-y,50%),var(--kb-indigo) 0%,#6b2a9e 46%,var(--kb-magenta-deep) 80%,transparent 100%);filter:brightness(1.7);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
 .kb-project-card:hover .kb-project-card__glare-ring{opacity:.85}
 .kb-project-card__desc{display:none}
+
+/* "Coming soon" badge for cards whose case study is still pending client
+   disclosure/NDA clearance (see comingSoon in projects.ts) - reuses the
+   design system's own .kb-badge component (kb-components.css) instead of a
+   one-off pill, so it reads as part of the same visual language rather
+   than a bolted-on sticker. Sits above the pointer-tracked glare/ring (z-
+   index 3) so it stays legible on hover. */
+.kb-badge.kb-card-badge{position:absolute;top:12px;right:12px;z-index:4;pointer-events:none;
+  /* .kb-badge--warning's own translucent tint (14% opacity) was designed to
+     sit on the page's own dark background - over an arbitrary, often light
+     photo it reads as barely-there text with no contrast. A near-opaque
+     backing (rather than a light blur) guarantees the purple-on-void
+     contrast the badge relies on, regardless of what's under it. */
+  background:rgba(13,3,66,.88);border:0;font-weight:var(--weight-semibold);color:var(--kb-lavender);
+  backdrop-filter:blur(var(--blur-glass));-webkit-backdrop-filter:blur(var(--blur-glass));box-shadow:0 2px 10px rgba(8,1,42,.45)}
+/* Hero cards deliberately bleed above the viewport (see .kb-home-cards'
+   negative margin-top) - a top-anchored badge would sit off-screen above
+   the fold. .kb-project-card__tilt is flex/justify-content:flex-end, so
+   the bottom edge is the one guaranteed to stay in view; anchor there
+   instead, opposite corner from the project logo mark. */
+.kb-project-card__tilt .kb-badge.kb-card-badge{top:auto;bottom:12px}
 
 /* ---------- Gallery section card hover ----------
    Same pointer-tracked glare + border-glow as .kb-project-card__glare/-ring
@@ -362,7 +413,7 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
 .kb-page.kb-leaving-home .kb-content{transition:transform 640ms var(--ease-in-out),opacity 640ms var(--ease-in-out);transform:translateY(10vh);opacity:0}
 .kb-page.kb-leaving-home .kb-aurora__mesh{transition:transform 720ms var(--ease-in-out);transform:translate3d(0,6%,0) scale(.94)}
 .kb-page.kb-leaving-home .kb-aurora__stars{transition:transform 720ms var(--ease-in-out),opacity 720ms var(--ease-in-out);transform:translate3d(0,3%,0);opacity:.25}
-.kb-page.kb-leaving-home .kb-footerbar--top{transition:transform 640ms var(--ease-in-out) 60ms;transform:translateY(calc(100vh - 64px))}
+.kb-page.kb-leaving-home .kb-footerbar--top{transition:transform 640ms var(--ease-in-out) 60ms;transform:translateY(calc(100vh - 64px));transform:translateY(calc(100svh - 64px))}
 @media (prefers-reduced-motion:reduce){
   .kb-page.kb-leaving-home .kb-content,
   .kb-page.kb-leaving-home .kb-aurora__mesh,
@@ -409,7 +460,7 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
    on desktop; collapses into a slide-in drawer under 960px. */
 .kb-project-layout{display:flex;align-items:flex-start}
 
-.kb-sidebar{position:sticky;top:0;z-index:5;flex:none;width:272px;height:100vh;overflow-y:auto;display:flex;flex-direction:column;gap:28px;padding:32px 24px;background:rgba(26,12,92,.275);backdrop-filter:blur(var(--blur-glass));-webkit-backdrop-filter:blur(var(--blur-glass));border-right:1px solid var(--border-soft)}
+.kb-sidebar{position:sticky;top:0;z-index:5;flex:none;width:360px;height:100vh;height:100svh;overflow-y:auto;display:flex;flex-direction:column;gap:24px;padding:32px 24px;background:rgba(26,12,92,.275);backdrop-filter:blur(var(--blur-glass));-webkit-backdrop-filter:blur(var(--blur-glass));border-right:1px solid var(--border-soft)}
 
 /* Sits at the bottom, right above the .kb-sidebar__actions divider - full
    width, matching the LinkedIn/résumé buttons below it, instead of the
@@ -717,15 +768,21 @@ html[data-active-lang="pt"] .kb-lang-switch button[data-lang-btn="pt"]{color:var
 /* --- Portrait: the one module that reads as a physical object. ---
    Same frame as before, unchanged, plus the Hero project cards' pointer-
    tilt + holo glare (see .kb-project-card__tilt/-glare/-glare-ring and
-   usePhotoTilt in WhoSection.tsx) added on top of it: the tilt transform
-   and the glare overlays both live on .kb-who__photo itself rather than a
-   separate inner wrapper, so hovering only ever adds to the existing look
-   instead of changing how it renders at rest. */
-/* transform (base tilt, hover tilt, and the rotateInDownLeft entrance) is
-   fully owned by motion now - see usePhotoTilt/WhoSection.tsx - so it's
-   deliberately not set here and not in this transition list. */
-.kb-who__photo{position:relative;left:11%;top:4.6%;width:26%;margin:0;
-  transition:box-shadow 300ms ease-out;
+   usePhotoTilt in WhoSection.tsx) added on top of it. The tilt transform
+   and glare overlays live on .kb-who__photo-tilt, a separate inner wrapper
+   - not on .kb-who__photo itself - for the same reason the Hero cards keep
+   .kb-project-card (stable, measured) apart from .kb-project-card__tilt
+   (the one that rotates): measuring the mouse position off an element
+   that's itself being 3D-tilted feeds back into its own bounding rect and
+   snaps near the edges. .kb-who__photo only ever carries the scroll-driven
+   entrance rotate, so its rect stays a stable reference for that
+   measurement; visually the split is invisible; hovering still only adds
+   to the existing look. */
+/* transform (the rotateInDownLeft entrance) is fully owned by motion now -
+   see WhoSection.tsx - so it's deliberately not set here and not in this
+   transition list. */
+.kb-who__photo{position:relative;left:11%;top:4.6%;width:26%;margin:0}
+.kb-who__photo-tilt{position:relative;transition:box-shadow 300ms ease-out;
   background:rgba(254,106,216,.16);border:2px solid rgba(254,106,216,.5);
   border-radius:30px;padding:10px 10px 0;
   box-shadow:0 18px 50px rgba(8,1,42,.5),0 0 60px rgba(254,106,216,.2)}
@@ -850,12 +907,9 @@ html[data-active-lang="pt"] .kb-lang-switch button[data-lang-btn="pt"]{color:var
 html[data-active-lang="pt"] .kb-who__body p{font-size:1.85cqw}
 
 /* --- Decor: loose confetti placed only in the gaps the modules leave.
-   Without it the negative space reads as a hole rather than as air.
-   Each piece also carries .kb-confetti (see the shared Confetti rules
-   below) for the cursor-parallax drift - --confetti-depth here just sets
-   how far *this type* of piece travels. --- */
+   Without it the negative space reads as a hole rather than as air. --- */
 .kb-who__decor{z-index:8;pointer-events:none}
-.kb-who__pip{border-radius:50%;background:var(--kb-lavender);opacity:.55;--confetti-depth:20px}
+.kb-who__pip{border-radius:50%;background:var(--kb-lavender);opacity:.55}
 .kb-who__pip--a{left:38.5%;top:2.5%;width:9px;height:9px}
 .kb-who__pip--b{left:97.5%;top:12%;width:11px;height:11px;background:var(--kb-blush);opacity:.5}
 .kb-who__pip--c{left:87%;top:19.5%;width:9px;height:9px;background:var(--kb-cyan);opacity:.5}
@@ -869,14 +923,14 @@ html[data-active-lang="pt"] .kb-who__body p{font-size:1.85cqw}
    whatever fixed value the keyframe names, instead of a/b/c keeping their
    own designed intensity. animation-delay is staggered per letter so the
    three don't pulse in exact unison. */
-.kb-who__spark{filter:drop-shadow(0 0 10px rgba(249,172,204,.7));--confetti-depth:26px;
+.kb-who__spark{filter:drop-shadow(0 0 10px rgba(249,172,204,.7));
   transform-box:fill-box;transform-origin:center;
   opacity:var(--confetti-opacity,1);animation:kb-sparkle 3.6s ease-in-out infinite}
 .kb-who__spark--a{left:92%;top:36%;width:3.2%;height:auto;color:var(--kb-blush);animation-delay:0s}
 .kb-who__spark--b{left:88.5%;top:72%;width:2.6%;height:auto;--confetti-opacity:.75;color:var(--kb-lavender);animation-delay:1.2s}
 .kb-who__spark--c{left:3%;top:62%;width:2.6%;height:auto;--confetti-opacity:.6;color:var(--kb-cyan);animation-delay:2.4s}
 @media (prefers-reduced-motion:reduce){.kb-who__spark{animation:none}}
-.kb-who__blob{left:88%;top:50%;width:6.2%;height:auto;aspect-ratio:5/4;z-index:7;--confetti-depth:10px;
+.kb-who__blob{left:88%;top:50%;width:6.2%;height:auto;aspect-ratio:5/4;z-index:7;
   border-radius:62% 38% 46% 54%/60% 44% 56% 40%;background:rgba(254,106,216,.5);
   box-shadow:0 0 26px rgba(254,106,216,.45)}
 

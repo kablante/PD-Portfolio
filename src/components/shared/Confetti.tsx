@@ -7,9 +7,6 @@ interface ConfettiBase {
   top: string
   color?: string
   opacity?: number
-  /** How far this piece drifts (px) at the pointer's full range - see
-   * .kb-confetti's translate rule in kb-site.css. Defaults per type below. */
-  depth?: number
 }
 interface ConfettiPip extends ConfettiBase {
   type: 'pip'
@@ -25,28 +22,21 @@ interface ConfettiBlob extends ConfettiBase {
 }
 export type ConfettiItem = ConfettiPip | ConfettiSpark | ConfettiBlob
 
-const DEFAULT_DEPTH: Record<ConfettiItem['type'], number> = { pip: 20, spark: 26, blob: 10 }
-
 /** A small cluster of decorative dots/sparkles/blobs, the same look as the
  * Who section's original hand-placed confetti (see .kb-who__pip/-spark/-blob
  * in kb-site.css) but reusable in any section: each item carries its own
- * position, size and parallax depth instead of a lettered CSS class per
- * spot. Every piece reads the same --kb-px/--kb-py cursor-parallax values
- * as the aurora background's orbs (see useAuroraParallax), just at its own
- * `depth`, so the whole page's confetti drifts together under one cursor
- * signal. Renders into an inset:0 layer, so the caller's own element must
- * be positioned (relative/absolute) for the percentages to land correctly. */
+ * position, size and color instead of a lettered CSS class per spot.
+ * Renders into an inset:0 layer, so the caller's own element must be
+ * positioned (relative/absolute) for the percentages to land correctly. */
 export default function Confetti({ items, className }: { items: ConfettiItem[]; className?: string }) {
   let sparkIndex = 0
   return (
     <div className={`kb-confetti-layer${className ? ` ${className}` : ''}`} aria-hidden="true">
       {items.map((item, i) => {
-        const depth = item.depth ?? DEFAULT_DEPTH[item.type]
         const style = {
           left: item.left,
           top: item.top,
           opacity: item.opacity,
-          '--confetti-depth': `${depth}px`,
         } as CSSProperties
 
         if (item.type === 'pip') {

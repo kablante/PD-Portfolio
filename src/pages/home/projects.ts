@@ -15,6 +15,11 @@ export interface HomeProject {
   titlePt?: string
   descEn?: string
   descPt?: string
+  /** Case study content is still pending client disclosure/NDA clearance -
+   * shows a "coming soon" badge wherever this project's cover image appears
+   * (Hero cards, Gallery grid) instead of letting the card look identical
+   * to a finished case study until the visitor clicks through. */
+  comingSoon?: boolean
 }
 
 /** Shared `view-transition-name` so the card image on Home and the header
@@ -33,6 +38,7 @@ export const homeProjects: HomeProject[] = [
     headerImage: asset('/assets/projects/VNT/VNT.jpg'),
     rotation: '-3.859deg',
     title: 'Venturus',
+    comingSoon: true,
   },
   {
     slug: 'VNT-Help',
@@ -42,6 +48,7 @@ export const homeProjects: HomeProject[] = [
     rotation: '1.891deg',
     title: 'Venturus: Help Page Redesign & AI Chatbot',
     titlePt: 'Venturus: Redesign da Página de Help e Chatbot de IA',
+    comingSoon: true,
   },
   {
     slug: 'boavista',
