@@ -1,11 +1,9 @@
-import { motion, useScroll, useTransform } from 'motion/react'
+import { motion, useReducedMotion } from 'motion/react'
 import type { MouseEvent } from 'react'
-import { useRef } from 'react'
 import { Link } from 'react-router-dom'
 import Confetti, { type ConfettiItem } from '@/components/shared/Confetti'
 import { asset } from '@/lib/asset'
 import { homeProjects } from './projects'
-import { SCROLL_RANGE } from './useHomeEffects'
 
 /** Same confetti as the Who and Hero sections (see Confetti.tsx), tucked
  * into the section's own padding gutter so it doesn't sit on top of the
@@ -25,6 +23,15 @@ interface GalleryItem {
   src: string
   alt: string
   href: string
+  /** EN/PT project title shown in the hover scrim - falls back to `alt`
+   * when a project has no `titlePt` of its own (a proper noun that reads
+   * the same in both languages). */
+  title: string
+  titlePt?: string
+  /** Mirrors the project's own `comingSoon` (see projects.ts) - shows the
+   * same "coming soon" badge here as on its Hero card, so the gallery grid
+   * doesn't look like a finished case study until the visitor clicks in. */
+  comingSoon?: boolean
 }
 
 /** Every project's own cover shot, plus two of Side Projects' own case-study
@@ -35,31 +42,43 @@ const ITEMS: GalleryItem[] = [
     src: vnt('VNT-Station-branch').headerImage!,
     alt: vnt('VNT-Station-branch').title,
     href: '/projects/VNT-Station-branch',
+    title: vnt('VNT-Station-branch').title,
+    titlePt: vnt('VNT-Station-branch').titlePt,
+    comingSoon: vnt('VNT-Station-branch').comingSoon,
   },
   {
     src: vnt('VNT-Help').headerImage!,
     alt: vnt('VNT-Help').title,
     href: '/projects/VNT-Help',
+    title: vnt('VNT-Help').title,
+    titlePt: vnt('VNT-Help').titlePt,
+    comingSoon: vnt('VNT-Help').comingSoon,
   },
   {
     src: boavista.headerImage!,
     alt: boavista.title,
     href: '/projects/boavista',
+    title: boavista.title,
+    titlePt: boavista.titlePt,
   },
   {
     src: forShe.headerImage!,
     alt: forShe.title,
     href: '/projects/for-she',
+    title: forShe.title,
+    titlePt: forShe.titlePt,
   },
   {
     src: asset('/assets/projects/side-projects/Fortal_City_-_Cover.png'),
     alt: 'Fortal City',
     href: '/projects/side-projects#fortal-city',
+    title: 'Fortal City',
   },
   {
     src: asset('/assets/projects/side-projects/Mobills_Study_-_Cover.png'),
     alt: 'Mobills',
     href: '/projects/side-projects#mobills',
+    title: 'Mobills',
   },
 ]
 
@@ -77,20 +96,26 @@ function onCardPointerMove(event: MouseEvent<HTMLElement>) {
 /** Gallery — a plain grid of every project's own cover shot, each one a link
  * straight to that project page. */
 export default function GallerySection() {
-  // animate__fadeInDown, scroll-scrubbed exactly like the Who section's own
-  // entrances (same SCROLL_RANGE, same technique - see useScrollEntrance in
-  // WhoSection.tsx) rather than a one-shot, duration-based animation: the
-  // heading drops in from above and fades in lockstep with scroll position,
-  // reversing cleanly if the reader scrolls back up.
-  const headingRef = useRef<HTMLDivElement>(null)
-  const { scrollYProgress: headingProgress } = useScroll({ target: headingRef, offset: [...SCROLL_RANGE] })
-  const headingY = useTransform(headingProgress, [0, 1], ['-100%', '0%'])
-  const headingOpacity = useTransform(headingProgress, [0, 1], [0, 1])
+  // animate__fadeInDown, playing once when it scrolls into view and
+  // reversing on scroll-out (whileInView) - same technique as WhoSection's
+  // own entrances (see useScrollEntrance there) - rather than continuously
+  // scrubbed against scroll position.
+  const shouldReduceMotion = useReducedMotion()
+  // Fixed px, not a percentage of the heading's own (large display-font)
+  // height - see useScrollEntrance's comment in WhoSection.tsx for why a
+  // huge self-relative offset both delays and destabilizes the reveal.
+  const headingHidden = shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: -24 }
 
   return (
     <section className="kb-gallery-section">
       <Confetti items={GALLERY_CONFETTI} />
-      <motion.div className="kb-gallery-heading" ref={headingRef} style={{ y: headingY, opacity: headingOpacity }}>
+      <motion.div
+        className="kb-gallery-heading"
+        initial={headingHidden}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: false, amount: 0.3 }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
+      >
         <span className="kb-gallery-heading__eyebrow">
           <span data-lang="en">case studies</span>
           <span data-lang="pt">estudos de caso</span>
@@ -112,6 +137,20 @@ export default function GallerySection() {
             <img src={item.src} alt={item.alt} loading="lazy" draggable={false} className="kb-gallery-card__img" />
             <span className="kb-gallery-card__glare" aria-hidden="true" />
             <span className="kb-gallery-card__glare-ring" aria-hidden="true" />
+            {item.comingSoon && (
+              <span className="kb-badge kb-badge--warning kb-card-badge">
+                <span data-lang="en">Coming soon</span>
+                <span data-lang="pt">Em breve</span>
+              </span>
+            )}
+            <span className="kb-gallery-card__scrim" aria-hidden="true">
+              <span className="kb-gallery-card__title" data-lang="en">
+                {item.title}
+              </span>
+              <span className="kb-gallery-card__title" data-lang="pt">
+                {item.titlePt ?? item.title}
+              </span>
+            </span>
           </Link>
         ))}
       </div>

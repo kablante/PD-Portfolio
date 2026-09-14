@@ -1,11 +1,10 @@
-import { useAuroraParallax, useSiteGrain } from '@/pages/home/useHomeEffects'
+import { useSiteGrain } from '@/pages/home/useHomeEffects'
 
 /** Site-wide fixed background - previously a drifting gradient mesh + star
  * field, now a set of soft pulsing glow orbs (ported from the KPop Carrd
  * Figma bento layout, recolored onto the site's own accent tokens). Keeps
- * the same dark-void base and grain texture, and the same cursor-parallax
- * wiring (--kb-px/--kb-py) as before. Shared by Home and ProjectPage so
- * both stay in sync.
+ * the same dark-void base and grain texture as before. Shared by Home and
+ * ProjectPage so both stay in sync.
  *
  * `grainOverlay` (default true) controls the animated full-page grain
  * canvas from useSiteGrain, on top of everything including page content -
@@ -13,7 +12,6 @@ import { useAuroraParallax, useSiteGrain } from '@/pages/home/useHomeEffects'
  * legibility, keeping only the static texture baked into .kb-aurora__grain
  * below (part of the fixed background itself, unaffected by this prop). */
 export default function AuroraBackground({ grainOverlay = true }: { grainOverlay?: boolean } = {}) {
-  useAuroraParallax()
   useSiteGrain(grainOverlay)
 
   return (

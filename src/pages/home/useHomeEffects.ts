@@ -1,20 +1,5 @@
 import { type RefObject, useEffect, useState } from 'react'
 
-// The scroll window every scroll-scrubbed entrance on the Home page (Who
-// section's photo/clock/rail/actions/body/highlight, the Gallery heading)
-// maps to progress 0->1: 0 when the element's top edge is still 85% of the
-// way down the viewport (just barely below the fold), 1 once it's scrolled
-// up to 60% from the top - same shape as useLogoMorph's hero/name
-// crossfade below, just expressed as a per-element scroll range (via
-// motion's useScroll) instead of one global scrollY/homeMain-height ratio,
-// since these modules don't all share a single fixed-height scroll track.
-// Being tied directly to scroll position (not a duration/spring) means
-// scrolling back up reverses these exactly, and scrolling past either end
-// just clamps - there's nothing to "replay", it's live the whole time.
-// One shared constant (rather than one per element/section) is what keeps
-// all of them moving at the same speed.
-export const SCROLL_RANGE = ['start 0.85', 'start 0.6'] as const
-
 const LANG_STORAGE_KEY = 'kb-lang'
 
 export type Lang = 'en' | 'pt'
@@ -67,6 +52,36 @@ const ROTATE_STEP_DEG = 2.5
 const ACTIVE_SCALE = 1.025
 const SPRING_OMEGA = 5 / 0.3 // duration 0.3s, bounce 0
 
+// Mirrors the CSS breakpoint that swaps the overlapping desktop stack for
+// the one-at-a-time mobile carousel (see the max-width:700px rules in
+// kb-site.css) - unlike a mount-time-only `matchMedia(...).matches` check,
+// this stays subscribed so resizing the window (not just switching device)
+// flips useCardSpreadEffects/useCardCarouselActive live instead of leaving
+// whichever one initialized first stuck until the next full reload.
+function useIsMobileCards() {
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window === 'undefined') return false
+    return window.matchMedia('(max-width: 700px)').matches || window.matchMedia('(pointer: coarse)').matches
+  })
+
+  useEffect(() => {
+    const widthQuery = window.matchMedia('(max-width: 700px)')
+    const pointerQuery = window.matchMedia('(pointer: coarse)')
+    function update() {
+      setIsMobile(widthQuery.matches || pointerQuery.matches)
+    }
+    update()
+    widthQuery.addEventListener('change', update)
+    pointerQuery.addEventListener('change', update)
+    return () => {
+      widthQuery.removeEventListener('change', update)
+      pointerQuery.removeEventListener('change', update)
+    }
+  }, [])
+
+  return isMobile
+}
+
 interface Spring {
   x: number
   rot: number
@@ -88,15 +103,25 @@ interface Target {
  * doesn't map cleanly onto React state without reintroducing per-frame
  * re-renders, so it stays imperative behind a ref. */
 export function useCardSpreadEffects(rowRef: RefObject<HTMLDivElement | null>) {
+  const isMobile = useIsMobileCards()
+
   useEffect(() => {
-    // Touch devices get the one-at-a-time carousel instead (see
-    // useCardCarouselActive) - a tap can still synthesize mouseenter/
-    // mousemove/mouseleave on many mobile browsers, which would set an
-    // inline `transform` here that outranks the carousel's own
-    // `transform:none` (see the max-width:700px rules in kb-site.css),
-    // bringing back the desktop rotation/tilt/spread on a screen that's
-    // meant to show flat, non-rotated cards.
-    if (window.matchMedia?.('(pointer: coarse)').matches) return
+    // The mobile carousel (see useCardCarouselActive) owns the cards below
+    // the 700px/coarse-pointer breakpoint instead - a tap can still
+    // synthesize mouseenter/mousemove/mouseleave on many mobile browsers,
+    // which would set an inline `transform` here that outranks the
+    // carousel's own `transform:none` (see the max-width:700px rules in
+    // kb-site.css), bringing back the desktop rotation/tilt/spread on a
+    // screen that's meant to show flat, non-rotated cards. isMobile is
+    // reactive (not just a mount-time check), so resizing the window across
+    // the breakpoint tears this down and clears any inline styles it left
+    // behind instead of leaving them stuck until a reload.
+    if (isMobile) return
+    // Same reasoning as useLogoMorph: the pointer tilt and spring-physics
+    // spread are both continuous, cursor-driven motion, not one-shot
+    // feedback - under prefers-reduced-motion the cards just sit at their
+    // resting CSS rotation (--card-rot) instead.
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
     const row = rowRef.current
     if (!row) return
     const cards = Array.from(row.querySelectorAll<HTMLAnchorElement>('.kb-project-card'))
@@ -244,8 +269,18 @@ export function useCardSpreadEffects(rowRef: RefObject<HTMLDivElement | null>) {
       tiltCleanups.forEach((fn) => fn())
       spreadCleanups.forEach((fn) => fn())
       if (rafId !== null) cancelAnimationFrame(rafId)
+      // Clears whatever the spring/tilt loop last wrote inline, so a switch
+      // into mobile territory doesn't leave a desktop transform sitting on
+      // top of (and outranking) the carousel's own `transform:none`.
+      cards.forEach((card, i) => {
+        card.style.transform = ''
+        card.style.removeProperty('--pointer-x')
+        card.style.removeProperty('--pointer-y')
+        const tilt = tilts[i]
+        if (tilt) tilt.style.transform = ''
+      })
     }
-  }, [rowRef])
+  }, [rowRef, isMobile])
 }
 
 /** Touch counterpart to useCardSpreadEffects: there's no cursor to hover
@@ -259,8 +294,10 @@ export function useCardSpreadEffects(rowRef: RefObject<HTMLDivElement | null>) {
  * and shows/hides the prev/next arrows so neither ever points at a card
  * that isn't there. */
 export function useCardCarouselActive(rowRef: RefObject<HTMLDivElement | null>) {
+  const isMobile = useIsMobileCards()
+
   useEffect(() => {
-    if (!window.matchMedia?.('(pointer: coarse)').matches) return
+    if (!isMobile) return
     const row = rowRef.current
     if (!row) return
     const cards = Array.from(row.querySelectorAll<HTMLElement>('.kb-project-card'))
@@ -302,8 +339,16 @@ export function useCardCarouselActive(rowRef: RefObject<HTMLDivElement | null>) 
     return () => {
       if (rafId !== null) cancelAnimationFrame(rafId)
       row.removeEventListener('scroll', onScroll)
+      // Switching back to desktop shouldn't leave a card stuck --active or
+      // the pointer-x glow parked wherever the carousel last left it.
+      cards.forEach((card) => {
+        card.classList.remove('kb-project-card--active')
+        card.style.removeProperty('--pointer-x')
+      })
+      if (prevButton) prevButton.style.display = ''
+      if (nextButton) nextButton.style.display = ''
     }
-  }, [rowRef])
+  }, [rowRef, isMobile])
 }
 
 const SPOTLIGHT_RADIUS = 220
@@ -480,38 +525,22 @@ export function useSiteGrain(enabled = true) {
   }, [enabled])
 }
 
-/** Mouse-driven depth parallax, site-wide: sets --kb-px/--kb-py (-0.5..0.5)
- * on the root element, so any descendant can read them via inherited CSS
- * custom properties - the fixed aurora background's mesh/star layers
- * (`.kb-aurora__orb`, set on .kb-bg before this lived on root) and every
- * page's own decorative confetti (`.kb-confetti`, see Confetti.tsx) alike.
- * One shared listener for the whole page instead of one per consumer.
- * Skipped on touch and reduced-motion. */
-export function useAuroraParallax() {
-  useEffect(() => {
-    if (window.matchMedia?.('(pointer: coarse)').matches) return
-    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
-
-    const root = document.documentElement
-    function onMove(e: MouseEvent) {
-      const px = e.clientX / window.innerWidth - 0.5
-      const py = e.clientY / window.innerHeight - 0.5
-      root.style.setProperty('--kb-px', px.toFixed(3))
-      root.style.setProperty('--kb-py', py.toFixed(3))
-    }
-    window.addEventListener('mousemove', onMove)
-    return () => window.removeEventListener('mousemove', onMove)
-  }, [])
-}
-
 /** Scroll-scrubbed handoff from the hero wordmark to the Who section's
  * name: as the user scrolls through .kb-home-main (progress 0 -> 1), the
- * logo fades from opacity 1 to 0 while drifting down and shrinking
- * slightly, and .kb-who__h fades in from 0 to 1 the same amount — reads as
- * the logo dissolving into the name rather than two unrelated fades.
- * Scroll-driven (not a one-shot trigger), so it reverses cleanly on scroll
- * back up. Skipped entirely under prefers-reduced-motion: both stay at
- * their normal, fully-visible resting state. */
+ * logo travels along the real screen-space delta between its own resting
+ * position and .kb-who__h's - center to center, plus scaling down to
+ * .kb-who__h's actual size - while fading out, and .kb-who__h fades in at
+ * its own natural (untouched) position. A plain opposed drift (logo down a
+ * bit, name up a bit) reads as two unrelated fades happening to coincide;
+ * landing the logo exactly where the name already sits, at the name's own
+ * size, is what sells "this becomes that" - the same delta this hand-rolls
+ * (measure both elements' rects, animate the first toward the second) is
+ * what GSAP's Flip plugin / framer's layoutId automate for a one-shot
+ * mount transition; scrubbing it against live scroll position instead
+ * needs the delta computed by hand. Scroll-driven (not a one-shot
+ * trigger), so it reverses cleanly on scroll back up. Skipped entirely
+ * under prefers-reduced-motion: both stay at their normal, fully-visible
+ * resting state. */
 export function useLogoMorph() {
   useEffect(() => {
     const logo = document.querySelector<HTMLElement>('.kb-hero-lockup')
@@ -521,32 +550,57 @@ export function useLogoMorph() {
     if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
 
     let rafId: number | null = null
+    let deltaX = 0
+    let deltaY = 0
+    let targetScale = 1
+
+    // Reads both elements' *untransformed* geometry - if this ran while
+    // logo.style.transform already held a mid-scroll value (e.g. a resize
+    // firing mid-scroll), the measured rect would be the already-morphed
+    // position/size, not the resting one the delta needs to be computed
+    // from, and every subsequent frame would drift further off target.
+    function measure() {
+      const prevTransform = logo!.style.transform
+      logo!.style.transform = ''
+      const logoRect = logo!.getBoundingClientRect()
+      const nameRect = name!.getBoundingClientRect()
+      logo!.style.transform = prevTransform
+
+      deltaX = nameRect.left + nameRect.width / 2 - (logoRect.left + logoRect.width / 2)
+      deltaY = nameRect.top + nameRect.height / 2 - (logoRect.top + logoRect.height / 2)
+      targetScale = logoRect.height > 0 ? nameRect.height / logoRect.height : 1
+    }
 
     function render() {
       rafId = null
       const range = homeMain!.offsetHeight
       const progress = range > 0 ? Math.min(Math.max(window.scrollY / range, 0), 1) : 0
+      const scale = 1 - progress * (1 - targetScale)
       logo!.style.opacity = String(1 - progress)
-      logo!.style.transform = `translateY(${progress * 40}px) scale(${1 - progress * 0.15})`
+      logo!.style.transform = `translate(${deltaX * progress}px, ${deltaY * progress}px) scale(${scale})`
       name!.style.opacity = String(progress)
-      name!.style.transform = `translateY(${(1 - progress) * 16}px)`
     }
 
     function onScroll() {
       if (rafId === null) rafId = requestAnimationFrame(render)
     }
 
+    function onResize() {
+      measure()
+      render()
+    }
+
+    measure()
     render()
     window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', render)
+    window.addEventListener('resize', onResize)
     return () => {
       if (rafId !== null) cancelAnimationFrame(rafId)
       window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', render)
+      window.removeEventListener('resize', onResize)
       logo!.style.opacity = ''
       logo!.style.transform = ''
       name!.style.opacity = ''
-      name!.style.transform = ''
     }
   }, [])
 }
