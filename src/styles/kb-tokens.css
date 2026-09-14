@@ -7,6 +7,13 @@
 @font-face{font-family:"Promised Freedom";src:url("/assets/fonts/Promised-Freedom.ttf") format("truetype");font-weight:400;font-style:normal;font-display:swap}
 
 :root{
+  /* Tells the browser this page already has its own dark theme, so it
+     doesn't try to auto-darken/recolor content - without this, Android
+     Chrome's "force dark" (system dark mode + no declared color-scheme)
+     algorithmically rewrites bright/saturated colors it doesn't
+     recognize as intentional, e.g. turning the pink language-switch knob
+     maroon. */
+  color-scheme:dark;
   /* ---- Base palette ---- */
   --kb-void:#0d0342;
   --kb-void-deep:#08012a;
@@ -177,7 +184,6 @@
   --blur-orb:60px;
   --blur-field:70px;
 
-  --grain-opacity:.26;
   --grain-url:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
 
   --ease-soft:cubic-bezier(.22,.61,.36,1);
@@ -202,5 +208,3 @@ a:hover{color:var(--text-link-hover)}
 *,*::before,*::after{box-sizing:border-box}
 ::selection{background:var(--kb-magenta);color:var(--kb-void)}
 :focus-visible{outline:none;box-shadow:var(--glow-focus)}
-
-.kb-grain::after{content:"";position:absolute;inset:0;pointer-events:none;background-image:var(--grain-url);opacity:var(--grain-opacity);mix-blend-mode:overlay}

@@ -457,6 +457,13 @@ export function useCursorSpotlight() {
 export function useSiteGrain(enabled = true) {
   useEffect(() => {
     if (!enabled) return
+    // Skipped on mobile/touch: the moving noise canvas reads as visual
+    // clutter more than atmosphere at phone size, and this is on top of
+    // the static .kb-aurora__grain texture underneath, which mobile also
+    // hides (see the max-width:700px rule in kb-site.css).
+    if (window.matchMedia?.('(max-width: 700px)').matches || window.matchMedia?.('(pointer: coarse)').matches) {
+      return
+    }
     const canvas = document.createElement('canvas')
     canvas.setAttribute('aria-hidden', 'true')
     canvas.id = 'kb-site-grain'
@@ -525,82 +532,3 @@ export function useSiteGrain(enabled = true) {
   }, [enabled])
 }
 
-/** Scroll-scrubbed handoff from the hero wordmark to the Who section's
- * name: as the user scrolls through .kb-home-main (progress 0 -> 1), the
- * logo travels along the real screen-space delta between its own resting
- * position and .kb-who__h's - center to center, plus scaling down to
- * .kb-who__h's actual size - while fading out, and .kb-who__h fades in at
- * its own natural (untouched) position. A plain opposed drift (logo down a
- * bit, name up a bit) reads as two unrelated fades happening to coincide;
- * landing the logo exactly where the name already sits, at the name's own
- * size, is what sells "this becomes that" - the same delta this hand-rolls
- * (measure both elements' rects, animate the first toward the second) is
- * what GSAP's Flip plugin / framer's layoutId automate for a one-shot
- * mount transition; scrubbing it against live scroll position instead
- * needs the delta computed by hand. Scroll-driven (not a one-shot
- * trigger), so it reverses cleanly on scroll back up. Skipped entirely
- * under prefers-reduced-motion: both stay at their normal, fully-visible
- * resting state. */
-export function useLogoMorph() {
-  useEffect(() => {
-    const logo = document.querySelector<HTMLElement>('.kb-hero-lockup')
-    const name = document.querySelector<HTMLElement>('.kb-who__h')
-    const homeMain = document.querySelector<HTMLElement>('.kb-home-main')
-    if (!logo || !name || !homeMain) return
-    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
-
-    let rafId: number | null = null
-    let deltaX = 0
-    let deltaY = 0
-    let targetScale = 1
-
-    // Reads both elements' *untransformed* geometry - if this ran while
-    // logo.style.transform already held a mid-scroll value (e.g. a resize
-    // firing mid-scroll), the measured rect would be the already-morphed
-    // position/size, not the resting one the delta needs to be computed
-    // from, and every subsequent frame would drift further off target.
-    function measure() {
-      const prevTransform = logo!.style.transform
-      logo!.style.transform = ''
-      const logoRect = logo!.getBoundingClientRect()
-      const nameRect = name!.getBoundingClientRect()
-      logo!.style.transform = prevTransform
-
-      deltaX = nameRect.left + nameRect.width / 2 - (logoRect.left + logoRect.width / 2)
-      deltaY = nameRect.top + nameRect.height / 2 - (logoRect.top + logoRect.height / 2)
-      targetScale = logoRect.height > 0 ? nameRect.height / logoRect.height : 1
-    }
-
-    function render() {
-      rafId = null
-      const range = homeMain!.offsetHeight
-      const progress = range > 0 ? Math.min(Math.max(window.scrollY / range, 0), 1) : 0
-      const scale = 1 - progress * (1 - targetScale)
-      logo!.style.opacity = String(1 - progress)
-      logo!.style.transform = `translate(${deltaX * progress}px, ${deltaY * progress}px) scale(${scale})`
-      name!.style.opacity = String(progress)
-    }
-
-    function onScroll() {
-      if (rafId === null) rafId = requestAnimationFrame(render)
-    }
-
-    function onResize() {
-      measure()
-      render()
-    }
-
-    measure()
-    render()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', onResize)
-    return () => {
-      if (rafId !== null) cancelAnimationFrame(rafId)
-      window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', onResize)
-      logo!.style.opacity = ''
-      logo!.style.transform = ''
-      name!.style.opacity = ''
-    }
-  }, [])
-}
