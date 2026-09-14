@@ -1,6 +1,7 @@
 import { Navigate, useLocation, useParams } from 'react-router-dom'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import AuroraBackground from '@/components/shared/AuroraBackground'
+import { useDocumentTitle } from '@/lib/useDocumentTitle'
 import '@/styles/kb-tokens.css'
 import '@/styles/kb-components.css'
 import '@/styles/kb-site.css'
@@ -97,6 +98,11 @@ export default function ProjectPage() {
   const articleRef = useRef<HTMLElement>(null)
 
   useCursorSpotlight()
+  useDocumentTitle(
+    project
+      ? `${(lang === 'pt' && project.titlePt) || project.title} — Katarina Blante`
+      : 'Katarina Blante — Product Designer',
+  )
 
   // React Router doesn't reset scroll on navigation (see ProjectSidebar's
   // goHome) - landing on a project page should default to its very top,

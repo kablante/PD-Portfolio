@@ -203,18 +203,7 @@ export default function WhoSection() {
           style={{ rotateX, rotateY, transformPerspective: 800, transformOrigin: 'left bottom' }}
         >
           <div className="kb-who__slot">
-            <span>
-              <span data-lang="en">
-                PORTRAIT
-                <br />
-                PLACEHOLDER · 3:4
-              </span>
-              <span data-lang="pt">
-                RETRATO
-                <br />
-                PLACEHOLDER · 3:4
-              </span>
-            </span>
+            <img className="kb-who__slot-img" src={asset('/assets/portrait.jpg')} alt="Katarina Blante" />
           </div>
           <span className="kb-who__photo-glare" aria-hidden="true" />
           <span className="kb-who__photo-glare-ring" aria-hidden="true" />

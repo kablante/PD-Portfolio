@@ -9,14 +9,9 @@ import '@/styles/kb-site.css'
 import GallerySection from './GallerySection'
 import LogoWordmark from './LogoWordmark'
 import WhoSection from './WhoSection'
+import { useDocumentTitle } from '@/lib/useDocumentTitle'
 import { homeProjects, projectImageTransitionName } from './projects'
-import {
-  useCardCarouselActive,
-  useCardSpreadEffects,
-  useCursorSpotlight,
-  useLang,
-  useLogoMorph,
-} from './useHomeEffects'
+import { useCardCarouselActive, useCardSpreadEffects, useCursorSpotlight, useLang } from './useHomeEffects'
 
 /** Same confetti as the Who section (see Confetti.tsx), placed in the
  * corners the card carousel and wordmark leave empty. */
@@ -33,10 +28,10 @@ export default function Home() {
   const rowRef = useRef<HTMLDivElement>(null)
   const { lang, setLang } = useLang()
 
+  useDocumentTitle(lang === 'pt' ? 'Katarina Blante — Designer de Produto' : 'Katarina Blante — Product Designer')
   useCardSpreadEffects(rowRef)
   useCardCarouselActive(rowRef)
   useCursorSpotlight()
-  useLogoMorph()
 
   function handleShiftCarousel(direction: 1 | -1) {
     const row = rowRef.current
@@ -99,7 +94,6 @@ export default function Home() {
                     className="kb-project-card__img"
                     src={project.image}
                     alt=""
-                    loading="lazy"
                     draggable={false}
                     style={{ viewTransitionName: projectImageTransitionName(project.slug) }}
                   />

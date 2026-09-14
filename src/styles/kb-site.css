@@ -96,6 +96,9 @@ body{overflow-x:hidden}
 .kb-aurora__orb--4{left:25%;top:65%;width:400px;height:400px;background:radial-gradient(circle,var(--kb-magenta-deep),transparent 70%);filter:blur(70px);opacity:.7;animation-duration:6.1s;animation-delay:1.2s}
 .kb-aurora__orb--5{left:85%;top:5%;width:300px;height:300px;background:radial-gradient(circle,var(--kb-blush),transparent 70%);filter:blur(60px);opacity:.55;animation-duration:6.8s;animation-delay:1.6s}
 .kb-aurora__grain{position:absolute;inset:0;background-image:var(--grain-url);opacity:.4;mix-blend-mode:overlay;pointer-events:none}
+@media (max-width:700px),(pointer:coarse){
+  .kb-aurora__grain{display:none}
+}
 
 @keyframes kb-orb-drift{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
 @keyframes kb-bloom-pulse{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:1;transform:scale(1.12)}}
@@ -186,8 +189,9 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
    stacking context, only rank within it.
 
    That z-index:10000 also outranks every *other* fixed UI on the page
-   (.kb-lang-dock, .kb-footerbar are z-index:20) — without pointer-events:none
-   here, this element's own transparent box (it paints nothing) sits above
+   (.kb-lang-dock is z-index:10001, above it, but nothing else is) — without
+   pointer-events:none here, this element's own transparent box (it paints
+   nothing) sits above
    them in hit-testing even though it's invisible, silently swallowing
    clicks on the language switch. Re-enabled on .kb-project-card itself so
    the actual cards stay clickable. */
@@ -403,24 +407,6 @@ html[data-active-lang="pt"] [data-lang="pt"]{display:inline}
   .kb-logo-art--desktop{display:block}
 }
 
-/* ---------- Content page → Home exit transition (reverse) ----------
-   The mirror of the transition above: any link back to the home page —
-   the back-link, the footerbar logo, whichever the user takes — drifts
-   the content down and fades it, parallaxes the aurora back the other
-   way, and slides the top nav bar down to where the bottom bar sits on
-   the home screen. Applies to about.html and every project page, since
-   they all share this same footer/back-link chrome. */
-.kb-page.kb-leaving-home .kb-content{transition:transform 640ms var(--ease-in-out),opacity 640ms var(--ease-in-out);transform:translateY(10vh);opacity:0}
-.kb-page.kb-leaving-home .kb-aurora__mesh{transition:transform 720ms var(--ease-in-out);transform:translate3d(0,6%,0) scale(.94)}
-.kb-page.kb-leaving-home .kb-aurora__stars{transition:transform 720ms var(--ease-in-out),opacity 720ms var(--ease-in-out);transform:translate3d(0,3%,0);opacity:.25}
-.kb-page.kb-leaving-home .kb-footerbar--top{transition:transform 640ms var(--ease-in-out) 60ms;transform:translateY(calc(100vh - 64px));transform:translateY(calc(100svh - 64px))}
-@media (prefers-reduced-motion:reduce){
-  .kb-page.kb-leaving-home .kb-content,
-  .kb-page.kb-leaving-home .kb-aurora__mesh,
-  .kb-page.kb-leaving-home .kb-aurora__stars,
-  .kb-page.kb-leaving-home .kb-footerbar--top{transition:none}
-}
-
 /* ---------- About / Project shared content column ---------- */
 /* fill-mode intentionally omitted — see the note on .kb-home-main: a
    forwards/both fill would keep this animation overriding transform/
@@ -531,17 +517,6 @@ html[data-active-lang="pt"] .kb-sidebar__lang .kb-lang-switch__knob{transform:tr
 .kb-project-header{border-radius:16px;overflow:hidden;margin-top:0}
 .kb-project-header__img{display:block;width:100%;height:auto}
 
-/* About */
-.kb-about-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:clamp(32px,5vw,64px);margin-top:32px;align-items:start}
-.kb-about-eyebrow{display:block;font-family:var(--font-mono);font-size:12px;letter-spacing:.16em;color:var(--kb-lavender)}
-.kb-about-grid h1{font-family:var(--font-display);font-size:clamp(40px,6vw,76px);line-height:1;color:var(--text-strong);margin:16px 0 0;text-wrap:pretty}
-.kb-about-grid p{font-size:18px;line-height:1.6;font-weight:300;color:var(--text-body);max-width:64ch;margin:16px 0 0;text-wrap:pretty}
-.kb-about-grid p:first-of-type{margin-top:24px}
-.kb-hand-note{display:block;font-family:var(--font-hand);font-size:34px;color:var(--kb-butter);margin-top:32px}
-.kb-about-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:32px}
-.kb-portrait-slot{border-radius:16px;border:1px solid var(--border-hairline);background:var(--gradient-nebula);height:clamp(320px,42vw,520px);display:flex;align-items:flex-end;padding:20px}
-.kb-slot-label{font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;color:rgba(255,255,255,.72)}
-
 /* Project */
 .kb-project-meta{display:block;font-family:var(--font-mono);font-size:12px;letter-spacing:.16em;color:var(--kb-lavender);margin-top:32px}
 .kb-project-title{font-family:var(--font-display);font-size:clamp(40px,6.4vw,84px);line-height:1;color:var(--text-strong);margin:16px 0 0;max-width:20ch;text-wrap:pretty}
@@ -557,11 +532,6 @@ html[data-active-lang="pt"] .kb-sidebar__lang .kb-lang-switch__knob{transform:tr
    render at the name's font size - same font stack as the visible subtitle
    so the measurement matches; never painted. */
 .kb-project-subtitle-measure{position:absolute;visibility:hidden;white-space:nowrap;top:-9999px;left:-9999px;font-family:var(--font-display);pointer-events:none}
-.kb-project-lede{font-size:20px;line-height:1.55;font-weight:300;color:var(--text-body);max-width:64ch;margin:24px 0 0;text-wrap:pretty}
-.kb-project-shot{border-radius:16px;border:1px solid var(--border-hairline);background:var(--gradient-nebula);height:clamp(240px,34vw,460px);margin-top:clamp(32px,4vw,56px);display:flex;align-items:flex-end;padding:20px}
-.kb-project-blocks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:clamp(24px,4vw,48px);margin-top:clamp(40px,5vw,72px)}
-.kb-project-blocks h2{font-family:var(--font-display);font-size:26px;line-height:1.1;color:var(--text-strong);margin:0}
-.kb-project-blocks p{font-size:17px;line-height:1.6;font-weight:300;color:var(--text-body);margin:12px 0 0;text-wrap:pretty}
 .kb-project-stats{display:flex;flex-wrap:wrap;gap:clamp(24px,5vw,72px);margin-top:clamp(40px,5vw,72px);padding-top:32px;border-top:1px solid var(--border-hairline)}
 .kb-project-stats__value{display:block;font-family:var(--font-display);font-size:44px;line-height:1;color:var(--kb-butter)}
 .kb-project-stats__label{display:block;font-size:14px;color:var(--text-muted);margin-top:8px}
@@ -720,17 +690,6 @@ html[data-active-lang="pt"] .kb-sidebar__lang .kb-lang-switch__knob{transform:tr
    Fixed to the top on about/project pages — the persistent piece of chrome
    on those pages. The home page instead has just the language switch,
    docked to the top-right corner (see .kb-lang-dock below). */
-/* Half the alpha of --surface-glass (kept local rather than touching the
-   shared token, which also backs cards/toasts elsewhere). */
-.kb-footerbar{position:fixed;left:0;right:0;z-index:20;height:64px;display:flex;align-items:center;gap:16px;padding:0 19px;background:rgba(26,12,92,.275);backdrop-filter:blur(var(--blur-glass));-webkit-backdrop-filter:blur(var(--blur-glass));overflow:hidden}
-.kb-footerbar::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background-image:var(--grain-url);opacity:var(--grain-opacity);mix-blend-mode:overlay}
-.kb-footerbar--top{top:0;border-bottom:1px solid var(--border-soft)}
-
-.kb-footerbar__logo{all:unset;cursor:pointer;flex:none;display:flex;align-items:center;margin-right:8px}
-.kb-footerbar__logo img{display:block;width:auto;height:46px}
-
-.kb-footerbar__actions{flex:none;display:flex;align-items:center;gap:8px;--control-height:36px;--border-hairline:var(--kb-white-64);--surface-card:transparent;color:var(--text-strong)}
-
 /* ---------- Home nav: language switch only, top-right corner ---------- */
 /* The hero cards sit at z-index:10000 (needed to outrank the site grain -
    see .kb-home-cards above), which otherwise outranks this too: on any
@@ -741,19 +700,18 @@ html[data-active-lang="pt"] .kb-sidebar__lang .kb-lang-switch__knob{transform:tr
 
 .kb-lang-switch{position:relative;width:80px;height:36px;border-radius:30px;box-shadow:inset 0 0 0 1px var(--kb-white-64);flex:none;background:none;border:0;padding:0}
 .kb-lang-switch__knob{position:absolute;top:0;left:0;width:43px;height:36px;border-radius:30px;background:var(--kb-blush);transition:transform 240ms cubic-bezier(.22,.61,.36,1),background var(--duration-base) var(--ease-soft),box-shadow var(--duration-base) var(--ease-soft);transform:translateX(0)}
-.kb-lang-switch:hover .kb-lang-switch__knob{background:var(--kb-butter);box-shadow:var(--glow-butter)}
+/* Scoped to real hover-capable pointers: on touch, `:hover` triggers on tap
+   and never clears (there's no mouseleave), leaving the knob stuck butter-
+   colored instead of its resting blush pink after every tap. */
+@media (hover:hover) and (pointer:fine){
+  .kb-lang-switch:hover .kb-lang-switch__knob{background:var(--kb-butter);box-shadow:var(--glow-butter)}
+}
 html[data-active-lang="pt"] .kb-lang-switch__knob{transform:translateX(37px)}
 .kb-lang-switch button{all:unset;cursor:pointer;position:absolute;top:0;width:43px;height:36px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:500;color:var(--kb-white-64)}
 .kb-lang-switch button[data-lang-btn="en"]{left:0;color:var(--text-on-accent)}
 .kb-lang-switch button[data-lang-btn="pt"]{right:0}
 html[data-active-lang="pt"] .kb-lang-switch button[data-lang-btn="en"]{color:var(--kb-white-64)}
 html[data-active-lang="pt"] .kb-lang-switch button[data-lang-btn="pt"]{color:var(--text-on-accent)}
-
-.kb-footerbar__copy{flex:1;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:clamp(11px,0.9vw,14px);color:var(--kb-lavender)}
-
-@media (max-width:640px){
-  .kb-footerbar__copy{display:none}
-}
 
 /* ---------- The Who section (home's second section) ----------
    Not a grid any more: a fixed-ratio canvas with every module placed in
@@ -786,11 +744,9 @@ html[data-active-lang="pt"] .kb-lang-switch button[data-lang-btn="pt"]{color:var
   background:rgba(254,106,216,.16);border:2px solid rgba(254,106,216,.5);
   border-radius:30px;padding:10px 10px 0;
   box-shadow:0 18px 50px rgba(8,1,42,.5),0 0 60px rgba(254,106,216,.2)}
-.kb-who__slot{aspect-ratio:3/4;border-radius:30px;
-  background:linear-gradient(155deg,rgba(41,25,143,.8),rgba(203,67,152,.45));
-  display:flex;align-items:flex-start;justify-content:center;padding-top:9%}
-.kb-who__slot span{font-family:var(--font-mono);font-size:1.85cqw;letter-spacing:.14em;
-  color:rgba(255,255,255,.44);text-align:center;line-height:1.7}
+.kb-who__slot{aspect-ratio:3/4;border-radius:30px;overflow:hidden;
+  background:linear-gradient(155deg,rgba(41,25,143,.8),rgba(203,67,152,.45))}
+.kb-who__slot-img{width:100%;height:100%;object-fit:cover;display:block}
 .kb-who__photo-glare{position:absolute;inset:0;z-index:2;opacity:0;pointer-events:none;
   mix-blend-mode:overlay;transition:opacity 300ms ease-out;border-radius:inherit;
   background:radial-gradient(circle at var(--pointer-x,50%) var(--pointer-y,50%),var(--kb-blush) 0%,transparent 75%)}
@@ -956,7 +912,6 @@ html[data-active-lang="pt"] .kb-who__body p{font-size:1.85cqw}
      room instead of the tight desktop clamp. */
   .kb-who__name{order:1;margin-bottom:4px}
   .kb-who__photo{order:2;width:76%;align-self:flex-start}
-  .kb-who__slot span{font-size:11px}
   .kb-who__handle{font-size:12px;padding:14px 0 18px}
   .kb-who__clock{order:3;width:120px;align-self:flex-end;margin-top:-78px;gap:2px}
   .kb-who__time{font-size:22px}
