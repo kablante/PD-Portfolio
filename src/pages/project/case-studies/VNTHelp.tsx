@@ -1,7 +1,23 @@
 import { Maximize2, Minimize2 } from 'lucide-react'
 import { useLayoutEffect, useRef, useState } from 'react'
+import ImageLightbox from '@/components/shared/ImageLightbox'
 import { PendingImage, PendingMetric } from '@/components/shared/Pending'
+import { asset } from '@/lib/asset'
 import { skillHue } from '../../home/skills'
+
+const ALL_IMAGES = [
+  { src: asset('/assets/projects/vnt-help/before-home.png'), alt: 'Old Help home screen, before the redesign' },
+]
+
+function Figure({ src, alt, onZoom }: { src: string; alt: string; onZoom: (image: { src: string; alt: string }) => void }) {
+  return (
+    <figure className="kb-project-figure">
+      <button type="button" className="kb-project-zoom" onClick={() => onZoom({ src, alt })}>
+        <img src={src} alt={alt} />
+      </button>
+    </figure>
+  )
+}
 
 const PROJECT_SKILLS = [
   'AI-Assisted Design Workflows',
@@ -115,6 +131,10 @@ function LaptopEmbed({ src, title, mockUrl }: { src: string; title: string; mock
  * of being skipped, so the page's shape is honest about what's still to
  * come rather than looking finished or leaving unexplained gaps. */
 export default function VNTHelp() {
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
+  const openLightbox = ({ src }: { src: string; alt: string }) =>
+    setLightboxIndex(ALL_IMAGES.findIndex((image) => image.src === src))
+
   return (
     <>
       <div className="kb-project-meta-row">
@@ -435,12 +455,7 @@ export default function VNTHelp() {
           <span data-lang="en">Before</span>
           <span data-lang="pt">Antes</span>
         </h2>
-        <PendingImage>
-          <span data-lang="en">Old Help home screen and old internal screens pending from Venturus.</span>
-          <span data-lang="pt">
-            Tela inicial antiga do Help e telas internas antigas pendentes da Venturus.
-          </span>
-        </PendingImage>
+        <Figure src={ALL_IMAGES[0].src} alt={ALL_IMAGES[0].alt} onZoom={openLightbox} />
 
         <h2>
           <span data-lang="en">After</span>
@@ -500,6 +515,15 @@ export default function VNTHelp() {
           </div>
         </div>
       </section>
+
+      {lightboxIndex !== null && (
+        <ImageLightbox
+          images={ALL_IMAGES}
+          index={lightboxIndex}
+          onNavigate={setLightboxIndex}
+          onClose={() => setLightboxIndex(null)}
+        />
+      )}
     </>
   )
 }

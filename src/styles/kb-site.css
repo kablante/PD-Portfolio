@@ -605,12 +605,18 @@ html[data-active-lang="pt"] .kb-sidebar__lang .kb-lang-switch__knob{transform:tr
 .kb-project-section p{font-size:19px;font-weight:300;line-height:1.75;color:var(--text-body);max-width:70ch;margin-top:18px;text-wrap:pretty}
 .kb-project-section p + p{margin-top:16px}
 .kb-project-section h3{font-family:var(--font-body);font-weight:var(--weight-semibold);font-size:20px;color:var(--text-strong);margin-top:clamp(32px,4vw,48px)}
+/* A second h2 (e.g. "After" following "Before") has margin:0 like every
+   heading, so with no PendingImage/paragraph before it to supply a top
+   margin of its own, it would sit flush against the previous figure/embed.
+   Standard figure-to-content gap, applied the other way round. */
+.kb-project-figure + h2,
+.kb-project-embed + h2{margin-top:clamp(28px,3.6vw,40px)}
 
 .kb-project-quote{position:relative;margin:clamp(32px,4vw,48px) 0 0;padding-left:clamp(20px,2.4vw,28px);border-left:3px solid var(--kb-cyan);max-width:62ch}
 .kb-project-quote p{margin:0;font-family:var(--font-display);font-weight:400;font-size:clamp(22px,2.6vw,32px);line-height:1.35;color:var(--text-strong);text-wrap:pretty}
 .kb-project-quote cite{display:block;margin-top:12px;font-style:normal;font-family:var(--font-mono);font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted)}
 
-.kb-project-list{list-style:none;margin:20px 0 0;padding:0;display:grid;gap:14px;max-width:60ch}
+.kb-project-list{list-style:none;margin:20px 0 0;padding:0;display:grid;gap:14px;max-width:70ch}
 .kb-project-list li{position:relative;padding-left:28px;font-size:18px;font-weight:300;line-height:1.65;color:var(--text-body)}
 .kb-project-list li::before{content:"";position:absolute;left:0;top:10px;width:8px;height:8px;border-radius:50%;background:var(--kb-cyan);box-shadow:0 0 10px rgba(72,247,250,.65)}
 
@@ -700,8 +706,18 @@ html[data-active-lang="pt"] .kb-sidebar__lang .kb-lang-switch__knob{transform:tr
    letting the block fill the card, collapsing it. */
 .kb-project-embed{position:relative;margin-top:clamp(28px,3.6vw,40px)}
 .kb-project-embed:fullscreen{display:flex;align-items:center;justify-content:center;margin:0;background:#000}
-.kb-project-embed__card{border-radius:16px;overflow:hidden;border:1px solid var(--border-hairline);background:var(--kb-void-200)}
-.kb-project-embed__chrome{display:flex;align-items:center;gap:12px;height:36px;padding:0 12px;background:var(--kb-void-200);border-bottom:1px solid var(--border-hairline)}
+/* The gradient goes on the chrome bar itself - the one surface on this
+   mockup that's actually analogous to .kb-project-figure's mat (a solid
+   fill with real height to show it on) - plus the same nebula gradient
+   traced around the window's own outline (double-background trick: an
+   opaque fill in the padding-box, the gradient showing through only in the
+   border-box gap). Stops are reversed from --gradient-nebula: on this
+   layered border-box (unlike a figure's plain single-layer background),
+   160deg's 0%/100% ends land on opposite corners - reversing the stops
+   here is what actually puts indigo back at the top-left and magenta at
+   the bottom-right, matching every figure's own diagonal. */
+.kb-project-embed__card{position:relative;border-radius:16px;overflow:hidden;border:1px solid transparent;background:linear-gradient(var(--kb-void-200),var(--kb-void-200)) padding-box,linear-gradient(160deg,var(--kb-magenta-deep) 0%,#6b2a9e 54%,var(--kb-indigo) 100%) border-box;box-shadow:var(--shadow-md),var(--shadow-inset-top)}
+.kb-project-embed__chrome{display:flex;align-items:center;gap:12px;height:36px;padding:0 12px;background:var(--gradient-nebula);border-bottom:1px solid var(--border-soft)}
 .kb-project-embed__dots{display:flex;gap:6px;flex-shrink:0}
 .kb-project-embed__dots i{display:block;width:8px;height:8px;border-radius:50%;background:var(--kb-white-64,rgba(255,255,255,.24));font-style:normal;opacity:.5}
 .kb-project-embed__url{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--font-mono);font-size:12px;letter-spacing:.02em;color:var(--text-muted)}
