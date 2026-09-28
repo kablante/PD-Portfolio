@@ -686,6 +686,34 @@ html[data-active-lang="pt"] .kb-sidebar__lang .kb-lang-switch__knob{transform:tr
 .kb-project-video{position:relative;margin-top:clamp(28px,3.6vw,40px);border-radius:16px;overflow:hidden;aspect-ratio:16/9;background:var(--kb-void-200)}
 .kb-project-video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 
+/* Interactive HTML embed (e.g. a live prototype) — framed like a browser
+   window (chrome bar + fake URL) rather than a bare video, so it reads as
+   "a simulated screen" on sight instead of looking like a foreign, possibly-
+   real screenshot dropped into the page. The iframe itself is rendered at a
+   fixed laptop viewport and scaled down via transform (see LaptopEmbed), so
+   the embedded page always shows its desktop layout regardless of card
+   width. The wrapper (fullscreen target) stays unsized in normal flow —
+   its ":fullscreen" rule below fills the screen and centers the card, which
+   is the element actually sized in px (by LaptopEmbed). Deliberately no
+   `aspect-ratio` on the frame: with an explicit (JS-driven) height and an
+   auto width, aspect-ratio would derive width from that height instead of
+   letting the block fill the card, collapsing it. */
+.kb-project-embed{position:relative;margin-top:clamp(28px,3.6vw,40px)}
+.kb-project-embed:fullscreen{display:flex;align-items:center;justify-content:center;margin:0;background:#000}
+.kb-project-embed__card{border-radius:16px;overflow:hidden;border:1px solid var(--border-hairline);background:var(--kb-void-200)}
+.kb-project-embed__chrome{display:flex;align-items:center;gap:12px;height:36px;padding:0 12px;background:var(--kb-void-200);border-bottom:1px solid var(--border-hairline)}
+.kb-project-embed__dots{display:flex;gap:6px;flex-shrink:0}
+.kb-project-embed__dots i{display:block;width:8px;height:8px;border-radius:50%;background:var(--kb-white-64,rgba(255,255,255,.24));font-style:normal;opacity:.5}
+.kb-project-embed__url{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--font-mono);font-size:12px;letter-spacing:.02em;color:var(--text-muted)}
+.kb-project-embed__frame iframe{display:block;border:0;transform-origin:top left}
+/* Same pink→butter primary-button treatment as the sidebar's "LinkedIn"
+   button (.kb-sidebar-btn--primary) — this is the one interactive control
+   on the whole page, so it gets the site's "look at me" accent instead of
+   blending into the chrome bar. */
+.kb-project-embed__fullscreen{flex-shrink:0;display:flex;align-items:center;gap:7px;padding:7px 14px;border:none;border-radius:999px;font-size:13px;font-weight:var(--weight-semibold);line-height:1;color:var(--kb-white);cursor:pointer;background:linear-gradient(130deg,rgba(254,106,216,.85),rgba(183,140,245,.85));box-shadow:0 0 14px rgba(254,106,216,.4);transition:transform var(--duration-fast) var(--ease-soft),background var(--duration-base) var(--ease-soft),color var(--duration-base) var(--ease-soft),box-shadow var(--duration-base) var(--ease-soft)}
+.kb-project-embed__fullscreen:hover,.kb-project-embed__fullscreen:focus-visible{transform:translateY(-1px);background:var(--kb-butter);color:var(--kb-void);box-shadow:var(--glow-butter)}
+.kb-project-embed:fullscreen .kb-project-embed__chrome{height:40px}
+
 /* ---------- Nav/footer bar ----------
    Fixed to the top on about/project pages — the persistent piece of chrome
    on those pages. The home page instead has just the language switch,

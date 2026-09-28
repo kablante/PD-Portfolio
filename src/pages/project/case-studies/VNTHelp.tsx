@@ -1,3 +1,5 @@
+import { Maximize2, Minimize2 } from 'lucide-react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { PendingImage, PendingMetric } from '@/components/shared/Pending'
 import { skillHue } from '../../home/skills'
 
@@ -8,6 +10,104 @@ const PROJECT_SKILLS = [
   'Cross-functional Collaboration',
   'User Research',
 ]
+
+// Matches a common laptop viewport, so the embedded mock always renders its
+// desktop layout — scaled down to fit the card — instead of collapsing into
+// its own mobile breakpoint at narrow container widths.
+const LAPTOP_WIDTH = 1440
+const LAPTOP_HEIGHT = 900
+
+// Height of the fake browser chrome bar (dots + URL) sitting above the
+// scaled iframe. Fixed rather than scaled, like a real browser's chrome,
+// so it stays legible and the mock reads as "framed" at any card size.
+const CHROME_HEIGHT = 36
+
+/** Embeds an external page at a fixed laptop viewport size, then scales the
+ * whole thing down (via CSS transform) to fit however wide the card ends up
+ * being, so responsiveness here tracks the card's width, not the iframe's
+ * own breakpoints. Framed with a fake browser chrome bar so it reads as a
+ * simulated screen rather than a real (or ambiguous) screenshot. A
+ * fullscreen toggle re-measures the same wrapper (which the browser resizes
+ * to the full screen) and switches the scale formula to contain-fit both
+ * screen dimensions, minus the chrome bar, instead of just filling the
+ * width. */
+function LaptopEmbed({ src, title, mockUrl }: { src: string; title: string; mockUrl: string }) {
+  const wrapperRef = useRef<HTMLDivElement>(null)
+  const isFullscreenRef = useRef(false)
+  const [scale, setScale] = useState(1)
+  const [isFullscreen, setIsFullscreen] = useState(false)
+
+  useLayoutEffect(() => {
+    const el = wrapperRef.current
+    if (!el) return
+    const observer = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect
+      setScale(
+        isFullscreenRef.current
+          ? Math.min(width / LAPTOP_WIDTH, (height - CHROME_HEIGHT) / LAPTOP_HEIGHT)
+          : width / LAPTOP_WIDTH,
+      )
+    })
+    observer.observe(el)
+
+    const handleFullscreenChange = () => {
+      const active = document.fullscreenElement === el
+      isFullscreenRef.current = active
+      setIsFullscreen(active)
+    }
+    document.addEventListener('fullscreenchange', handleFullscreenChange)
+
+    return () => {
+      observer.disconnect()
+      document.removeEventListener('fullscreenchange', handleFullscreenChange)
+    }
+  }, [])
+
+  const toggleFullscreen = () => {
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(() => {})
+    } else {
+      wrapperRef.current?.requestFullscreen().catch(() => {})
+    }
+  }
+
+  return (
+    <div className="kb-project-embed" ref={wrapperRef}>
+      <div className="kb-project-embed__card" style={{ width: LAPTOP_WIDTH * scale }}>
+        <div className="kb-project-embed__chrome">
+          <span className="kb-project-embed__dots" aria-hidden="true">
+            <i />
+            <i />
+            <i />
+          </span>
+          <span className="kb-project-embed__url">{mockUrl}</span>
+          <button type="button" className="kb-project-embed__fullscreen" onClick={toggleFullscreen}>
+            {isFullscreen ? <Minimize2 size={13} aria-hidden="true" /> : <Maximize2 size={13} aria-hidden="true" />}
+            {isFullscreen ? (
+              <>
+                <span data-lang="en">Exit fullscreen</span>
+                <span data-lang="pt">Sair da tela cheia</span>
+              </>
+            ) : (
+              <>
+                <span data-lang="en">Fullscreen</span>
+                <span data-lang="pt">Tela cheia</span>
+              </>
+            )}
+          </button>
+        </div>
+        <div className="kb-project-embed__frame" style={{ width: LAPTOP_WIDTH * scale, height: LAPTOP_HEIGHT * scale }}>
+          <iframe
+            src={src}
+            title={title}
+            loading="lazy"
+            style={{ width: LAPTOP_WIDTH, height: LAPTOP_HEIGHT, transform: `scale(${scale})` }}
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
 
 /** Venturus Help Page & AI Chatbot — case study draft. Several screenshots
  * and metrics are still pending Venturus's disclosure/NDA clearance; those
@@ -99,11 +199,6 @@ export default function VNTHelp() {
           <span data-lang="en">Overview</span>
           <span data-lang="pt">Visão Geral</span>
         </span>
-
-        <PendingImage>
-          <span data-lang="en">Overview image pending from Venturus.</span>
-          <span data-lang="pt">Imagem da visão geral pendente da Venturus.</span>
-        </PendingImage>
 
         <p>
           <span data-lang="en">
@@ -351,14 +446,23 @@ export default function VNTHelp() {
           <span data-lang="en">After</span>
           <span data-lang="pt">Depois</span>
         </h2>
-        <PendingImage>
+        <p>
           <span data-lang="en">
-            New Help home screen with search bar, new menus, and new internal screens pending from Venturus.
+            The real Help page can't be shown due to Venturus's confidentiality policy, so this is a mock built with
+            the same structure — global search, rebuilt hierarchy, and hyperlinked terms — to demonstrate the new
+            experience interactively.
           </span>
           <span data-lang="pt">
-            Nova tela inicial do Help com barra de busca, novos menus, e novas telas internas pendentes da Venturus.
+            A página de Help real não pode ser mostrada por causa da política de confidencialidade da Venturus,
+            então este é um mock construído com a mesma estrutura — busca global, hierarquia reconstruída, e termos
+            com hyperlink — para demonstrar a nova experiência de forma interativa.
           </span>
-        </PendingImage>
+        </p>
+        <LaptopEmbed
+          src={`${import.meta.env.BASE_URL}mocks/vnt-help/index.html`}
+          title="Venturus Help page — interactive mock"
+          mockUrl="Venturus — Help Page Redesign"
+        />
       </section>
 
       <section className="kb-project-section">
