@@ -605,12 +605,18 @@ html[data-active-lang="pt"] .kb-sidebar__lang .kb-lang-switch__knob{transform:tr
 .kb-project-section p{font-size:19px;font-weight:300;line-height:1.75;color:var(--text-body);max-width:70ch;margin-top:18px;text-wrap:pretty}
 .kb-project-section p + p{margin-top:16px}
 .kb-project-section h3{font-family:var(--font-body);font-weight:var(--weight-semibold);font-size:20px;color:var(--text-strong);margin-top:clamp(32px,4vw,48px)}
+/* A second h2 (e.g. "After" following "Before") has margin:0 like every
+   heading, so with no PendingImage/paragraph before it to supply a top
+   margin of its own, it would sit flush against the previous figure/embed.
+   Standard figure-to-content gap, applied the other way round. */
+.kb-project-figure + h2,
+.kb-project-embed + h2{margin-top:clamp(28px,3.6vw,40px)}
 
 .kb-project-quote{position:relative;margin:clamp(32px,4vw,48px) 0 0;padding-left:clamp(20px,2.4vw,28px);border-left:3px solid var(--kb-cyan);max-width:62ch}
 .kb-project-quote p{margin:0;font-family:var(--font-display);font-weight:400;font-size:clamp(22px,2.6vw,32px);line-height:1.35;color:var(--text-strong);text-wrap:pretty}
 .kb-project-quote cite{display:block;margin-top:12px;font-style:normal;font-family:var(--font-mono);font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted)}
 
-.kb-project-list{list-style:none;margin:20px 0 0;padding:0;display:grid;gap:14px;max-width:60ch}
+.kb-project-list{list-style:none;margin:20px 0 0;padding:0;display:grid;gap:14px;max-width:70ch}
 .kb-project-list li{position:relative;padding-left:28px;font-size:18px;font-weight:300;line-height:1.65;color:var(--text-body)}
 .kb-project-list li::before{content:"";position:absolute;left:0;top:10px;width:8px;height:8px;border-radius:50%;background:var(--kb-cyan);box-shadow:0 0 10px rgba(72,247,250,.65)}
 
@@ -685,6 +691,44 @@ html[data-active-lang="pt"] .kb-sidebar__lang .kb-lang-switch__knob{transform:tr
 
 .kb-project-video{position:relative;margin-top:clamp(28px,3.6vw,40px);border-radius:16px;overflow:hidden;aspect-ratio:16/9;background:var(--kb-void-200)}
 .kb-project-video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+
+/* Interactive HTML embed (e.g. a live prototype) — framed like a browser
+   window (chrome bar + fake URL) rather than a bare video, so it reads as
+   "a simulated screen" on sight instead of looking like a foreign, possibly-
+   real screenshot dropped into the page. The iframe itself is rendered at a
+   fixed laptop viewport and scaled down via transform (see LaptopEmbed), so
+   the embedded page always shows its desktop layout regardless of card
+   width. The wrapper (fullscreen target) stays unsized in normal flow —
+   its ":fullscreen" rule below fills the screen and centers the card, which
+   is the element actually sized in px (by LaptopEmbed). Deliberately no
+   `aspect-ratio` on the frame: with an explicit (JS-driven) height and an
+   auto width, aspect-ratio would derive width from that height instead of
+   letting the block fill the card, collapsing it. */
+.kb-project-embed{position:relative;margin-top:clamp(28px,3.6vw,40px)}
+.kb-project-embed:fullscreen{display:flex;align-items:center;justify-content:center;margin:0;background:#000}
+/* The gradient goes on the chrome bar itself - the one surface on this
+   mockup that's actually analogous to .kb-project-figure's mat (a solid
+   fill with real height to show it on) - plus the same nebula gradient
+   traced around the window's own outline (double-background trick: an
+   opaque fill in the padding-box, the gradient showing through only in the
+   border-box gap). Stops are reversed from --gradient-nebula: on this
+   layered border-box (unlike a figure's plain single-layer background),
+   160deg's 0%/100% ends land on opposite corners - reversing the stops
+   here is what actually puts indigo back at the top-left and magenta at
+   the bottom-right, matching every figure's own diagonal. */
+.kb-project-embed__card{position:relative;border-radius:16px;overflow:hidden;border:1px solid transparent;background:linear-gradient(var(--kb-void-200),var(--kb-void-200)) padding-box,linear-gradient(160deg,var(--kb-magenta-deep) 0%,#6b2a9e 54%,var(--kb-indigo) 100%) border-box;box-shadow:var(--shadow-md),var(--shadow-inset-top)}
+.kb-project-embed__chrome{display:flex;align-items:center;gap:12px;height:36px;padding:0 12px;background:var(--gradient-nebula);border-bottom:1px solid var(--border-soft)}
+.kb-project-embed__dots{display:flex;gap:6px;flex-shrink:0}
+.kb-project-embed__dots i{display:block;width:8px;height:8px;border-radius:50%;background:var(--kb-white-64,rgba(255,255,255,.24));font-style:normal;opacity:.5}
+.kb-project-embed__url{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--font-mono);font-size:12px;letter-spacing:.02em;color:var(--text-muted)}
+.kb-project-embed__frame iframe{display:block;border:0;transform-origin:top left}
+/* Same pink→butter primary-button treatment as the sidebar's "LinkedIn"
+   button (.kb-sidebar-btn--primary) — this is the one interactive control
+   on the whole page, so it gets the site's "look at me" accent instead of
+   blending into the chrome bar. */
+.kb-project-embed__fullscreen{flex-shrink:0;display:flex;align-items:center;gap:7px;padding:7px 14px;border:none;border-radius:999px;font-size:13px;font-weight:var(--weight-semibold);line-height:1;color:var(--kb-white);cursor:pointer;background:linear-gradient(130deg,rgba(254,106,216,.85),rgba(183,140,245,.85));box-shadow:0 0 14px rgba(254,106,216,.4);transition:transform var(--duration-fast) var(--ease-soft),background var(--duration-base) var(--ease-soft),color var(--duration-base) var(--ease-soft),box-shadow var(--duration-base) var(--ease-soft)}
+.kb-project-embed__fullscreen:hover,.kb-project-embed__fullscreen:focus-visible{transform:translateY(-1px);background:var(--kb-butter);color:var(--kb-void);box-shadow:var(--glow-butter)}
+.kb-project-embed:fullscreen .kb-project-embed__chrome{height:40px}
 
 /* ---------- Nav/footer bar ----------
    Fixed to the top on about/project pages — the persistent piece of chrome

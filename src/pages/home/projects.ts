@@ -43,8 +43,7 @@ export const homeProjects: HomeProject[] = [
   {
     slug: 'VNT-Help',
     image: asset('/assets/projects/VNT-Help.png'),
-    // Placeholder header - Venturus's own screenshots are pending disclosure/NDA clearance.
-    headerImage: asset('/assets/projects/VNT/VNT.jpg'),
+    headerImage: asset('/assets/projects/vnt-help/VNT-help.jpg'),
     rotation: '1.891deg',
     title: 'Venturus: Help Page Redesign & AI Chatbot',
     titlePt: 'Venturus: Redesign da Página de Help e Chatbot de IA',
