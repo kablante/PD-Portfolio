@@ -1,5 +1,23 @@
-import { PendingImage, PendingMetric } from '@/components/shared/Pending'
+import { Maximize2, Minimize2 } from 'lucide-react'
+import { useLayoutEffect, useRef, useState } from 'react'
+import ImageLightbox from '@/components/shared/ImageLightbox'
+import { PendingImage } from '@/components/shared/Pending'
+import { asset } from '@/lib/asset'
 import { skillHue } from '../../home/skills'
+
+const ALL_IMAGES = [
+  { src: asset('/assets/projects/vnt-help/before-home.png'), alt: 'Old Help home screen, before the redesign' },
+]
+
+function Figure({ src, alt, onZoom }: { src: string; alt: string; onZoom: (image: { src: string; alt: string }) => void }) {
+  return (
+    <figure className="kb-project-figure">
+      <button type="button" className="kb-project-zoom" onClick={() => onZoom({ src, alt })}>
+        <img src={src} alt={alt} />
+      </button>
+    </figure>
+  )
+}
 
 const PROJECT_SKILLS = [
   'AI-Assisted Design Workflows',
@@ -9,12 +27,114 @@ const PROJECT_SKILLS = [
   'User Research',
 ]
 
-/** Venturus Help Page & AI Chatbot — case study draft. Several screenshots
- * and metrics are still pending Venturus's disclosure/NDA clearance; those
- * spots render as marked placeholders (PendingImage/PendingMetric) instead
- * of being skipped, so the page's shape is honest about what's still to
- * come rather than looking finished or leaving unexplained gaps. */
+// Matches a common laptop viewport, so the embedded mock always renders its
+// desktop layout — scaled down to fit the card — instead of collapsing into
+// its own mobile breakpoint at narrow container widths.
+const LAPTOP_WIDTH = 1440
+const LAPTOP_HEIGHT = 900
+
+// Height of the fake browser chrome bar (dots + URL) sitting above the
+// scaled iframe. Fixed rather than scaled, like a real browser's chrome,
+// so it stays legible and the mock reads as "framed" at any card size.
+const CHROME_HEIGHT = 36
+
+/** Embeds an external page at a fixed laptop viewport size, then scales the
+ * whole thing down (via CSS transform) to fit however wide the card ends up
+ * being, so responsiveness here tracks the card's width, not the iframe's
+ * own breakpoints. Framed with a fake browser chrome bar so it reads as a
+ * simulated screen rather than a real (or ambiguous) screenshot. A
+ * fullscreen toggle re-measures the same wrapper (which the browser resizes
+ * to the full screen) and switches the scale formula to contain-fit both
+ * screen dimensions, minus the chrome bar, instead of just filling the
+ * width. */
+function LaptopEmbed({ src, title, mockUrl }: { src: string; title: string; mockUrl: string }) {
+  const wrapperRef = useRef<HTMLDivElement>(null)
+  const isFullscreenRef = useRef(false)
+  const [scale, setScale] = useState(1)
+  const [isFullscreen, setIsFullscreen] = useState(false)
+
+  useLayoutEffect(() => {
+    const el = wrapperRef.current
+    if (!el) return
+    const observer = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect
+      setScale(
+        isFullscreenRef.current
+          ? Math.min(width / LAPTOP_WIDTH, (height - CHROME_HEIGHT) / LAPTOP_HEIGHT)
+          : width / LAPTOP_WIDTH,
+      )
+    })
+    observer.observe(el)
+
+    const handleFullscreenChange = () => {
+      const active = document.fullscreenElement === el
+      isFullscreenRef.current = active
+      setIsFullscreen(active)
+    }
+    document.addEventListener('fullscreenchange', handleFullscreenChange)
+
+    return () => {
+      observer.disconnect()
+      document.removeEventListener('fullscreenchange', handleFullscreenChange)
+    }
+  }, [])
+
+  const toggleFullscreen = () => {
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(() => {})
+    } else {
+      wrapperRef.current?.requestFullscreen().catch(() => {})
+    }
+  }
+
+  return (
+    <div className="kb-project-embed" ref={wrapperRef}>
+      <div className="kb-project-embed__card" style={{ width: LAPTOP_WIDTH * scale }}>
+        <div className="kb-project-embed__chrome">
+          <span className="kb-project-embed__dots" aria-hidden="true">
+            <i />
+            <i />
+            <i />
+          </span>
+          <span className="kb-project-embed__url">{mockUrl}</span>
+          <button type="button" className="kb-project-embed__fullscreen" onClick={toggleFullscreen}>
+            {isFullscreen ? <Minimize2 size={13} aria-hidden="true" /> : <Maximize2 size={13} aria-hidden="true" />}
+            {isFullscreen ? (
+              <>
+                <span data-lang="en">Exit fullscreen</span>
+                <span data-lang="pt">Sair da tela cheia</span>
+              </>
+            ) : (
+              <>
+                <span data-lang="en">Fullscreen</span>
+                <span data-lang="pt">Tela cheia</span>
+              </>
+            )}
+          </button>
+        </div>
+        <div className="kb-project-embed__frame" style={{ width: LAPTOP_WIDTH * scale, height: LAPTOP_HEIGHT * scale }}>
+          <iframe
+            src={src}
+            title={title}
+            loading="lazy"
+            style={{ width: LAPTOP_WIDTH, height: LAPTOP_HEIGHT, transform: `scale(${scale})` }}
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/** Venturus Help Page & AI Chatbot — case study draft. Chatbot screenshots
+ * are still pending Venturus's disclosure/NDA clearance; that spot renders
+ * as a marked placeholder (PendingImage) instead of being skipped, so the
+ * page's shape is honest about what's still to come rather than looking
+ * finished or leaving an unexplained gap. */
 export default function VNTHelp() {
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
+  const openLightbox = ({ src }: { src: string; alt: string }) =>
+    setLightboxIndex(ALL_IMAGES.findIndex((image) => image.src === src))
+
   return (
     <>
       <div className="kb-project-meta-row">
@@ -100,21 +220,14 @@ export default function VNTHelp() {
           <span data-lang="pt">Visão Geral</span>
         </span>
 
-        <PendingImage>
-          <span data-lang="en">Overview image pending from Venturus.</span>
-          <span data-lang="pt">Imagem da visão geral pendente da Venturus.</span>
-        </PendingImage>
-
         <p>
           <span data-lang="en">
             At Venturus, working with a hardware manufacturing client, I rebuilt the product's User Guide (Help)
-            page and added an in-product AI chatbot.{' '}
-            <PendingMetric>Lead metric pending Venturus disclosure/NDA clearance</PendingMetric>
+            page and added an in-product AI chatbot.
           </span>
           <span data-lang="pt">
             Na Venturus, trabalhando com um cliente fabricante de hardware, reconstruí o Guia do Usuário (Help) do
-            produto e adicionei um chatbot de IA dentro do produto.{' '}
-            <PendingMetric>Métrica principal pendente de liberação de disclosure/NDA da Venturus</PendingMetric>
+            produto e adicionei um chatbot de IA dentro do produto.
           </span>
         </p>
       </section>
@@ -153,13 +266,12 @@ export default function VNTHelp() {
         <p>
           <span data-lang="en">
             I rebuilt the Help page and added an in-product AI chatbot that answers questions directly from the Help
-            content.{' '}
-            <PendingMetric>Outcome statement pending Venturus disclosure/NDA clearance</PendingMetric>
+            content. The combination gave new team members a self-serve path that didn't exist before.
           </span>
           <span data-lang="pt">
             Reconstruí a página de Help e adicionei um chatbot de IA dentro do produto que responde perguntas
-            diretamente a partir do conteúdo do Help.{' '}
-            <PendingMetric>Resultado pendente de liberação de disclosure/NDA da Venturus</PendingMetric>
+            diretamente a partir do conteúdo do Help. A combinação deu aos novos membros dos times um caminho de
+            autoatendimento que não existia antes.
           </span>
         </p>
       </section>
@@ -340,62 +452,39 @@ export default function VNTHelp() {
           <span data-lang="en">Before</span>
           <span data-lang="pt">Antes</span>
         </h2>
-        <PendingImage>
-          <span data-lang="en">Old Help home screen and old internal screens pending from Venturus.</span>
-          <span data-lang="pt">
-            Tela inicial antiga do Help e telas internas antigas pendentes da Venturus.
-          </span>
-        </PendingImage>
+        <Figure src={ALL_IMAGES[0].src} alt={ALL_IMAGES[0].alt} onZoom={openLightbox} />
 
         <h2>
           <span data-lang="en">After</span>
           <span data-lang="pt">Depois</span>
         </h2>
-        <PendingImage>
+        <p>
           <span data-lang="en">
-            New Help home screen with search bar, new menus, and new internal screens pending from Venturus.
+            The real Help page can't be shown due to Venturus's confidentiality policy, so this is a mock built
+            with the same structure (global search, rebuilt hierarchy, and hyperlinked terms) to demonstrate the
+            new experience interactively.
           </span>
           <span data-lang="pt">
-            Nova tela inicial do Help com barra de busca, novos menus, e novas telas internas pendentes da Venturus.
+            A página de Help real não pode ser mostrada por causa da política de confidencialidade da Venturus,
+            então este é um mock construído com a mesma estrutura (busca global, hierarquia reconstruída, e termos
+            com hyperlink) para demonstrar a nova experiência de forma interativa.
           </span>
-        </PendingImage>
+        </p>
+        <LaptopEmbed
+          src={`${import.meta.env.BASE_URL}mocks/vnt-help/index.html`}
+          title="Venturus Help page — interactive mock"
+          mockUrl="Venturus — Help Page Redesign"
+        />
       </section>
 
-      <section className="kb-project-section">
-        <span className="kb-project-section__eyebrow">
-          <span data-lang="en">Product Successes</span>
-          <span data-lang="pt">Resultados do Produto</span>
-        </span>
-
-        <div className="kb-project-stats">
-          <div>
-            <span className="kb-project-stats__value">—</span>
-            <span className="kb-project-stats__label">
-              <span data-lang="en">
-                Help page access, before → after —{' '}
-                <PendingMetric>Pending Venturus disclosure/NDA clearance</PendingMetric>
-              </span>
-              <span data-lang="pt">
-                Acessos à página de Help, antes → depois —{' '}
-                <PendingMetric>Pendente de liberação de disclosure/NDA da Venturus</PendingMetric>
-              </span>
-            </span>
-          </div>
-          <div>
-            <span className="kb-project-stats__value">—</span>
-            <span className="kb-project-stats__label">
-              <span data-lang="en">
-                Chatbot usage in production —{' '}
-                <PendingMetric>Pending Venturus disclosure/NDA clearance</PendingMetric>
-              </span>
-              <span data-lang="pt">
-                Uso do chatbot em produção —{' '}
-                <PendingMetric>Pendente de liberação de disclosure/NDA da Venturus</PendingMetric>
-              </span>
-            </span>
-          </div>
-        </div>
-      </section>
+      {lightboxIndex !== null && (
+        <ImageLightbox
+          images={ALL_IMAGES}
+          index={lightboxIndex}
+          onNavigate={setLightboxIndex}
+          onClose={() => setLightboxIndex(null)}
+        />
+      )}
     </>
   )
 }
