@@ -1,7 +1,7 @@
 import { Maximize2, Minimize2 } from 'lucide-react'
 import { useLayoutEffect, useRef, useState } from 'react'
 import ImageLightbox from '@/components/shared/ImageLightbox'
-import { PendingImage, PendingMetric } from '@/components/shared/Pending'
+import { PendingImage } from '@/components/shared/Pending'
 import { asset } from '@/lib/asset'
 import { skillHue } from '../../home/skills'
 
@@ -125,11 +125,11 @@ function LaptopEmbed({ src, title, mockUrl }: { src: string; title: string; mock
   )
 }
 
-/** Venturus Help Page & AI Chatbot — case study draft. Several screenshots
- * and metrics are still pending Venturus's disclosure/NDA clearance; those
- * spots render as marked placeholders (PendingImage/PendingMetric) instead
- * of being skipped, so the page's shape is honest about what's still to
- * come rather than looking finished or leaving unexplained gaps. */
+/** Venturus Help Page & AI Chatbot — case study draft. Chatbot screenshots
+ * are still pending Venturus's disclosure/NDA clearance; that spot renders
+ * as a marked placeholder (PendingImage) instead of being skipped, so the
+ * page's shape is honest about what's still to come rather than looking
+ * finished or leaving an unexplained gap. */
 export default function VNTHelp() {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
   const openLightbox = ({ src }: { src: string; alt: string }) =>
@@ -223,13 +223,11 @@ export default function VNTHelp() {
         <p>
           <span data-lang="en">
             At Venturus, working with a hardware manufacturing client, I rebuilt the product's User Guide (Help)
-            page and added an in-product AI chatbot.{' '}
-            <PendingMetric>Lead metric pending Venturus disclosure/NDA clearance</PendingMetric>
+            page and added an in-product AI chatbot.
           </span>
           <span data-lang="pt">
             Na Venturus, trabalhando com um cliente fabricante de hardware, reconstruí o Guia do Usuário (Help) do
-            produto e adicionei um chatbot de IA dentro do produto.{' '}
-            <PendingMetric>Métrica principal pendente de liberação de disclosure/NDA da Venturus</PendingMetric>
+            produto e adicionei um chatbot de IA dentro do produto.
           </span>
         </p>
       </section>
@@ -268,13 +266,12 @@ export default function VNTHelp() {
         <p>
           <span data-lang="en">
             I rebuilt the Help page and added an in-product AI chatbot that answers questions directly from the Help
-            content.{' '}
-            <PendingMetric>Outcome statement pending Venturus disclosure/NDA clearance</PendingMetric>
+            content. The combination gave new team members a self-serve path that didn't exist before.
           </span>
           <span data-lang="pt">
             Reconstruí a página de Help e adicionei um chatbot de IA dentro do produto que responde perguntas
-            diretamente a partir do conteúdo do Help.{' '}
-            <PendingMetric>Resultado pendente de liberação de disclosure/NDA da Venturus</PendingMetric>
+            diretamente a partir do conteúdo do Help. A combinação deu aos novos membros dos times um caminho de
+            autoatendimento que não existia antes.
           </span>
         </p>
       </section>
@@ -463,14 +460,14 @@ export default function VNTHelp() {
         </h2>
         <p>
           <span data-lang="en">
-            The real Help page can't be shown due to Venturus's confidentiality policy, so this is a mock built with
-            the same structure — global search, rebuilt hierarchy, and hyperlinked terms — to demonstrate the new
-            experience interactively.
+            The real Help page can't be shown due to Venturus's confidentiality policy, so this is a mock built
+            with the same structure (global search, rebuilt hierarchy, and hyperlinked terms) to demonstrate the
+            new experience interactively.
           </span>
           <span data-lang="pt">
             A página de Help real não pode ser mostrada por causa da política de confidencialidade da Venturus,
-            então este é um mock construído com a mesma estrutura — busca global, hierarquia reconstruída, e termos
-            com hyperlink — para demonstrar a nova experiência de forma interativa.
+            então este é um mock construído com a mesma estrutura (busca global, hierarquia reconstruída, e termos
+            com hyperlink) para demonstrar a nova experiência de forma interativa.
           </span>
         </p>
         <LaptopEmbed
@@ -478,42 +475,6 @@ export default function VNTHelp() {
           title="Venturus Help page — interactive mock"
           mockUrl="Venturus — Help Page Redesign"
         />
-      </section>
-
-      <section className="kb-project-section">
-        <span className="kb-project-section__eyebrow">
-          <span data-lang="en">Product Successes</span>
-          <span data-lang="pt">Resultados do Produto</span>
-        </span>
-
-        <div className="kb-project-stats">
-          <div>
-            <span className="kb-project-stats__value">—</span>
-            <span className="kb-project-stats__label">
-              <span data-lang="en">
-                Help page access, before → after —{' '}
-                <PendingMetric>Pending Venturus disclosure/NDA clearance</PendingMetric>
-              </span>
-              <span data-lang="pt">
-                Acessos à página de Help, antes → depois —{' '}
-                <PendingMetric>Pendente de liberação de disclosure/NDA da Venturus</PendingMetric>
-              </span>
-            </span>
-          </div>
-          <div>
-            <span className="kb-project-stats__value">—</span>
-            <span className="kb-project-stats__label">
-              <span data-lang="en">
-                Chatbot usage in production —{' '}
-                <PendingMetric>Pending Venturus disclosure/NDA clearance</PendingMetric>
-              </span>
-              <span data-lang="pt">
-                Uso do chatbot em produção —{' '}
-                <PendingMetric>Pendente de liberação de disclosure/NDA da Venturus</PendingMetric>
-              </span>
-            </span>
-          </div>
-        </div>
       </section>
 
       {lightboxIndex !== null && (
