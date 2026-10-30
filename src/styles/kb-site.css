@@ -642,6 +642,10 @@ html[data-active-lang="pt"] .kb-sidebar__lang .kb-lang-switch__knob{transform:tr
 .kb-project-figure img{display:block;width:100%;height:auto;object-fit:contain;border-radius:8px;margin:0 auto}
 .kb-project-figure figcaption{margin-top:12px;font-family:var(--font-mono);font-size:13px;letter-spacing:.04em;color:rgba(255,255,255,.72);text-align:center}
 .kb-project-figure-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:clamp(16px,2.4vw,24px);margin-top:clamp(28px,3.6vw,40px)}
+/* Caps a figure at a source screenshot's own small native width, centered,
+   instead of the default full-width stretch - keeps a low-res image from
+   being upscaled into visible blur. */
+.kb-project-figure--narrow{max-width:360px;margin-left:auto;margin-right:auto}
 .kb-project-figure-row .kb-project-figure{margin-top:0}
 
 /* Every image (besides the page header) opens full-size on click - a plain
@@ -729,6 +733,75 @@ html[data-active-lang="pt"] .kb-sidebar__lang .kb-lang-switch__knob{transform:tr
 .kb-project-embed__fullscreen{flex-shrink:0;display:flex;align-items:center;gap:7px;padding:7px 14px;border:none;border-radius:999px;font-size:13px;font-weight:var(--weight-semibold);line-height:1;color:var(--kb-white);cursor:pointer;background:linear-gradient(130deg,rgba(254,106,216,.85),rgba(183,140,245,.85));box-shadow:0 0 14px rgba(254,106,216,.4);transition:transform var(--duration-fast) var(--ease-soft),background var(--duration-base) var(--ease-soft),color var(--duration-base) var(--ease-soft),box-shadow var(--duration-base) var(--ease-soft)}
 .kb-project-embed__fullscreen:hover,.kb-project-embed__fullscreen:focus-visible{transform:translateY(-1px);background:var(--kb-butter);color:var(--kb-void);box-shadow:var(--glow-butter)}
 .kb-project-embed:fullscreen .kb-project-embed__chrome{height:40px}
+
+/* ---------- Chatbot mock ----------
+   A light, product-chrome-styled card (not the dark site theme — it's
+   meant to read as a screenshot of the real product UI) recreating the
+   chatbot's own interface well enough to type into, instead of a static
+   screenshot. Sending a message and the header's close button both lead to
+   the same honest disclaimer; minimize, expand and dragging the window
+   around its frame are real, not mocked. */
+/* The frame is the gradient mat every other figure on this page uses, but
+   full width and tall enough to give the floating window room to be
+   dragged around in, instead of shrinking to match the card like
+   .kb-project-figure--narrow does. Tall enough for the card's own taller
+   default height (below) plus real drag room above/below it. */
+.kb-project-figure--chatmock{position:relative;min-height:clamp(580px,58vw,700px)}
+/* A standard chat-widget proportion (narrower than tall) rather than the
+   wide, short card this started as. */
+.kb-chatmock{position:absolute;display:flex;flex-direction:column;width:min(380px,100%);background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 20px 50px rgba(8,1,42,.45);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:15px;color:#1c1c1e}
+.kb-chatmock--dragging{box-shadow:0 28px 64px rgba(8,1,42,.55);cursor:grabbing}
+/* `inset:0` on a position:absolute child resolves against the frame's
+   padding box, so this fills exactly the frame's own inner area (respecting
+   .kb-project-figure's existing padding) without needing a second, redundant
+   margin value to match it. `width`/`height` are cleared explicitly since an
+   absolutely positioned box with both inset and an explicit size is
+   over-constrained - left alone, the still-set `width:min(380px,100%)` above
+   would win over the inset and the card wouldn't actually fill the frame. */
+.kb-chatmock--expanded{inset:0;width:auto;height:auto}
+.kb-chatmock--minimized .kb-chatmock__note,.kb-chatmock--minimized .kb-chatmock__body,.kb-chatmock--minimized .kb-chatmock__inputrow{display:none}
+.kb-chatmock__notice{position:absolute;top:8px;left:50%;z-index:2;transform:translate(-50%,-8px);opacity:0;pointer-events:none;max-width:calc(100% - 24px);padding:8px 14px;border-radius:999px;background:var(--kb-void);color:var(--kb-white);font-size:13px;line-height:1.3;text-align:center;box-shadow:0 8px 20px rgba(8,1,42,.35);transition:opacity var(--duration-base) var(--ease-soft),transform var(--duration-base) var(--ease-soft)}
+.kb-chatmock__notice[data-visible="true"]{opacity:1;transform:translate(-50%,0)}
+/* The drag handle - grabbing anything else in the header (the action
+   buttons) is excluded in JS before a drag ever starts. */
+.kb-chatmock__header{display:flex;align-items:center;gap:9px;padding:12px 14px;border-bottom:1px solid #e5e5ea;cursor:grab;touch-action:none}
+.kb-chatmock--dragging .kb-chatmock__header{cursor:grabbing}
+.kb-chatmock--expanded .kb-chatmock__header{cursor:default}
+.kb-chatmock__action{all:unset;display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:6px;color:#8e8e93;cursor:pointer}
+.kb-chatmock__action:hover,.kb-chatmock__action:focus-visible{background:#f2f2f7;color:#1c1c1e}
+.kb-chatmock__icon{display:flex;align-items:center;justify-content:center;width:23px;height:23px;border-radius:6px;background:linear-gradient(135deg,#20ba9a,#61bb46);color:#fff;flex-shrink:0}
+.kb-chatmock__title{flex:1;min-width:0;font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* `.kb-project-section p` (19px, --text-body) otherwise outranks a single
+   class here, since a two-part descendant selector beats one class on
+   specificity - these pair with the .kb-chatmock parent to win cleanly
+   instead of reaching for !important. */
+.kb-chatmock .kb-chatmock__note{max-width:none;margin:0;padding:9px 16px;border-bottom:1px solid #e5e5ea;font-size:12.5px;font-style:italic;line-height:1.4;color:#8e8e93;text-align:center}
+.kb-chatmock__body{display:flex;flex-direction:column;gap:14px;max-height:400px;overflow-y:auto;padding:16px;scrollbar-width:thin;scrollbar-color:#c7c7cc #f2f2f7}
+/* Expanded fills the frame via `inset:0` on the card itself, so the body's
+   job changes from "cap my own height" to "take whatever's left after the
+   header/note/input" - flex:1 instead of a second, larger max-height. */
+.kb-chatmock--expanded .kb-chatmock__body{flex:1;max-height:none;min-height:0}
+.kb-chatmock__body::-webkit-scrollbar{width:9px}
+.kb-chatmock__body::-webkit-scrollbar-track{background:#f2f2f7}
+.kb-chatmock__body::-webkit-scrollbar-thumb{background-color:#c7c7cc;border-radius:999px;border:2px solid #f2f2f7}
+.kb-chatmock__turn{display:flex;flex-direction:column;gap:5px}
+.kb-chatmock__sender{font-size:11.5px;font-weight:600;letter-spacing:.02em;color:#8e8e93}
+.kb-chatmock .kb-chatmock__bubble{align-self:flex-start;max-width:92%;margin:0;padding:11px 13px;border-radius:13px;background:#f2f2f7;font-size:14.5px;line-height:1.55;color:#1c1c1e}
+/* Same teal→green gradient as the header icon, not the site's own
+   indigo/magenta accent — the user's own bubble should read as part of the
+   same product chrome as the rest of the widget. */
+.kb-chatmock .kb-chatmock__bubble--user{align-self:flex-end;background:linear-gradient(135deg,#20ba9a,#61bb46);color:#fff}
+.kb-chatmock__link{color:#0071e3;text-decoration:underline;text-underline-offset:2px;cursor:default}
+.kb-chatmock__inputrow{display:flex;align-items:center;gap:10px;padding:12px 14px;border-top:1px solid #e5e5ea}
+.kb-chatmock__input{all:unset;flex:1;min-width:0;font-size:14.5px;color:#1c1c1e}
+.kb-chatmock__input::placeholder{color:#a1a1a6}
+.kb-chatmock__send{all:unset;display:flex;align-items:center;justify-content:center;flex-shrink:0;width:30px;height:30px;border-radius:50%;background:#d1d1d6;color:#fff;cursor:pointer;transition:background var(--duration-fast) var(--ease-soft)}
+.kb-chatmock__send:not(:disabled){background:linear-gradient(135deg,#20ba9a,#61bb46)}
+.kb-chatmock__send:disabled{cursor:default}
+
+@media (max-width:560px){
+  .kb-project-figure--chatmock{min-height:600px}
+}
 
 /* ---------- Nav/footer bar ----------
    Fixed to the top on about/project pages — the persistent piece of chrome
