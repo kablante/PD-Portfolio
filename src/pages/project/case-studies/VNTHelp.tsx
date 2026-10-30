@@ -1,7 +1,6 @@
-import { Maximize2, Minimize2 } from 'lucide-react'
-import { useLayoutEffect, useRef, useState } from 'react'
+import { ArrowUp, Maximize2, Minimize2, Minus, Sparkles, X } from 'lucide-react'
+import { type FormEvent, type PointerEvent as ReactPointerEvent, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import ImageLightbox from '@/components/shared/ImageLightbox'
-import { PendingImage } from '@/components/shared/Pending'
 import { asset } from '@/lib/asset'
 import { skillHue } from '../../home/skills'
 
@@ -9,9 +8,22 @@ const ALL_IMAGES = [
   { src: asset('/assets/projects/vnt-help/before-home.png'), alt: 'Old Help home screen, before the redesign' },
 ]
 
-function Figure({ src, alt, onZoom }: { src: string; alt: string; onZoom: (image: { src: string; alt: string }) => void }) {
+function Figure({
+  src,
+  alt,
+  onZoom,
+  narrow,
+}: {
+  src: string
+  alt: string
+  onZoom: (image: { src: string; alt: string }) => void
+  /** Caps the figure at the source image's own (small) native width instead
+   * of stretching it to the full column — avoids upscaling a low-res
+   * screenshot into visible blur. */
+  narrow?: boolean
+}) {
   return (
-    <figure className="kb-project-figure">
+    <figure className={narrow ? 'kb-project-figure kb-project-figure--narrow' : 'kb-project-figure'}>
       <button type="button" className="kb-project-zoom" onClick={() => onZoom({ src, alt })}>
         <img src={src} alt={alt} />
       </button>
@@ -125,11 +137,255 @@ function LaptopEmbed({ src, title, mockUrl }: { src: string; title: string; mock
   )
 }
 
-/** Venturus Help Page & AI Chatbot — case study draft. Chatbot screenshots
- * are still pending Venturus's disclosure/NDA clearance; that spot renders
- * as a marked placeholder (PendingImage) instead of being skipped, so the
- * page's shape is honest about what's still to come rather than looking
- * finished or leaving an unexplained gap. */
+/** Reads `html[data-active-lang]` (see useLang in useHomeEffects.ts) and
+ * stays in sync with the sidebar's EN/PT toggle, without needing its own
+ * useLang() instance — ProjectPage owns the single source of truth and
+ * doesn't pass it down to case-study components, so this observes the DOM
+ * attribute directly instead of drifting out of sync with a stale copy. */
+function useActiveLang(): 'en' | 'pt' {
+  const [active, setActive] = useState<'en' | 'pt'>(
+    () => (document.documentElement.getAttribute('data-active-lang') as 'en' | 'pt') || 'en',
+  )
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setActive((document.documentElement.getAttribute('data-active-lang') as 'en' | 'pt') || 'en')
+    })
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-active-lang'] })
+    return () => observer.disconnect()
+  }, [])
+
+  return active
+}
+
+const CHATMOCK_NOTICE = {
+  en: "This is a visual mockup, not a functional chat.",
+  pt: 'Isso é um mockup visual, não um chat funcional.',
+}
+
+interface ChatmockDrag {
+  pointerId: number
+  offsetX: number
+  offsetBottom: number
+  frameLeft: number
+  frameBottom: number
+  frameWidth: number
+  frameHeight: number
+  cardWidth: number
+  cardHeight: number
+}
+
+/** Recreation of the real chatbot's UI as a working (if canned) chat, rather
+ * than a static screenshot. Sending a message and the header's close button
+ * both lead to the same honest disclaimer; minimize, expand and dragging the
+ * window around its frame are real, not mocked. */
+function ChatbotMock() {
+  const lang = useActiveLang()
+  const [messages, setMessages] = useState<Array<{ role: 'user' | 'bot'; text: string }>>([])
+  const [input, setInput] = useState('')
+  const [noticeVisible, setNoticeVisible] = useState(false)
+  const [minimized, setMinimized] = useState(false)
+  const [expanded, setExpanded] = useState(false)
+  const [pos, setPos] = useState<{ left: number; bottom: number } | null>(null)
+  const [dragging, setDragging] = useState(false)
+  const noticeTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const bodyRef = useRef<HTMLDivElement>(null)
+  const frameRef = useRef<HTMLDivElement>(null)
+  const cardRef = useRef<HTMLDivElement>(null)
+  const dragRef = useRef<ChatmockDrag | null>(null)
+
+  useEffect(() => {
+    bodyRef.current?.scrollTo({ top: bodyRef.current.scrollHeight, behavior: 'smooth' })
+  }, [messages])
+
+  useEffect(() => () => {
+    if (noticeTimeout.current) clearTimeout(noticeTimeout.current)
+  }, [])
+
+  // Starts the window docked to the frame's bottom-right corner — measured
+  // once (after the CSS inset it's rendered with initially) and locked into
+  // an explicit left/bottom pixel position, so dragging has a real
+  // coordinate to work from instead of fighting the right/bottom inset.
+  // Anchoring by `bottom` (not `top`) matters once minimize can shrink the
+  // card's height: with `top` fixed, a shorter card would rise away from
+  // the bottom-right dock point it started at; with `bottom` fixed, it
+  // collapses straight down into that corner instead, like a real chat
+  // widget's minimized bar.
+  useLayoutEffect(() => {
+    if (pos || expanded) return
+    const frame = frameRef.current
+    const card = cardRef.current
+    if (!frame || !card) return
+    const frameRect = frame.getBoundingClientRect()
+    const cardRect = card.getBoundingClientRect()
+    setPos({ left: cardRect.left - frameRect.left, bottom: frameRect.bottom - cardRect.bottom })
+  }, [pos, expanded])
+
+  function flashNotice() {
+    setNoticeVisible(true)
+    if (noticeTimeout.current) clearTimeout(noticeTimeout.current)
+    noticeTimeout.current = setTimeout(() => setNoticeVisible(false), 2800)
+  }
+
+  function handleSend(e: FormEvent) {
+    e.preventDefault()
+    const text = input.trim()
+    if (!text) return
+    setInput('')
+    setMessages((prev) => [...prev, { role: 'user', text }, { role: 'bot', text: CHATMOCK_NOTICE[lang] }])
+  }
+
+  function handleDragPointerDown(e: ReactPointerEvent<HTMLDivElement>) {
+    if ((e.target as HTMLElement).closest('.kb-chatmock__action')) return
+    const frame = frameRef.current
+    const card = cardRef.current
+    if (!frame || !card || expanded) return
+    const frameRect = frame.getBoundingClientRect()
+    const cardRect = card.getBoundingClientRect()
+    dragRef.current = {
+      pointerId: e.pointerId,
+      offsetX: e.clientX - cardRect.left,
+      offsetBottom: cardRect.bottom - e.clientY,
+      frameLeft: frameRect.left,
+      frameBottom: frameRect.bottom,
+      frameWidth: frameRect.width,
+      frameHeight: frameRect.height,
+      cardWidth: cardRect.width,
+      cardHeight: cardRect.height,
+    }
+    e.currentTarget.setPointerCapture(e.pointerId)
+    setDragging(true)
+  }
+
+  function handleDragPointerMove(e: ReactPointerEvent<HTMLDivElement>) {
+    const drag = dragRef.current
+    if (!drag || drag.pointerId !== e.pointerId) return
+    const maxLeft = Math.max(drag.frameWidth - drag.cardWidth, 0)
+    const maxBottom = Math.max(drag.frameHeight - drag.cardHeight, 0)
+    const left = Math.min(Math.max(e.clientX - drag.frameLeft - drag.offsetX, 0), maxLeft)
+    const bottom = Math.min(Math.max(drag.frameBottom - e.clientY - drag.offsetBottom, 0), maxBottom)
+    setPos({ left, bottom })
+  }
+
+  function handleDragPointerUp(e: ReactPointerEvent<HTMLDivElement>) {
+    if (dragRef.current?.pointerId !== e.pointerId) return
+    dragRef.current = null
+    setDragging(false)
+  }
+
+  const cardClassName = [
+    'kb-chatmock',
+    minimized && 'kb-chatmock--minimized',
+    expanded && 'kb-chatmock--expanded',
+    dragging && 'kb-chatmock--dragging',
+  ]
+    .filter(Boolean)
+    .join(' ')
+
+  const cardStyle = expanded
+    ? undefined
+    : pos
+      ? { left: pos.left, bottom: pos.bottom }
+      : { right: 20, bottom: 20 }
+
+  return (
+    <div className="kb-project-figure kb-project-figure--chatmock" ref={frameRef}>
+      <div className={cardClassName} ref={cardRef} style={cardStyle}>
+        <div className="kb-chatmock__notice" aria-live="polite" data-visible={noticeVisible}>
+          {CHATMOCK_NOTICE[lang]}
+        </div>
+
+        <div
+          className="kb-chatmock__header"
+          onPointerDown={handleDragPointerDown}
+          onPointerMove={handleDragPointerMove}
+          onPointerUp={handleDragPointerUp}
+          onPointerCancel={handleDragPointerUp}
+        >
+          <button type="button" className="kb-chatmock__action" onClick={flashNotice} aria-label="Close">
+            <X size={18} aria-hidden="true" />
+          </button>
+          <span className="kb-chatmock__icon" aria-hidden="true">
+            <Sparkles size={13} />
+          </span>
+          <span className="kb-chatmock__title">AI Assistant</span>
+          <button
+            type="button"
+            className="kb-chatmock__action"
+            onClick={() => setMinimized((m) => !m)}
+            aria-label={minimized ? 'Restore' : 'Minimize'}
+            aria-pressed={minimized}
+          >
+            <Minus size={17} aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            className="kb-chatmock__action"
+            onClick={() => setExpanded((ex) => !ex)}
+            aria-label={expanded ? 'Shrink' : 'Expand'}
+            aria-pressed={expanded}
+          >
+            {expanded ? <Minimize2 size={15} aria-hidden="true" /> : <Maximize2 size={15} aria-hidden="true" />}
+          </button>
+        </div>
+
+        <p className="kb-chatmock__note">
+          <span data-lang="en">Note: AI Assistant is AI-powered and may occasionally be incorrect.</span>
+          <span data-lang="pt">Nota: o AI Assistant é alimentado por IA e pode, ocasionalmente, errar.</span>
+        </p>
+
+        <div className="kb-chatmock__body" ref={bodyRef}>
+          <div className="kb-chatmock__turn">
+            <span className="kb-chatmock__sender">AI Assistant</span>
+            <p className="kb-chatmock__bubble">
+              <span data-lang="en">
+                Welcome to <strong>AI Assistant</strong>. This assistant answers questions about{' '}
+                <strong>Fruit Guide</strong> using the official{' '}
+                <span className="kb-chatmock__link">User Guide (Help) documentation</span>. It can explain
+                features, terminology, roles and workflows.
+              </span>
+              <span data-lang="pt">
+                Bem-vindo ao <strong>AI Assistant</strong>. Este assistente responde perguntas sobre{' '}
+                <strong>Fruit Guide</strong> usando a documentação oficial do{' '}
+                <span className="kb-chatmock__link">Guia do Usuário (Help)</span>. Ele pode explicar
+                funcionalidades, terminologia, papéis e fluxos de trabalho.
+              </span>
+            </p>
+          </div>
+
+          {messages.map((message, i) => (
+            <div className="kb-chatmock__turn" key={i}>
+              {message.role === 'bot' && <span className="kb-chatmock__sender">AI Assistant</span>}
+              <p
+                className={
+                  message.role === 'user' ? 'kb-chatmock__bubble kb-chatmock__bubble--user' : 'kb-chatmock__bubble'
+                }
+              >
+                {message.text}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        <form className="kb-chatmock__inputrow" onSubmit={handleSend}>
+          <input
+            type="text"
+            className="kb-chatmock__input"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder={lang === 'pt' ? 'Digite sua pergunta...' : 'Type your question...'}
+            aria-label={lang === 'pt' ? 'Digite sua pergunta' : 'Type your question'}
+          />
+          <button type="submit" className="kb-chatmock__send" disabled={!input.trim()} aria-label="Send">
+            <ArrowUp size={16} aria-hidden="true" />
+          </button>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+/** Venturus Help Page & AI Chatbot — case study. */
 export default function VNTHelp() {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
   const openLightbox = ({ src }: { src: string; alt: string }) =>
@@ -397,10 +653,7 @@ export default function VNTHelp() {
           </span>
         </p>
 
-        <PendingImage>
-          <span data-lang="en">Chatbot screenshots pending from Venturus.</span>
-          <span data-lang="pt">Capturas de tela do chatbot pendentes da Venturus.</span>
-        </PendingImage>
+        <ChatbotMock />
 
         <h3>
           <span data-lang="en">Guidelines</span>
